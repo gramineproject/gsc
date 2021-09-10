@@ -415,7 +415,7 @@ This example assumes that all prerequisites are installed and configured.
 
    .. code-block:: sh
 
-      ./gsc build --insecure-args python generic.manifest
+      ./gsc build --insecure-args python test/generic.manifest
 
 #. Sign the graminized Docker image using :command:`gsc sign-image`:
 
