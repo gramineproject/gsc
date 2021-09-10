@@ -1,4 +1,38 @@
 /build
+
 config.yaml
 config.aks.*.yaml
+
+# Don't accidentally leak private key (for signing enclaves).
 *.pem
+
+# No editor backup files.
+*.sw*
+*.backup
+*.orig
+\#*#
+*~
+
+# python
+*.py[co]
+__pycache__
+
+# sgx
+*.manifest.sgx
+*.sig
+*.token
+
+# gnu global
+GPATH
+GTAGS
+GSYMS
+GRTAGS
+
+# tags/etags
+tags
+TAGS
+
+# cscope
+cscope.*
+ncscope.*
+*cscope*
