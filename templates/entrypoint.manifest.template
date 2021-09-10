@@ -1,7 +1,7 @@
 libos.entrypoint = "/{{binary}}"
-loader.preload = "file:/graphene/meson_build_output/lib/x86_64-linux-gnu/graphene/libsysdb.so"
+loader.preload = "file:/gramine/meson_build_output/lib/x86_64-linux-gnu/gramine/libsysdb.so"
 
-loader.env.LD_LIBRARY_PATH = "/graphene/meson_build_output/lib/x86_64-linux-gnu/graphene/runtime/glibc:{{"{{library_paths}}"}}"
+loader.env.LD_LIBRARY_PATH = "/gramine/meson_build_output/lib/x86_64-linux-gnu/gramine/runtime/glibc:{{"{{library_paths}}"}}"
 loader.env.PATH = "{{"{{env_path}}"}}"
 loader.log_level = {% if debug %} "all" {% else %} "error" {% endif %}
 
@@ -9,7 +9,7 @@ fs.root.type = "chroot"
 fs.root.path = "/"
 fs.root.uri = "file:/"
 
-# Graphene's default working dir is '/', so change the working directory to the desired one
+# Gramine's default working dir is '/', so change the working directory to the desired one
 fs.start_dir = "{{working_dir}}"
 
 sgx.nonpie_binary = true
@@ -17,7 +17,7 @@ sgx.nonpie_binary = true
 {% if insecure_args %}
 # !! INSECURE !! Allow passing command-line arguments from the host without validation.
 # Most Docker images rely on runtime arguments and hence, a more general technique is required.
-# The issue is documented at https://github.com/oscarlab/graphene/issues/1520.
+# The issue is documented at https://github.com/gramineproject/graphene/issues/1520.
 loader.argv0_override = "{{binary}}"
 loader.insecure__use_cmdline_argv = true
 {% else %}

@@ -9,8 +9,8 @@ ENV LANGUAGE en_US.UTF-8
 
 COPY gsc-signer-key.pem /gsc-signer-key.pem
 
-RUN export PYTHONPATH="${PYTHONPATH}:$(find /graphene/meson_build_output/lib -type d -path '*/site-packages')" \
-    && graphene-sgx-sign \
+RUN export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib -type d -path '*/site-packages')" \
+    && gramine-sgx-sign \
          --key /gsc-signer-key.pem \
          --manifest /entrypoint.manifest \
          --output /entrypoint.manifest.sgx

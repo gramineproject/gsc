@@ -127,7 +127,7 @@ def extract_build_args(args):
     return buildargs_dict
 
 
-# Command 1: Build unsigned graphenized Docker image from original app Docker image.
+# Command 1: Build unsigned graminized Docker image from original app Docker image.
 def gsc_build(args):
     original_image_name = args.image                           # input original-app image name
     unsigned_image_name = gsc_unsigned_image_name(args.image)  # output unsigned image name
@@ -137,7 +137,7 @@ def gsc_build(args):
     docker_socket = docker.from_env()
 
     if get_docker_image(docker_socket, signed_image_name) is not None:
-        print(f'Final graphenized image `{signed_image_name}` already exists.')
+        print(f'Final graminized image `{signed_image_name}` already exists.')
         sys.exit(0)
 
     original_image = get_docker_image(docker_socket, original_image_name)
@@ -145,7 +145,7 @@ def gsc_build(args):
         print(f'Cannot find original application Docker image `{original_image_name}`.')
         sys.exit(1)
 
-    print(f'Building unsigned graphenized Docker image `{unsigned_image_name}` from original '
+    print(f'Building unsigned graminized Docker image `{unsigned_image_name}` from original '
           f'application image `{original_image_name}`...')
 
     # initialize Jinja env with configurations extracted from the original Docker image
@@ -160,7 +160,7 @@ def gsc_build(args):
     os.makedirs(tmp_build_path, exist_ok=True)
 
     # generate Dockerfile.build from Jinja-style templates/Dockerfile.<distro>.build.template
-    # using the user-provided config file with info on OS distro, Graphene version and SGX driver
+    # using the user-provided config file with info on OS distro, Gramine version and SGX driver
     # and other env configurations generated above
     build_template = env.get_template(f'Dockerfile.{env.globals["Distro"]}.build.template')
     with open(tmp_build_path / 'Dockerfile.build', 'w') as dockerfile:
@@ -188,7 +188,7 @@ def gsc_build(args):
         entrypoint_manifest.write(base_image_environment)
         entrypoint_manifest.write('\n')
 
-    # copy helper script to finalize the manifest from within graphenized Docker image
+    # copy helper script to finalize the manifest from within graminized Docker image
     shutil.copyfile('finalize_manifest.py', tmp_build_path / 'finalize_manifest.py')
 
     build_docker_image(docker_socket.api, tmp_build_path, unsigned_image_name, 'Dockerfile.build',
@@ -196,34 +196,34 @@ def gsc_build(args):
 
     # Check if docker build failed
     if get_docker_image(docker_socket, unsigned_image_name) is None:
-        print(f'Failed to build unsigned graphenized docker image `{unsigned_image_name}`.')
+        print(f'Failed to build unsigned graminized docker image `{unsigned_image_name}`.')
         sys.exit(1)
 
-    print(f'Successfully built an unsigned graphenized Docker image `{unsigned_image_name}` from '
+    print(f'Successfully built an unsigned graminized Docker image `{unsigned_image_name}` from '
           f'original application image `{original_image_name}`.')
 
 
-# Command 2: Build a "base Graphene" Docker image with the compiled runtime of Graphene.
-def gsc_build_graphene(args):
-    graphene_image_name = gsc_image_name(args.image)  # output base-Graphene image name
+# Command 2: Build a "base Gramine" Docker image with the compiled runtime of Gramine.
+def gsc_build_gramine(args):
+    gramine_image_name = gsc_image_name(args.image)  # output base-Gramine image name
     tmp_build_path = gsc_tmp_build_path(args.image)   # pathlib obj with build artifacts
 
     config = yaml.safe_load(args.config_file)
-    if 'Image' in config['Graphene']:
-        print('`gsc build-graphene` does not allow `Graphene.Image` to be set.')
+    if 'Image' in config['Gramine']:
+        print('`gsc build-gramine` does not allow `Gramine.Image` to be set.')
         sys.exit(1)
 
     docker_socket = docker.from_env()
 
-    if get_docker_image(docker_socket, graphene_image_name) is not None:
-        print(f'Base-Graphene Docker image `{graphene_image_name}` already exists.')
+    if get_docker_image(docker_socket, gramine_image_name) is not None:
+        print(f'Base-Gramine Docker image `{gramine_image_name}` already exists.')
         sys.exit(0)
 
-    print(f'Building base-Graphene image `{graphene_image_name}`...')
+    print(f'Building base-Gramine image `{gramine_image_name}`...')
 
     # generate Dockerfile.compile from Jinja-style templates/Dockerfile.<distro>.compile.template
-    # using the user-provided config file with info on OS distro, Graphene version and SGX driver
-    # and other user-provided args (see argparser::gsc_build_graphene below)
+    # using the user-provided config file with info on OS distro, Gramine version and SGX driver
+    # and other user-provided args (see argparser::gsc_build_gramine below)
     env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates/'))
     env.globals.update(config)
     env.globals.update(vars(args))
@@ -234,18 +234,18 @@ def gsc_build_graphene(args):
         dockerfile.write(compile_template.render())
 
     if args.file_only:
-        print(f'Successfully created Dockerfile.compile for base-Graphene image '
-              f'`{graphene_image_name}`.')
+        print(f'Successfully created Dockerfile.compile for base-Gramine image '
+              f'`{gramine_image_name}`.')
         return
 
-    build_docker_image(docker_socket.api, tmp_build_path, graphene_image_name, 'Dockerfile.compile',
+    build_docker_image(docker_socket.api, tmp_build_path, gramine_image_name, 'Dockerfile.compile',
                        rm=args.rm, nocache=args.no_cache, buildargs=extract_build_args(args))
 
-    if get_docker_image(docker_socket, graphene_image_name) is None:
-        print(f'Failed to build a base-Graphene image `{graphene_image_name}`.')
+    if get_docker_image(docker_socket, gramine_image_name) is None:
+        print(f'Failed to build a base-Gramine image `{gramine_image_name}`.')
         sys.exit(1)
 
-    print(f'Successfully built a base-Graphene image `{graphene_image_name}`.')
+    print(f'Successfully built a base-Gramine image `{gramine_image_name}`.')
 
 
 # Command 3: Sign Docker image which was previously built via `gsc build`.
@@ -258,14 +258,14 @@ def gsc_sign_image(args):
 
     unsigned_image = get_docker_image(docker_socket, unsigned_image_name)
     if unsigned_image is None:
-        print(f'Cannot find unsigned graphenized Docker image `{unsigned_image_name}`.\n'
+        print(f'Cannot find unsigned graminized Docker image `{unsigned_image_name}`.\n'
               f'You must first build this image via `gsc build` command.')
         sys.exit(1)
 
-    print(f'Signing graphenized Docker image `unsigned_image_name` -> `{signed_image_name}`...')
+    print(f'Signing graminized Docker image `unsigned_image_name` -> `{signed_image_name}`...')
 
     # generate Dockerfile.sign from Jinja-style templates/Dockerfile.<distro>.sign.template
-    # using the user-provided config file with info on OS distro, Graphene version and SGX driver
+    # using the user-provided config file with info on OS distro, Gramine version and SGX driver
     env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates/'))
     env.globals.update(yaml.safe_load(args.config_file))
     sign_template = env.get_template(f'Dockerfile.{env.globals["Distro"]}.sign.template')
@@ -287,14 +287,14 @@ def gsc_sign_image(args):
         os.remove(tmp_build_key_path)
 
     if get_docker_image(docker_socket, signed_image_name) is None:
-        print(f'Failed to build a signed graphenized Docker image `{signed_image_name}`.')
+        print(f'Failed to build a signed graminized Docker image `{signed_image_name}`.')
         sys.exit(1)
 
     print(f'Successfully built a signed Docker image `{signed_image_name}` from '
           f'`{unsigned_image_name}`.')
 
 
-# Simplified version of read_sigstruct from python/graphenelibos/sgx_get_token.py
+# Simplified version of read_sigstruct from python/graminelibos/sgx_get_token.py
 def read_sigstruct(sig):
     # Offsets for fields in SIGSTRUCT (defined by the SGX HW architecture, they never change)
     SGX_ARCH_ENCLAVE_CSS_DATE = 20
@@ -318,13 +318,13 @@ def read_sigstruct(sig):
 
     return attr
 
-# Retrieve information about a previously built graphenized Docker image
+# Retrieve information about a previously built graminized Docker image
 def gsc_info_image(args):
     docker_socket = docker.from_env()
     gsc_image = get_docker_image(docker_socket, args.image)
     if gsc_image is None:
-        print(f'Could not find graphenized Docker image {args.image}.\n'
-              'Please make sure to build the graphenized image first by using \'gsc build\''
+        print(f'Could not find graminized Docker image {args.image}.\n'
+              'Please make sure to build the graminized image first by using \'gsc build\''
               ' command.')
         sys.exit(1)
 
@@ -358,17 +358,17 @@ argparser = argparse.ArgumentParser()
 subcommands = argparser.add_subparsers(metavar='<command>')
 subcommands.required = True
 
-sub_build = subcommands.add_parser('build', help='Build graphenized Docker image')
+sub_build = subcommands.add_parser('build', help='Build graminized Docker image')
 sub_build.set_defaults(command=gsc_build)
 sub_build.add_argument('-d', '--debug', action='store_true',
-    help='Compile Graphene with debug flags and output.')
+    help='Compile Gramine with debug flags and output.')
 sub_build.add_argument('-L', '--linux', action='store_true',
-    help='Compile Graphene with Linux PAL in addition to Linux-SGX PAL.')
+    help='Compile Gramine with Linux PAL in addition to Linux-SGX PAL.')
 sub_build.add_argument('--insecure-args', action='store_true',
     help='Allow to specify untrusted arguments during Docker run. '
          'Otherwise arguments are ignored.')
 sub_build.add_argument('-nc', '--no-cache', action='store_true',
-    help='Build graphenized Docker image without any cached images.')
+    help='Build graminized Docker image without any cached images.')
 sub_build.add_argument('--rm', action='store_true',
     help='Remove intermediate Docker images when build is successful.')
 sub_build.add_argument('--build-arg', action='append', default=[],
@@ -378,38 +378,38 @@ sub_build.add_argument('-c', '--config_file', type=argparse.FileType('r', encodi
 sub_build.add_argument('image', help='Name of the application Docker image.')
 sub_build.add_argument('manifest', help='Manifest file to use.')
 
-sub_build_graphene = subcommands.add_parser('build-graphene',
-    help='Build base-Graphene Docker image')
-sub_build_graphene.set_defaults(command=gsc_build_graphene)
-sub_build_graphene.add_argument('-d', '--debug', action='store_true',
-    help='Compile Graphene with debug flags and output.')
-sub_build_graphene.add_argument('-L', '--linux', action='store_true',
-    help='Compile Graphene with Linux PAL in addition to Linux-SGX PAL.')
-sub_build_graphene.add_argument('-nc', '--no-cache', action='store_true',
-    help='Build graphenized Docker image without any cached images.')
-sub_build_graphene.add_argument('--rm', action='store_true',
+sub_build_gramine = subcommands.add_parser('build-gramine',
+    help='Build base-Gramine Docker image')
+sub_build_gramine.set_defaults(command=gsc_build_gramine)
+sub_build_gramine.add_argument('-d', '--debug', action='store_true',
+    help='Compile Gramine with debug flags and output.')
+sub_build_gramine.add_argument('-L', '--linux', action='store_true',
+    help='Compile Gramine with Linux PAL in addition to Linux-SGX PAL.')
+sub_build_gramine.add_argument('-nc', '--no-cache', action='store_true',
+    help='Build graminized Docker image without any cached images.')
+sub_build_gramine.add_argument('--rm', action='store_true',
     help='Remove intermediate Docker images when build is successful.')
-sub_build_graphene.add_argument('--build-arg', action='append', default=[],
+sub_build_gramine.add_argument('--build-arg', action='append', default=[],
     help='Set build-time variables (same as "docker build --build-arg").')
-sub_build_graphene.add_argument('-c', '--config_file',
+sub_build_gramine.add_argument('-c', '--config_file',
     type=argparse.FileType('r', encoding='UTF-8'),
     default='config.yaml', help='Specify configuration file.')
-sub_build_graphene.add_argument('-f', '--file-only', action='store_true',
+sub_build_gramine.add_argument('-f', '--file-only', action='store_true',
     help='Stop after Dockerfile is created and do not build the Docker image.')
-sub_build_graphene.add_argument('image',
-    help='Name of the output base-Graphene Docker image.')
+sub_build_gramine.add_argument('image',
+    help='Name of the output base-Gramine Docker image.')
 
-sub_sign = subcommands.add_parser('sign-image', help='Sign graphenized Docker image')
+sub_sign = subcommands.add_parser('sign-image', help='Sign graminized Docker image')
 sub_sign.set_defaults(command=gsc_sign_image)
 sub_sign.add_argument('-c', '--config_file', type=argparse.FileType('r', encoding='UTF-8'),
     default='config.yaml', help='Specify configuration file.')
 sub_sign.add_argument('image', help='Name of the application (base) Docker image.')
 sub_sign.add_argument('key', help='Key to sign the Intel SGX enclaves inside the Docker image.')
 
-sub_info = subcommands.add_parser('info-image', help='Retrieve information about a graphenized '
+sub_info = subcommands.add_parser('info-image', help='Retrieve information about a graminized '
                                   'Docker image')
 sub_info.set_defaults(command=gsc_info_image)
-sub_info.add_argument('image', help='Name of the graphenized Docker image.')
+sub_info.add_argument('image', help='Name of the graminized Docker image.')
 
 def main(args):
     args = argparser.parse_args()

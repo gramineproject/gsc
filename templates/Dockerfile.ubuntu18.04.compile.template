@@ -1,4 +1,4 @@
-FROM ubuntu:18.04 AS graphene
+FROM ubuntu:18.04 AS gramine
 
 RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
     && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -18,26 +18,26 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
         wget \
     && python3 -B -m pip install toml>=0.10
 
-RUN git clone {{Graphene.Repository}} /graphene
+RUN git clone {{Gramine.Repository}} /gramine
 
-RUN cd /graphene \
-    && git fetch origin {{Graphene.Branch}} \
-    && git checkout {{Graphene.Branch}}
+RUN cd /gramine \
+    && git fetch origin {{Gramine.Branch}} \
+    && git checkout {{Gramine.Branch}}
 
 {% if SGXDriver.Repository %}
-RUN cd /graphene/Pal/src/host/Linux-SGX \
+RUN cd /gramine/Pal/src/host/Linux-SGX \
     && git clone {{SGXDriver.Repository}} linux-sgx-driver \
     && cd linux-sgx-driver \
     && git checkout {{SGXDriver.Branch}}
-ENV ISGX_DRIVER_PATH "/graphene/Pal/src/host/Linux-SGX/linux-sgx-driver"
+ENV ISGX_DRIVER_PATH "/gramine/Pal/src/host/Linux-SGX/linux-sgx-driver"
 {% else %}
 ENV ISGX_DRIVER_PATH ""
 {% endif %}
 
-RUN cd /graphene \
+RUN cd /gramine \
     && make -s -j WERROR=1 SGX=1 {% if debug %} DEBUG=1 {% endif %} \
     && make -s -j WERROR=1 {% if debug %} DEBUG=1 {% endif %} \
-    && meson build --prefix="/graphene/meson_build_output" \
+    && meson build --prefix="/gramine/meson_build_output" \
        --buildtype={% if debug %}debug{% else %}release{% endif %} \
        -Ddirect=enabled -Dsgx=enabled \
     && ninja -C build \
