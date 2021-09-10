@@ -21,9 +21,9 @@ The GSC tool transforms a Docker image into a new image which includes the
 Gramine Library OS, manifest files, Intel SGX related information, and executes
 the application inside an Intel SGX enclave using the Gramine Library OS. It
 follows the common Docker approach to first build an image and subsequently run
-a container of an image.  At first a Docker image has to be graminized via the
-``gsc build`` command. When the graminized image should run within an Intel SGX
-enclave, the image has to be signed via a ``gsc sign-image`` command.
+this image inside of a container. At first a Docker image has to be graminized
+via the ``gsc build`` command. When the graminized image should run within an
+Intel SGX enclave, the image has to be signed via a ``gsc sign-image`` command.
 Subsequently, the image can be run using ``docker run``.
 
 Gramine and GSC documentation
