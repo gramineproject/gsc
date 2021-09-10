@@ -42,7 +42,7 @@ def generate_trusted_files(root_dir, already_added_files):
                                 r'|etc/mtab'
                                 r'|dev/.*'
                                 r'|etc/rc(\d|.)\.d/.*'
-                                r'|graphene/python/.*'
+                                r'|gramine/python/.*'
                                 r'|finalize_manifest\.py'
                                 r'|proc/.*'
                                 r'|sys/.*'

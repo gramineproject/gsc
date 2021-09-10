@@ -2,14 +2,14 @@
 # Dockerfiles (compile, build, sign) under templates/
 Distro: "ubuntu18.04"
 
-# If you're using your own fork and branch of Graphene, specify the GitHub link and the branch name
+# If you're using your own fork and branch of Gramine, specify the GitHub link and the branch name
 # below; typically, you want to keep the default values though
-Graphene:
-    Repository: "https://github.com/oscarlab/graphene.git"
+Gramine:
+    Repository: "https://github.com/gramineproject/gramine.git"
     Branch:     "master"
 
 # Specify the Intel SGX driver installed on your machine (more specifically, on the machine where
-# the graphenized Docker container will run); there are several variants of the SGX driver:
+# the graminized Docker container will run); there are several variants of the SGX driver:
 #
 #   - legacy out-of-tree driver: use something like the below values, but adjust the branch name
 #         Repository: "https://github.com/01org/linux-sgx-driver.git"
