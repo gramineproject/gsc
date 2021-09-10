@@ -21,18 +21,3 @@ __pycache__
 *.manifest.sgx
 *.sig
 *.token
-
-# gnu global
-GPATH
-GTAGS
-GSYMS
-GRTAGS
-
-# tags/etags
-tags
-TAGS
-
-# cscope
-cscope.*
-ncscope.*
-*cscope*
