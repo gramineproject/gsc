@@ -1,31 +1,3 @@
-# Steps to create ra-tls-secret-prov server image for AKS:
-#
-# STEP 1: Prepare server certificate
-#         1.1 Create server certificate signed by your trusted root CA. Ensure Common Name
-#             field in the server certificate corresponds to <AKS-DNS-NAME> used in STEP 5.
-#         1.2 Put trusted root CA certificate, server certificate, and server key in
-#             gramine/examples/ra-tls-secret-prov/certs directory with existing naming convention.
-#
-# STEP 2: Make sure RA-TLS DCAP libraries are built in Gramine via:
-#         $ cd gramine/Pal/src/host/Linux-SGX/tools/ra-tls && make dcap
-#
-# STEP 3: Create base ra-tls-secret-prov server image
-#         $ cd gramine
-#         $ docker build -t <aks-secret-prov-server-img> \
-#           -f <path-to-gsc>/examples/gramine-aks-attestation/aks-secret-prov-server.dockerfile .
-#
-# STEP 4: Push resulting image to Docker Hub or your preferred registry
-#         $ docker tag <aks-secret-prov-server-img> \
-#           <dockerhubusername>/<aks-secret-prov-server-img>
-#         $ docker push <dockerhubusername>/<aks-secret-prov-server-img>
-#
-# STEP 5: Deploy <aks-secret-prov-server-img> in AKS confidential compute cluster
-#         Reference deployment file:
-#         gsc/examples/gramine-aks-attestation/aks-secret-prov-server-deployment.yaml
-#
-# NOTE:  Server can be deployed at a non-confidential compute node as well. However, in that case
-#        QVE-based dcap verification will fail.
-
 FROM ubuntu:18.04
 
 RUN apt-get update \

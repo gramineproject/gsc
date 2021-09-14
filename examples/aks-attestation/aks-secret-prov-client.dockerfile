@@ -1,33 +1,3 @@
-# Steps to create ra-tls-secret-prov min client GSC image for AKS:
-#
-# STEP 1: Make sure RA-TLS DCAP libraries are built in Gramine via:
-#         $ cd gramine/Pal/src/host/Linux-SGX/tools/ra-tls && make dcap
-#
-# STEP 2: Create base ra-tls-secret-prov min client image
-#         $ cd gramine
-#         $ docker build -t <base-secret-prov-client-img> \
-#           -f <path-to-gsc>/examples/gramine-aks-attestation/aks-secret-prov-client.dockerfile .
-#
-# STEP 3: Prepare client to connect with remote ra-tls-secret-prov server hosted inside AKS cluster
-#         3.1 Provide server dns name <AKS-DNS-NAME> as loader.env.SECRET_PROVISION_SERVERS value
-#             inside gsc/examples/gramine-aks-attestation/aks-secret-prov-client.manifest file.
-#
-# STEP 4: Create gsc image for ra-tls-secret-prov min client
-#         $ cd gsc
-#         $ openssl genrsa -3 -out enclave-key.pem 3072
-#         $ ./gsc build <base-secret-prov-client-img> \
-#           examples/gramine-aks-attestation/aks-secret-prov-client.manifest
-#         $ ./gsc sign-image <base-secret-prov-client-img> enclave-key.pem
-#
-# STEP 5: Push resulting image to Docker Hub or your preferred registry
-#         $ docker tag <gsc-base-secret-prov-client-img> \
-#           <dockerhubusername>/<aks-gsc-secret-prov-client-img>
-#         $ docker push <dockerhubusername>/<aks-gsc-secret-prov-client-img>
-#
-# STEP 6: Deploy <aks-gsc-secret-prov-client-img> in AKS confidential compute cluster
-#         Reference deployment file:
-#         gsc/examples/gramine-aks-attestation/aks-secret-prov-client-deployment.yaml
-
 FROM ubuntu:18.04
 
 RUN apt-get update \
