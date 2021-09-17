@@ -159,10 +159,10 @@ def gsc_build(args):
 
     os.makedirs(tmp_build_path, exist_ok=True)
 
-    # generate Dockerfile.build from Jinja-style templates/Dockerfile.<distro>.build.template
+    # generate Dockerfile.build from Jinja-style templates/Dockerfile.build.template
     # using the user-provided config file with info on OS distro, Graphene version and SGX driver
     # and other env configurations generated above
-    build_template = env.get_template(f'Dockerfile.{env.globals["Distro"]}.build.template')
+    build_template = env.get_template(f'Dockerfile.build.template')
     with open(tmp_build_path / 'Dockerfile.build', 'w') as dockerfile:
         dockerfile.write(build_template.render())
 
@@ -221,13 +221,13 @@ def gsc_build_graphene(args):
 
     print(f'Building base-Graphene image `{graphene_image_name}`...')
 
-    # generate Dockerfile.compile from Jinja-style templates/Dockerfile.<distro>.compile.template
+    # generate Dockerfile.compile from Jinja-style templates/Dockerfile.compile.template
     # using the user-provided config file with info on OS distro, Graphene version and SGX driver
     # and other user-provided args (see argparser::gsc_build_graphene below)
     env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates/'))
     env.globals.update(config)
     env.globals.update(vars(args))
-    compile_template = env.get_template(f'Dockerfile.{env.globals["Distro"]}.compile.template')
+    compile_template = env.get_template(f'Dockerfile.compile.template')
 
     os.makedirs(tmp_build_path, exist_ok=True)
     with open(tmp_build_path / 'Dockerfile.compile', 'w') as dockerfile:
@@ -264,11 +264,11 @@ def gsc_sign_image(args):
 
     print(f'Signing graphenized Docker image `unsigned_image_name` -> `{signed_image_name}`...')
 
-    # generate Dockerfile.sign from Jinja-style templates/Dockerfile.<distro>.sign.template
+    # generate Dockerfile.sign from Jinja-style templates/Dockerfile.sign.template
     # using the user-provided config file with info on OS distro, Graphene version and SGX driver
     env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates/'))
     env.globals.update(yaml.safe_load(args.config_file))
-    sign_template = env.get_template(f'Dockerfile.{env.globals["Distro"]}.sign.template')
+    sign_template = env.get_template(f'Dockerfile.sign.template')
 
     os.makedirs(tmp_build_path, exist_ok=True)
     with open(tmp_build_path / 'Dockerfile.sign', 'w') as dockerfile:
