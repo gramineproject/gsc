@@ -5,7 +5,7 @@ MAXTESTNUM ?= 11
 TESTS = $(foreach D,$(DISTRIBUTIONS),$(foreach T,$(TESTCASES),$D-$T))
 
 GRAPHENE_REPO ?= https://github.com/oscarlab/graphene.git
-GRAPHENE_BRANCH ?= "2e737e69f076c60918f87d6829bb769925e75fec" # last working commit
+GRAPHENE_BRANCH ?= "master"
 
 # the below default values assume Linux 5.11+ with built-in SGX driver; see ../config.yaml.template
 # for different options (legacy driver, out-of-tree DCAP driver, in-kernel driver)
@@ -27,6 +27,8 @@ ADDITIONAL_VOLUMES ?= --volume /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.so
 
 DEVICES_VOLUMES = --device=/dev/${INTEL_SGX_DEVICE} ${ADDITIONAL_DEVICES} ${ADDITIONAL_VOLUMES}
 
+DISTRO_PREFIX = ubuntu
+
 .PHONY: all
 all: $(KEY_FILE)
 	for d in $(DISTRIBUTIONS); do \
@@ -34,7 +36,7 @@ all: $(KEY_FILE)
 	done
 
 config-%.yaml:
-	echo "Distro: \"$*\"" > config-$*.yaml
+	echo "Distro: \"$(subst $(DISTRO_PREFIX),$(DISTRO_PREFIX):,$(*))\"" > config-$*.yaml
 	echo "Graphene:" >> config-$*.yaml
 	echo "    Repository: \"$(GRAPHENE_REPO)\"" >> config-$*.yaml
 	echo "    Branch:     \"$(GRAPHENE_BRANCH)\"" >> config-$*.yaml
