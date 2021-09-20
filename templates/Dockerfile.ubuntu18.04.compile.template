@@ -16,7 +16,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
         python3-pip \
         python3-protobuf \
         wget \
-    && python3 -B -m pip install toml>=0.10
+    && python3 -B -m pip install 'toml>=0.10'
 
 RUN git clone {{Graphene.Repository}} /graphene
 
