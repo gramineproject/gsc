@@ -22,7 +22,9 @@ used then).
 Building sample images
 ----------------------
 
-The example below shows how to graminize the sample Docker image of Bash.
+The example below shows how to graminize the sample Docker image of Bash. The
+below commands assume that you already created the GSC configuration file
+(`config.yaml`); for details on this file see the GSC documentation.
 
 .. code-block:: sh
 
