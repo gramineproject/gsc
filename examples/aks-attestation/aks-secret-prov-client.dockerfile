@@ -21,12 +21,10 @@ RUN apt-get update \
 
 # Build environment of this Dockerfile should point to the root of Gramine directory
 
-# Before copy do "make clean && make secret_prov_min_client" in CI-Examples/ra-tls-secret-prov directory
+RUN mkdir -p /ra-tls-secret-prov
 
-COPY CI-Examples/ra-tls-secret-prov /gramine/Examples/ra-tls-secret-prov
+COPY CI-Examples/ra-tls-secret-prov /ra-tls-secret-prov
 
-WORKDIR /gramine/Examples/ra-tls-secret-prov
+WORKDIR /ra-tls-secret-prov
 
-ENV PATH = "${PATH}:/gramine/Examples/ra-tls-secret-prov"
-
-ENTRYPOINT ["/gramine/Examples/ra-tls-secret-prov/secret_prov_min_client"]
+ENTRYPOINT ["/ra-tls-secret-prov/secret_prov_min_client"]
