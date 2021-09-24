@@ -45,9 +45,6 @@ In order to create the below two images, user needs to download core [Gramine re
     - Reference deployment file:
         `gsc/examples/aks-attestation/aks-secret-prov-server-deployment.yaml`
 
-**NOTE**: Server can be deployed at a non-confidential compute node as well. However, in that case
-       QVE-based dcap verification will fail.
-
 ### Creating client image
 
 1. Make sure Gramine is built with `meson setup ... -Ddcap=enabled`.
