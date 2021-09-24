@@ -45,7 +45,7 @@ In order to create the below two images, user needs to download core [Gramine re
     - Reference deployment file:
         `gsc/examples/aks-attestation/aks-secret-prov-server-deployment.yaml`
 
-NOTE:  Server can be deployed at a non-confidential compute node as well. However, in that case
+**NOTE**: Server can be deployed at a non-confidential compute node as well. However, in that case
        QVE-based dcap verification will fail.
 
 ### Creating client image
@@ -66,7 +66,7 @@ NOTE:  Server can be deployed at a non-confidential compute node as well. Howeve
     - Provide server dns name `<AKS-DNS-NAME>` as `loader.env.SECRET_PROVISION_SERVERS` value
       inside `gsc/examples/aks-attestation/aks-secret-prov-client.manifest` file.
 
-4. Create gsc image for ra-tls-secret-prov min client:
+4. Create GSC image for ra-tls-secret-prov min client:
 
     ```sh
     $ cd gsc
@@ -88,7 +88,7 @@ NOTE:  Server can be deployed at a non-confidential compute node as well. Howeve
     - Reference deployment file:
         `gsc/examples/aks-attestation/aks-secret-prov-client-deployment.yaml`
 
-NOTE: We recommend deploying gsc images on Ubuntu with Linux kernel version 5.11 or higher.
+**NOTE**: We recommend deploying GSC images on Ubuntu with Linux kernel version 5.11 or higher.
 
 ## Deploying client and server images inside AKS Confidential Compute cluster
 
