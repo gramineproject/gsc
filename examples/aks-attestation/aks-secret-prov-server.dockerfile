@@ -31,6 +31,16 @@ RUN mkdir -p /ra-tls-secret-prov
 
 COPY CI-Examples/ra-tls-secret-prov /ra-tls-secret-prov
 
+RUN mkdir -p /ra-tls-secret-prov/libs
+
+COPY build/Pal/src/host/Linux-SGX/tools/ra-tls/libsecret_prov_verify_dcap.so /ra-tls-secret-prov/libs
+COPY build/Pal/src/host/Linux-SGX/tools/common/libsgx_util.so /ra-tls-secret-prov/libs
+COPY build/subprojects/mbedtls-mbedtls-2.26.0/libmbedcrypto_gramine.so.6 /ra-tls-secret-prov/libs
+COPY build/subprojects/mbedtls-mbedtls-2.26.0/libmbedtls_gramine.so.13 /ra-tls-secret-prov/libs
+COPY build/subprojects/mbedtls-mbedtls-2.26.0/libmbedx509_gramine.so.1 /ra-tls-secret-prov/libs
+
+ENV LD_LIBRARY_PATH = "${LD_LIBRARY_PATH}:/ra-tls-secret-prov/libs"
+
 WORKDIR /ra-tls-secret-prov
 
 ENTRYPOINT ["/ra-tls-secret-prov/secret_prov_server_dcap"]

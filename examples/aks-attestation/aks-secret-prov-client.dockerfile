@@ -27,4 +27,6 @@ COPY CI-Examples/ra-tls-secret-prov /ra-tls-secret-prov
 
 WORKDIR /ra-tls-secret-prov
 
+ENV PATH = "${PATH}:/ra-tls-secret-prov"
+
 ENTRYPOINT ["/ra-tls-secret-prov/secret_prov_min_client"]
