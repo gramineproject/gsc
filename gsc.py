@@ -302,6 +302,8 @@ def read_sigstruct(sig):
     SGX_ARCH_ENCLAVE_CSS_ENCLAVE_HASH = 960
     SGX_ARCH_ENCLAVE_CSS_ISV_PROD_ID = 1024
     SGX_ARCH_ENCLAVE_CSS_ISV_SVN = 1026
+    SGX_ARCH_ENCLAVE_CSS_ATTRIBUTES = 928
+    SGX_ARCH_ENCLAVE_CSS_MISC_SELECT = 900
     # Field format: (offset, type, value)
     fields = {
         'date': (SGX_ARCH_ENCLAVE_CSS_DATE, '<HBB', 'year', 'month', 'day'),
@@ -309,6 +311,8 @@ def read_sigstruct(sig):
         'enclave_hash': (SGX_ARCH_ENCLAVE_CSS_ENCLAVE_HASH, '32s', 'enclave_hash'),
         'isv_prod_id': (SGX_ARCH_ENCLAVE_CSS_ISV_PROD_ID, '<H', 'isv_prod_id'),
         'isv_svn': (SGX_ARCH_ENCLAVE_CSS_ISV_SVN, '<H', 'isv_svn'),
+        'attributes': (SGX_ARCH_ENCLAVE_CSS_ATTRIBUTES, '8s8s', 'flags', 'xfrms'),
+        'misc_select': (SGX_ARCH_ENCLAVE_CSS_MISC_SELECT, '4s', 'misc_select'),
     }
     attr = {}
     for field in fields.values():
@@ -346,6 +350,11 @@ def gsc_info_image(args):
             sigstruct['isv_prod_id'] = attr['isv_prod_id']
             sigstruct['isv_svn'] = attr['isv_svn']
             sigstruct['date'] = '%d-%02d-%02d' % (attr['year'], attr['month'], attr['day'])
+            sigstruct['flags'] = attr['flags'].hex()
+            sigstruct['xfrms'] = attr['xfrms'].hex()
+            sigstruct['misc_select'] = attr['misc_select'].hex()
+            # DEBUG attribute of the enclave is very important, so we print it also separately
+            sigstruct['debug'] = bool(attr['flags'][0] & 0b10)
 
         if not sigstruct:
             print(f'Could not extract Intel SGX-related information from image {args.image}.')
