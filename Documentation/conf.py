@@ -44,7 +44,6 @@ release = ''
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.todo',
-    'breathe',
     'sphinx_rtd_theme',
 ]
 
@@ -82,20 +81,8 @@ rst_prolog = '''
    :trim:
 '''
 
-breathe_projects = {
-    'gsc': '_build/doxygen/xml',
-}
-
-def generate_doxygen(app):
-    subprocess.check_call(['doxygen', 'Doxyfile'])
-
 def setup(app):
     app.add_stylesheet('css/gramine.css')
-    app.connect('builder-inited', generate_doxygen)
-
-breathe_domain_by_extension = {
-    'h': 'c',
-}
 
 todo_include_todos = True
 
