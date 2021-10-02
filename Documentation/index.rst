@@ -299,8 +299,8 @@ in :file:`config.yaml.template`.
 
 .. describe:: Distro
 
-   Defines Linux distribution to be used to build Gramine in. Currently the
-   only supported value is ``ubuntu18.04``.
+   Defines Linux distribution to be used to build Gramine in. Currently tested
+   distros are Ubuntu 18.04 and Ubuntu 20.04. Default value is ``ubuntu:18.04``.
 
 .. describe:: Gramine.Repository
 

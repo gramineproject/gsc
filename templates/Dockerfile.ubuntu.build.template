@@ -2,7 +2,7 @@
 {% if Gramine.Image %}
 FROM gsc-{{Gramine.Image}} AS gramine
 {% else %}
-{% include "Dockerfile.ubuntu18.04.compile.template" %}
+{% include "Dockerfile.ubuntu.compile.template" %}
 {% endif %}
 
 # Combine Gramine image with the original app image
