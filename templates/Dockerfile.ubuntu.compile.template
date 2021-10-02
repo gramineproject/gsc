@@ -1,4 +1,5 @@
-FROM ubuntu:18.04 AS gramine
+# Currently tested base OS images are Ubuntu 18.04 and Ubuntu 20.04.
+FROM {{Distro}} AS gramine
 
 RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
     && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
