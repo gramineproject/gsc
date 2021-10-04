@@ -12,6 +12,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
         git \
         libcurl4-openssl-dev \
         libprotobuf-c-dev \
+        linux-headers-generic \
         ninja-build \
         pkg-config \
         protobuf-c-compiler \
@@ -28,20 +29,28 @@ RUN cd /gramine \
     && git checkout {{Gramine.Branch}}
 
 {% if SGXDriver.Repository %}
-RUN cd /gramine/Pal/src/host/Linux-SGX \
-    && git clone {{SGXDriver.Repository}} linux-sgx-driver \
-    && cd linux-sgx-driver \
+RUN cd /gramine \
+    && git clone {{SGXDriver.Repository}} driver \
+    && cd driver \
     && git checkout {{SGXDriver.Branch}}
-ENV ISGX_DRIVER_PATH "/gramine/Pal/src/host/Linux-SGX/linux-sgx-driver"
 {% else %}
-ENV ISGX_DRIVER_PATH ""
+RUN mkdir -p /gramine/driver/asm \
+    && cd /gramine/driver/asm \
+    && wget --timeout=10 -O sgx.h \
+        https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain/arch/x86/include/uapi/asm/sgx.h?h=v5.11 \
+    && sha256sum sgx.h | grep -q a34a997ade42b61376b1c5d3d50f839fd28f2253fa047cb9c0e68a1b00477956
 {% endif %}
 
 RUN cd /gramine \
-    && make -s -j WERROR=1 SGX=1 {% if debug %} DEBUG=1 {% endif %} \
-    && make -s -j WERROR=1 {% if debug %} DEBUG=1 {% endif %} \
     && meson setup build/ --prefix="/gramine/meson_build_output" \
        --buildtype={% if debug %}debug{% else %}release{% endif %} \
        -Ddirect=enabled -Dsgx=enabled \
+       {% if "SGXDataCenterAttestationPrimitives" in SGXDriver.Repository %} \
+       -Dsgx_driver=dcap1.10 -Dsgx_driver_include_path=/gramine/driver/driver/linux/include \
+       {% elif "linux-sgx-driver" in SGXDriver.Repository %} \
+       -Dsgx_driver=oot -Dsgx_driver_include_path=/gramine/driver \
+       {% else %} \
+       -Dsgx_driver=upstream -Dsgx_driver_include_path=/gramine/driver \
+       {% endif %} \
     && ninja -C build \
     && ninja -C build install

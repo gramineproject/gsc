@@ -50,7 +50,7 @@ def generate_trusted_files(root_dir, already_added_files):
     exclude_re = re.compile(excluded_paths_regex)
 
     num_trusted = 0
-    trusted_files = ''
+    trusted_files = 'sgx.trusted_files = [\n'
     for root, _, files in os.walk(root_dir.encode('UTF-8'), followlinks=False):
         for file in files:
             filename = os.path.join(root, file)
@@ -78,10 +78,11 @@ def generate_trusted_files(root_dir, already_added_files):
                 # user manifest already contains this file (probably as allowed or protected)
                 continue
 
-            trusted_files += f'sgx.trusted_files.file{num_trusted} = {trusted_file_entry}\n'
+            trusted_files += f'  {trusted_file_entry},\n'
             num_trusted += 1
 
     print(f'\t[from inside Docker container] Found {num_trusted} files in `{root_dir}`.')
+    trusted_files += f']\n'
     return trusted_files
 
 

@@ -16,7 +16,7 @@ Gramine:
 #
 #   - DCAP out-of-tree driver: use something like the below values
 #         Repository: "https://github.com/intel/SGXDataCenterAttestationPrimitives.git"
-#         Branch:     "DCAP_1.6 && cp -r driver/linux/* ."
+#         Branch:     "DCAP_1.11 && cp -r driver/linux/* ."
 #
 #   - DCAP in-kernel driver: use empty values like below
 #         Repository: ""
