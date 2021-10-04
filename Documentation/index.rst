@@ -377,18 +377,18 @@ sign the image via a :command:`gsc sign-image` command.
 
    This environment variable specifies the pal loader.
 
-GSC requires a custom seccomp profile while running in Linux PAL, which has to be
-specified at Docker run time. There are two options here
+GSC requires a custom seccomp profile while running with Linux PAL, which has to be
+specified at Docker run time. There are two options:
 
 #. Pass `unconfined` to run the container without the default seccomp profile.
    This option is generally considered insecure, since this results in containers
-   running with enhanced privileges.
+   running with unrestricted privileges.
 
 #. Pass the custom seccomp profile
-   `https://github.com/gramineproject/gramine/blob/master/Scripts/docker_seccomp.json`
+   https://github.com/gramineproject/gramine/blob/master/Scripts/docker_seccomp.json.
 
    With this option, execution of Docker containers is maintained at the least privilege,
-   while the necessary actions required for GSC to function are enabled.
+   while the necessary capabilities required for GSC to function are enabled.
 
 .. code-block:: sh
 
