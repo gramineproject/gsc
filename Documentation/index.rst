@@ -469,10 +469,10 @@ This document focuses on the most important limitations of GSC. `Issue #13
 <https://github.com/gramineproject/gsc/issues/13>`__ provides the complete list
 of known limitations and serves as a discussion board for workarounds.
 
-Dependency on Ubuntu 18.04
---------------------------
+Dependency on Ubuntu
+--------------------
 
-Docker images not based on Ubuntu 18.04 may not be compatible with GSC. GSC
+Docker images not based on Ubuntu may not be compatible with GSC. GSC
 relies on Gramine to execute Linux applications inside Intel SGX enclaves and
 the installation of prerequisites depends on package manager and package
 repositories. GSC can simply be extended to support other distributions by
