@@ -12,6 +12,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
         git \
         libcurl4-openssl-dev \
         libprotobuf-c-dev \
+        linux-headers-generic \
         ninja-build \
         pkg-config \
         protobuf-c-compiler \
@@ -27,14 +28,21 @@ RUN cd /gramine \
     && git fetch origin {{Gramine.Branch}} \
     && git checkout {{Gramine.Branch}}
 
-{% if SGXDriver.Repository %}
-RUN cd /gramine/Pal/src/host/Linux-SGX \
-    && git clone {{SGXDriver.Repository}} linux-sgx-driver \
-    && cd linux-sgx-driver \
-    && git checkout {{SGXDriver.Branch}}
-ENV ISGX_DRIVER_PATH "/gramine/Pal/src/host/Linux-SGX/linux-sgx-driver"
-{% else %}
+# Latest Gramine doesn't use ISGX_DRIVER_PATH but we keep it for backward compatibility
 ENV ISGX_DRIVER_PATH ""
+ENV ISGX_DRIVER_MESON ""
+
+{% if SGXDriver.Repository %}
+RUN cd /gramine \
+    && git clone {{SGXDriver.Repository}} driver \
+    && cd driver \
+    && git checkout {{SGXDriver.Branch}}
+ENV ISGX_DRIVER_PATH "/gramine/driver"
+  {% if "SGXDataCenterAttestationPrimitives" in SGXDriver.Repository %}
+  ENV ISGX_DRIVER_MESON "-Dsgx_driver=dcap1.10 -Dsgx_driver_include_path=/gramine/driver/driver/linux/include/"
+  {% elif "linux-sgx-driver" in SGXDriver.Repository %}
+  ENV ISGX_DRIVER_MESON "-Dsgx_driver=oot -Dsgx_driver_include_path=/gramine/driver/"
+  {% endif %}
 {% endif %}
 
 RUN cd /gramine \
@@ -43,5 +51,6 @@ RUN cd /gramine \
     && meson setup build/ --prefix="/gramine/meson_build_output" \
        --buildtype={% if debug %}debug{% else %}release{% endif %} \
        -Ddirect=enabled -Dsgx=enabled \
+       ${ISGX_DRIVER_MESON} \
     && ninja -C build \
     && ninja -C build install
