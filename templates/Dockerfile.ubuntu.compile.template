@@ -30,7 +30,6 @@ RUN cd /gramine \
 
 # Latest Gramine doesn't use ISGX_DRIVER_PATH but we keep it for backward compatibility
 ENV ISGX_DRIVER_PATH ""
-ENV ISGX_DRIVER_MESON ""
 
 {% if SGXDriver.Repository %}
 RUN cd /gramine \
@@ -43,6 +42,11 @@ ENV ISGX_DRIVER_PATH "/gramine/driver"
   {% elif "linux-sgx-driver" in SGXDriver.Repository %}
   ENV ISGX_DRIVER_MESON "-Dsgx_driver=oot -Dsgx_driver_include_path=/gramine/driver/"
   {% endif %}
+{% else %}
+RUN mkdir -p /gramine/driver \
+    && cd driver \
+    && wget --timeout=10 https://raw.githubusercontent.com/torvalds/linux/v5.11/arch/x86/include/uapi/asm/sgx.h
+ENV ISGX_DRIVER_MESON "-Dsgx_driver=upstream -Dsgx_driver_include_path=/gramine/driver/"
 {% endif %}
 
 RUN cd /gramine \
