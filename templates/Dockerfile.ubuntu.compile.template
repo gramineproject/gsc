@@ -37,8 +37,8 @@ RUN cd /gramine \
 RUN mkdir -p /gramine/driver/asm \
     && cd /gramine/driver/asm \
     && wget --timeout=10 -O sgx.h \
-        https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain/arch/x86/include/uapi/asm/sgx.h?v5.11 \
-    && sha256sum sgx.h | grep -q 4764b8ce858579d99f1b66bb1e5f04ba149a38aea15649fff19f65f8d9113fd0
+        https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain/arch/x86/include/uapi/asm/sgx.h?h=v5.11 \
+    && sha256sum sgx.h | grep -q a34a997ade42b61376b1c5d3d50f839fd28f2253fa047cb9c0e68a1b00477956
 {% endif %}
 
 RUN cd /gramine \
