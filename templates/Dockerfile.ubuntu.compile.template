@@ -41,7 +41,7 @@ RUN cd /gramine \
 {% else %}
 RUN mkdir -p /gramine/driver/asm \
     && cd /gramine/driver/asm \
-    && wget --timeout=10 https://raw.githubusercontent.com/torvalds/linux/v5.11/arch/x86/include/uapi/asm/sgx.h
+    && wget --timeout=10 https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain/arch/x86/include/uapi/asm/sgx.h
 ENV ISGX_DRIVER_MESON "-Dsgx_driver=upstream -Dsgx_driver_include_path=/gramine/driver/"
 {% endif %}
 
