@@ -33,22 +33,24 @@ RUN cd /gramine \
     && git clone {{SGXDriver.Repository}} driver \
     && cd driver \
     && git checkout {{SGXDriver.Branch}}
-  {% if "SGXDataCenterAttestationPrimitives" in SGXDriver.Repository %}
-  ENV ISGX_DRIVER_MESON "-Dsgx_driver=dcap1.10 -Dsgx_driver_include_path=/gramine/driver/driver/linux/include/"
-  {% elif "linux-sgx-driver" in SGXDriver.Repository %}
-  ENV ISGX_DRIVER_MESON "-Dsgx_driver=oot -Dsgx_driver_include_path=/gramine/driver/"
-  {% endif %}
 {% else %}
 RUN mkdir -p /gramine/driver/asm \
     && cd /gramine/driver/asm \
-    && wget --timeout=10 https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain/arch/x86/include/uapi/asm/sgx.h
-ENV ISGX_DRIVER_MESON "-Dsgx_driver=upstream -Dsgx_driver_include_path=/gramine/driver/"
+    && wget --timeout=10 -O sgx.h \
+        https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain/arch/x86/include/uapi/asm/sgx.h?v5.11 \
+    && sha256sum sgx.h | grep -q 4764b8ce858579d99f1b66bb1e5f04ba149a38aea15649fff19f65f8d9113fd0
 {% endif %}
 
 RUN cd /gramine \
     && meson setup build/ --prefix="/gramine/meson_build_output" \
        --buildtype={% if debug %}debug{% else %}release{% endif %} \
        -Ddirect=enabled -Dsgx=enabled \
-       ${ISGX_DRIVER_MESON} \
+       {% if "SGXDataCenterAttestationPrimitives" in SGXDriver.Repository %} \
+       -Dsgx_driver=dcap1.10 -Dsgx_driver_include_path=/gramine/driver/driver/linux/include \
+       {% elif "linux-sgx-driver" in SGXDriver.Repository %} \
+       -Dsgx_driver=oot -Dsgx_driver_include_path=/gramine/driver \
+       {% else %} \
+       -Dsgx_driver=upstream -Dsgx_driver_include_path=/gramine/driver \
+       {% endif %} \
     && ninja -C build \
     && ninja -C build install
