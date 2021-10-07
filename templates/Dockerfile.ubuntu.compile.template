@@ -28,15 +28,11 @@ RUN cd /gramine \
     && git fetch origin {{Gramine.Branch}} \
     && git checkout {{Gramine.Branch}}
 
-# Latest Gramine doesn't use ISGX_DRIVER_PATH but we keep it for backward compatibility
-ENV ISGX_DRIVER_PATH ""
-
 {% if SGXDriver.Repository %}
 RUN cd /gramine \
     && git clone {{SGXDriver.Repository}} driver \
     && cd driver \
     && git checkout {{SGXDriver.Branch}}
-ENV ISGX_DRIVER_PATH "/gramine/driver"
   {% if "SGXDataCenterAttestationPrimitives" in SGXDriver.Repository %}
   ENV ISGX_DRIVER_MESON "-Dsgx_driver=dcap1.10 -Dsgx_driver_include_path=/gramine/driver/driver/linux/include/"
   {% elif "linux-sgx-driver" in SGXDriver.Repository %}
@@ -50,8 +46,6 @@ ENV ISGX_DRIVER_MESON "-Dsgx_driver=upstream -Dsgx_driver_include_path=/gramine/
 {% endif %}
 
 RUN cd /gramine \
-    && make -s -j WERROR=1 SGX=1 {% if debug %} DEBUG=1 {% endif %} \
-    && make -s -j WERROR=1 {% if debug %} DEBUG=1 {% endif %} \
     && meson setup build/ --prefix="/gramine/meson_build_output" \
        --buildtype={% if debug %}debug{% else %}release{% endif %} \
        -Ddirect=enabled -Dsgx=enabled \
