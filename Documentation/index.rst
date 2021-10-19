@@ -4,11 +4,6 @@
 :program:`gsc` -- Gramine Shielded Containers
 =============================================
 
-.. warning::
-    GSC is still under development and must not be used in production! Please
-    see `issue #13 <https://github.com/gramineproject/gsc/issues/13>`__ for a
-    description of missing features and security caveats.
-
 Synopsis
 ========
 
