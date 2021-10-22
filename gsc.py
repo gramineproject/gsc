@@ -126,6 +126,18 @@ def extract_build_args(args):
                 sys.exit(1)
     return buildargs_dict
 
+def merge_user_manifest_and_entrypoint_manifest(user_manifest, entrypoint_manifest, path=[]):
+    for key in entrypoint_manifest:
+        if key in user_manifest:
+            if isinstance(user_manifest[key], dict) and isinstance(entrypoint_manifest[key], dict):
+                merge_user_manifest_and_entrypoint_manifest(user_manifest[key], entrypoint_manifest[key], path + [str(key)])
+            elif user_manifest[key] == entrypoint_manifest[key]:
+                pass
+            else:
+                raise Exception('Duplicate Key with different values found %s' % '.'.join(path + [str(key)]))
+        else:
+            user_manifest[key] = entrypoint_manifest[key]
+    return user_manifest
 
 # Command 1: Build unsigned graminized Docker image from original app Docker image.
 def gsc_build(args):
@@ -181,9 +193,12 @@ def gsc_build(args):
     base_image_environment = extract_environment_from_image_config(original_image.attrs['Config'])
 
     with open(tmp_build_path / 'entrypoint.manifest', 'w') as entrypoint_manifest:
-        entrypoint_manifest.write(env.get_template('entrypoint.manifest.template').render())
-        entrypoint_manifest.write('\n')
-        entrypoint_manifest.write(user_manifest_contents)
+
+        entrypoint_manifest_dict = toml.loads(env.get_template('entrypoint.manifest.template').render())
+        user_manifest_dict = toml.loads(user_manifest_contents)
+        merged_manifest_dict = merge_user_manifest_and_entrypoint_manifest(user_manifest_dict,entrypoint_manifest_dict)
+
+        entrypoint_manifest.write(toml.dumps(merged_manifest_dict))
         entrypoint_manifest.write('\n')
         entrypoint_manifest.write(base_image_environment)
         entrypoint_manifest.write('\n')
