@@ -126,6 +126,21 @@ def extract_build_args(args):
                 sys.exit(1)
     return buildargs_dict
 
+def merge_two_dicts(dict1, dict2, path=[]):
+    for key in dict2:
+        if key in dict1:
+            if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
+                merge_two_dicts(dict1[key], dict2[key], path + [str(key)])
+            elif isinstance(dict1[key], list) and isinstance(dict2[key], list):
+                dict1[key].extend(dict2[key])
+            elif dict1[key] == dict2[key]:
+                pass
+            else:
+                raise Exception(f'''Duplicate key with different values found: `{".".join(path +
+                                   [str(key)])}`''')
+        else:
+            dict1[key] = dict2[key]
+    return dict1
 
 # Command 1: Build unsigned graminized Docker image from original app Docker image.
 def gsc_build(args):
@@ -170,23 +185,43 @@ def gsc_build(args):
     with open(tmp_build_path / 'apploader.sh', 'w') as apploader:
         apploader.write(env.get_template('apploader.template').render())
 
-    # generate entrypoint.manifest from Jinja-style templates/entrypoint.manifest.template and
-    # append additional, user-provided manifest options
+    # generate entrypoint.manifest from three parts:
+    #   - Jinja-style templates/entrypoint.manifest.template
+    #   - base Docker image's environment variables
+    #   - additional, user-provided manifest options
+    entrypoint_manifest_render = env.get_template('entrypoint.manifest.template').render()
+    entrypoint_manifest_dict = toml.loads(entrypoint_manifest_render)
+
+    base_image_environment = extract_environment_from_image_config(original_image.attrs['Config'])
+    base_image_dict = toml.loads(base_image_environment)
+
     user_manifest_contents = ''
     if os.path.exists(args.manifest):
         with open(args.manifest, 'r') as user_manifest_file:
             user_manifest_contents = user_manifest_file.read()
+    user_manifest_dict = toml.loads(user_manifest_contents)
 
-    # extract base docker image's environment variables to append inside entrypoint.manifest file
-    base_image_environment = extract_environment_from_image_config(original_image.attrs['Config'])
+    # Support deprecated syntax: replace old-style TOML-dict (`sgx.trusted_files.key = "file:foo"`)
+    # with new-style TOML-array (`sgx.trusted_files = ["file:foo"]`) in the user manifest
+    if 'sgx' in user_manifest_dict:
+        if 'trusted_files' in user_manifest_dict['sgx']:
+            if isinstance(user_manifest_dict['sgx']['trusted_files'], dict):
+                tf_list = list(user_manifest_dict['sgx']['trusted_files'].values())
+                user_manifest_dict['sgx']['trusted_files'] = tf_list
+        if 'allowed_files' in user_manifest_dict['sgx']:
+            if isinstance(user_manifest_dict['sgx']['allowed_files'], dict):
+                af_list = list(user_manifest_dict['sgx']['allowed_files'].values())
+                user_manifest_dict['sgx']['allowed_files'] = af_list
+        if 'protected_files' in user_manifest_dict['sgx']:
+            if isinstance(user_manifest_dict['sgx']['protected_files'], dict):
+                pf_list = list(user_manifest_dict['sgx']['protected_files'].values())
+                user_manifest_dict['sgx']['protected_files'] = pf_list
+
+    merged_manifest_dict = merge_two_dicts(user_manifest_dict, entrypoint_manifest_dict)
+    merged_manifest_dict = merge_two_dicts(merged_manifest_dict, base_image_dict)
 
     with open(tmp_build_path / 'entrypoint.manifest', 'w') as entrypoint_manifest:
-        entrypoint_manifest.write(env.get_template('entrypoint.manifest.template').render())
-        entrypoint_manifest.write('\n')
-        entrypoint_manifest.write(user_manifest_contents)
-        entrypoint_manifest.write('\n')
-        entrypoint_manifest.write(base_image_environment)
-        entrypoint_manifest.write('\n')
+        toml.dump(merged_manifest_dict, entrypoint_manifest)
 
     # copy helper script to finalize the manifest from within graminized Docker image
     shutil.copyfile('finalize_manifest.py', tmp_build_path / 'finalize_manifest.py')

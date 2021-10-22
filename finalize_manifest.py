@@ -11,6 +11,7 @@ import subprocess
 import sys
 
 import jinja2
+import toml
 
 def is_utf8(filename_bytes):
     try:
@@ -19,18 +20,13 @@ def is_utf8(filename_bytes):
     except UnicodeError:
         return False
 
-
 def extract_files_from_user_manifest(manifest):
-    # files list contains entries as they appear in manifest (i.e., `"file:escaped-file-name"`)
     files = []
-    for line in manifest.splitlines():
-        line = line.strip()
-        if line.startswith((f'sgx.trusted_files', f'sgx.allowed_files', f'sgx.protected_files')):
-            if line.count('=') != 1:
-                # TODO: process manifest lines like `sgx.allowed_files.a = "file:=weird=file="`
-                continue
-            filename = line.split('=')[1].strip()
-            files.append(filename)
+
+    files.extend(manifest['sgx'].get('trusted_files', []))
+    files.extend(manifest['sgx'].get('allowed_files', []))
+    files.extend(manifest['sgx'].get('protected_files',[]))
+
     return files
 
 
@@ -50,7 +46,7 @@ def generate_trusted_files(root_dir, already_added_files):
     exclude_re = re.compile(excluded_paths_regex)
 
     num_trusted = 0
-    trusted_files = 'sgx.trusted_files = [\n'
+    trusted_files = []
     for root, _, files in os.walk(root_dir.encode('UTF-8'), followlinks=False):
         for file in files:
             filename = os.path.join(root, file)
@@ -72,17 +68,15 @@ def generate_trusted_files(root_dir, already_added_files):
                 # we use TOML's basic single-line strings, can't have newlines
                 continue
 
-            escaped_filename = filename.translate(str.maketrans({'\\': r'\\', '"': r'\"'}))
-            trusted_file_entry = f'"file:{escaped_filename}"'
+            trusted_file_entry = f'file:{filename}'
             if trusted_file_entry in already_added_files:
                 # user manifest already contains this file (probably as allowed or protected)
                 continue
 
-            trusted_files += f'  {trusted_file_entry},\n'
+            trusted_files.append(trusted_file_entry)
             num_trusted += 1
 
     print(f'\t[from inside Docker container] Found {num_trusted} files in `{root_dir}`.')
-    trusted_files += f']\n'
     return trusted_files
 
 
@@ -110,12 +104,12 @@ def main(args=None):
 
     manifest = '/entrypoint.manifest'
     rendered_manifest = env.get_template(manifest).render()
-    already_added_files = extract_files_from_user_manifest(rendered_manifest)
+    rendered_manifest_dict = toml.loads(rendered_manifest)
+    already_added_files = extract_files_from_user_manifest(rendered_manifest_dict)
     trusted_files = generate_trusted_files(args.dir, already_added_files)
-    with open(manifest, 'wb') as manifest_file:
-        trusted_files_string = '\n'.join((rendered_manifest, trusted_files, '\n'))
-        manifest_file.write(trusted_files_string.encode('UTF-8'))
-
+    rendered_manifest_dict['sgx'].setdefault('trusted_files', []).extend(trusted_files)
+    with open(manifest, 'w') as manifest_file:
+        toml.dump(rendered_manifest_dict, manifest_file)
     print(f'\t[from inside Docker container] Successfully finalized `{manifest}`.')
 
 if __name__ == '__main__':
