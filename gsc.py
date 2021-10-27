@@ -126,18 +126,30 @@ def extract_build_args(args):
                 sys.exit(1)
     return buildargs_dict
 
-def merge_user_manifest_and_entrypoint_manifest(user_manifest, entrypoint_manifest, path=[]):
-    for key in entrypoint_manifest:
-        if key in user_manifest:
-            if isinstance(user_manifest[key], dict) and isinstance(entrypoint_manifest[key], dict):
-                merge_user_manifest_and_entrypoint_manifest(user_manifest[key], entrypoint_manifest[key], path + [str(key)])
-            elif user_manifest[key] == entrypoint_manifest[key]:
+
+def dict_to_list(user_file_dict):
+    files = []
+    for _, user_file in user_file_dict.items():
+        if isinstance(user_file, str):
+            files.append(user_file)
+        else:
+            raise Exception(f'Unknown user file format: {user_file!r}')
+    return files
+
+def merge_two_dicts(dict1, dict2, path=[]):
+    for key in dict2:
+        if key in dict1:
+            if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
+                merge_two_dicts(dict1[key], dict2[key], path + [str(key)])
+            elif isinstance(dict1[key], list) and isinstance(dict2[key], list):
+                dict1[key].extend(dict2[key])
+            elif dict1[key] == dict2[key]:
                 pass
             else:
-                raise Exception('Duplicate Key with different values found %s' % '.'.join(path + [str(key)]))
+                raise Exception(f'Duplicate Key with different values found %s' % '.'.join(path + [str(key)]))
         else:
-            user_manifest[key] = entrypoint_manifest[key]
-    return user_manifest
+            dict1[key] = dict2[key]
+    return dict1
 
 # Command 1: Build unsigned graminized Docker image from original app Docker image.
 def gsc_build(args):
@@ -196,9 +208,22 @@ def gsc_build(args):
 
         entrypoint_manifest_dict = toml.loads(env.get_template('entrypoint.manifest.template').render())
         user_manifest_dict = toml.loads(user_manifest_contents)
-        merged_manifest_dict = merge_user_manifest_and_entrypoint_manifest(user_manifest_dict,entrypoint_manifest_dict)
 
-        entrypoint_manifest.write(toml.dumps(merged_manifest_dict))
+        # Supporting old, deprecated syntax
+        if 'sgx' in user_manifest_dict:
+            if 'trusted_files' in user_manifest_dict['sgx']:
+                if isinstance (user_manifest_dict['sgx']['trusted_files'], dict):
+                    user_manifest_dict['sgx']['trusted_files'] = dict_to_list(user_manifest_dict['sgx']['trusted_files'])
+            if 'allowed_files' in user_manifest_dict['sgx']:
+                if isinstance (user_manifest_dict['sgx']['allowed_files'], dict):
+                    user_manifest_dict['sgx']['allowed_files'] = dict_to_list(user_manifest_dict['sgx']['allowed_files'])
+            if 'protected_files' in user_manifest_dict['sgx']:
+                if isinstance (user_manifest_dict['sgx']['protected_files'], dict):
+                    user_manifest_dict['sgx']['protected_files'] = dict_to_list(user_manifest_dict['sgx']['protected_files'])
+
+        merged_manifest_dict = merge_two_dicts(user_manifest_dict, entrypoint_manifest_dict)
+
+        toml.dump(merged_manifest_dict, entrypoint_manifest)
         entrypoint_manifest.write('\n')
         entrypoint_manifest.write(base_image_environment)
         entrypoint_manifest.write('\n')

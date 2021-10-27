@@ -21,17 +21,16 @@ def is_utf8(filename_bytes):
 
 def extract_files_from_user_manifest(manifest):
     files = []
-    manifest_sgx = manifest['sgx']
 
-    if 'trusted_files' in manifest_sgx:
+    if 'trusted_files' in manifest['sgx']:
         for tf in manifest['sgx']['trusted_files']:
             files.append(tf)
 
-    if 'allowed_files' in manifest_sgx:
+    if 'allowed_files' in manifest['sgx']:
         for af in manifest['sgx']['allowed_files']:
             files.append(af)
 
-    if 'protected_files' in manifest_sgx:
+    if 'protected_files' in manifest['sgx']:
         for pf in manifest['sgx']['protected_files']:
             files.append(pf)
 
@@ -116,15 +115,9 @@ def main(args=None):
     rendered_manifest_dict = toml.loads(rendered_manifest)
     already_added_files = extract_files_from_user_manifest(rendered_manifest_dict)
     trusted_files = generate_trusted_files(args.dir, already_added_files)
-
-    if 'trusted_files' in rendered_manifest_dict['sgx']:
-      rendered_manifest_dict['sgx']['trusted_files'].extend(trusted_files)
-    else:
-      rendered_manifest_dict['sgx']['trusted_files'] = trusted_files
-
+    rendered_manifest_dict['sgx'].setdefault('trusted_files', []).extend(trusted_files)
     with open(manifest, 'w') as manifest_file:
-        manifest_file.write(toml.dumps(rendered_manifest_dict))
-
+        toml.dump(rendered_manifest_dict, manifest_file)
     print(f'\t[from inside Docker container] Successfully finalized `{manifest}`.')
 
 if __name__ == '__main__':

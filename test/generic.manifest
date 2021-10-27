@@ -1,2 +1,6 @@
 sgx.enclave_size = "4G"
 sgx.thread_num = 8
+
+[[sgx.trusted_files]]
+uri = "file:dummy_file_for_test_merge_manifests"
+sha256 = "41dacdf1e6d0481d3b1ab1a91f93139db02b96f29cfdd3fb0b819ba1e33cafc4"
