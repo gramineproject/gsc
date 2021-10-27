@@ -213,13 +213,16 @@ def gsc_build(args):
         if 'sgx' in user_manifest_dict:
             if 'trusted_files' in user_manifest_dict['sgx']:
                 if isinstance (user_manifest_dict['sgx']['trusted_files'], dict):
-                    user_manifest_dict['sgx']['trusted_files'] = dict_to_list(user_manifest_dict['sgx']['trusted_files'])
+                    user_manifest_dict['sgx']['trusted_files'] =
+                        dict_to_list(user_manifest_dict['sgx']['trusted_files'])
             if 'allowed_files' in user_manifest_dict['sgx']:
                 if isinstance (user_manifest_dict['sgx']['allowed_files'], dict):
-                    user_manifest_dict['sgx']['allowed_files'] = dict_to_list(user_manifest_dict['sgx']['allowed_files'])
+                    user_manifest_dict['sgx']['allowed_files'] =
+                        dict_to_list(user_manifest_dict['sgx']['allowed_files'])
             if 'protected_files' in user_manifest_dict['sgx']:
                 if isinstance (user_manifest_dict['sgx']['protected_files'], dict):
-                    user_manifest_dict['sgx']['protected_files'] = dict_to_list(user_manifest_dict['sgx']['protected_files'])
+                    user_manifest_dict['sgx']['protected_files'] =
+                        dict_to_list(user_manifest_dict['sgx']['protected_files'])
 
         merged_manifest_dict = merge_two_dicts(user_manifest_dict, entrypoint_manifest_dict)
 
