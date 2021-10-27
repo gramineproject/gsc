@@ -129,7 +129,7 @@ def extract_build_args(args):
 
 def dict_to_list(user_file_dict):
     files = []
-    for _, user_file in user_file_dict.items():
+    for user_file in user_file_dict.values():
         if isinstance(user_file, str):
             files.append(user_file)
         else:
@@ -146,7 +146,7 @@ def merge_two_dicts(dict1, dict2, path=[]):
             elif dict1[key] == dict2[key]:
                 pass
             else:
-                raise Exception(f'Duplicate Key with different values found %s' % '.'.join(path + [str(key)]))
+                raise Exception(f'Duplicate key with different values found: `{".".join(path + [str(key)])}`')
         else:
             dict1[key] = dict2[key]
     return dict1
@@ -209,19 +209,21 @@ def gsc_build(args):
         entrypoint_manifest_dict = toml.loads(env.get_template('entrypoint.manifest.template').render())
         user_manifest_dict = toml.loads(user_manifest_contents)
 
-        # Supporting old, deprecated syntax
+        # Support old, deprecated syntax: replace old-style TOML-dict
+        # (e.g., `sgx.trusted_files.file1 = "file:foo"`) with new-style
+        # TOML-array (`sgx.trusted_files = ["file:foo"]`) in the user manifest
         if 'sgx' in user_manifest_dict:
             if 'trusted_files' in user_manifest_dict['sgx']:
-                if isinstance (user_manifest_dict['sgx']['trusted_files'], dict):
-                    user_manifest_dict['sgx']['trusted_files'] =
+                if isinstance(user_manifest_dict['sgx']['trusted_files'], dict):
+                    user_manifest_dict['sgx']['trusted_files'] = \
                         dict_to_list(user_manifest_dict['sgx']['trusted_files'])
             if 'allowed_files' in user_manifest_dict['sgx']:
-                if isinstance (user_manifest_dict['sgx']['allowed_files'], dict):
-                    user_manifest_dict['sgx']['allowed_files'] =
+                if isinstance(user_manifest_dict['sgx']['allowed_files'], dict):
+                    user_manifest_dict['sgx']['allowed_files'] = \
                         dict_to_list(user_manifest_dict['sgx']['allowed_files'])
             if 'protected_files' in user_manifest_dict['sgx']:
-                if isinstance (user_manifest_dict['sgx']['protected_files'], dict):
-                    user_manifest_dict['sgx']['protected_files'] =
+                if isinstance(user_manifest_dict['sgx']['protected_files'], dict):
+                    user_manifest_dict['sgx']['protected_files'] = \
                         dict_to_list(user_manifest_dict['sgx']['protected_files'])
 
         merged_manifest_dict = merge_two_dicts(user_manifest_dict, entrypoint_manifest_dict)
