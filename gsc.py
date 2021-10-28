@@ -206,9 +206,8 @@ def gsc_build(args):
     base_image_environment = extract_environment_from_image_config(original_image.attrs['Config'])
 
     with open(tmp_build_path / 'entrypoint.manifest', 'w') as entrypoint_manifest:
-
-        entrypoint_manifest_dict = toml.loads(env.get_template('entrypoint.manifest.template')
-                                                                  .render())
+        entrypoint_manifest_render = env.get_template('entrypoint.manifest.template').render()
+        entrypoint_manifest_dict = toml.loads(entrypoint_manifest_render)
         user_manifest_dict = toml.loads(user_manifest_contents)
 
         # Support old, deprecated syntax: replace old-style TOML-dict (e.g.,
@@ -217,16 +216,16 @@ def gsc_build(args):
         if 'sgx' in user_manifest_dict:
             if 'trusted_files' in user_manifest_dict['sgx']:
                 if isinstance(user_manifest_dict['sgx']['trusted_files'], dict):
-                    user_manifest_dict['sgx']['trusted_files'] = (
-                        dict_to_list(user_manifest_dict['sgx']['trusted_files']))
+                    as_dict = dict_to_list(user_manifest_dict['sgx']['trusted_files'])
+                    user_manifest_dict['sgx']['trusted_file'] = as_dict
             if 'allowed_files' in user_manifest_dict['sgx']:
                 if isinstance(user_manifest_dict['sgx']['allowed_files'], dict):
-                    user_manifest_dict['sgx']['allowed_files'] = (
-                        dict_to_list(user_manifest_dict['sgx']['allowed_files']))
+                    as_dict = dict_to_list(user_manifest_dict['sgx']['allowed_files'])
+                    user_manifest_dict['sgx']['allowed_files'] = as_dict
             if 'protected_files' in user_manifest_dict['sgx']:
                 if isinstance(user_manifest_dict['sgx']['protected_files'], dict):
-                    user_manifest_dict['sgx']['protected_files'] = (
-                        dict_to_list(user_manifest_dict['sgx']['protected_files']))
+                    as_dict = dict_to_list(user_manifest_dict['sgx']['protected_files'])
+                    user_manifest_dict['sgx']['protected_files'] = as_dict
 
         merged_manifest_dict = merge_two_dicts(user_manifest_dict, entrypoint_manifest_dict)
         toml.dump(merged_manifest_dict, entrypoint_manifest)
