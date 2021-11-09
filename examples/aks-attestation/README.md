@@ -10,30 +10,31 @@ deployed to the AKS cluster.
 
 ## Preparing client and server images
 
-This demonstration is created for ``gramine/CI-Examples/ra-tls-secret-prov`` sample.
-In order to create the below two images, user needs to download core [Gramine repository](https://github.com/gramineproject/gramine).
+This demonstration is created for ``gramine/CI-Examples/ra-tls-secret-prov`` sample. The sample
+contains client and server applications, where by-default server is running on localhost:4433. Here,
+the client sends its SGX quote to the server for verification. After successful quote verification,
+the server sends a secret to the client. To run these client and server applications inside AKS
+cluster, user needs to prepare two docker images, each for client and server application. Since, now
+the server will no longer run on localhost, instead it will run as part of a container inside AKS
+cluster, the server container should be assigned a dns name (e.g., `<AKS-DNS-NAME>`) for outside
+container visibility. The client will send requests to this dns name. Therefore, for demonstration
+ we updated ``gramine/CI-Examples/ra-tls-secret-prov/certs`` directory certificates by replacing
+"Common Name" field in the server certificate (i.e., `server2-sha256.crt`) from `localhost` to
+`<AKS-DNS-NAME.*.cloudapp.azure.com>`.
+
+In order to create base client and server images for AKS environment, user can execute
+base-image-generation-script.sh script. Since, both client and server applications will run
+inside containers in AKS cluster, and the client wants to send its SGX quote to the server for
+verification, therefore the user needs to graminize the client application, so that it can leverage
+SGX capabilities from within a container. Hence, the following two steps create base server image
+and gsc-client image for AKS cluster.
 
 ### Creating server image
 
-1. Prepare server certificate:
-    - Create server certificate signed by your trusted root CA. Ensure "Common Name"
-      field in the server certificate corresponds to `<AKS-DNS-NAME>` used in step 5.
-    - Put trusted root CA certificate, server certificate, and server key in
-      `gramine/CI-Examples/ra-tls-secret-prov/certs` directory with existing naming convention.
+1. The base-image-generation-script.sh script will create server image with the name
+   aks-secret-prov-server-img:latest.
 
-2. Make sure Gramine is built with `meson setup ... -Ddcap=enabled`.
-
-3. Create base ra-tls-secret-prov server image:
-
-    ```sh
-    $ cd gramine/CI-Examples/ra-tls-secret-prov
-    $ make clean && make dcap
-    $ cd gramine
-    $ docker build -t <aks-secret-prov-server-img> \
-        -f <path-to-gsc>/examples/aks-attestation/aks-secret-prov-server.dockerfile .
-    ```
-
-4. Push resulting image to Docker Hub or your preferred registry:
+2. Push server image to Docker Hub or your preferred registry:
 
     ```sh
     $ docker tag <aks-secret-prov-server-img> \
@@ -41,29 +42,16 @@ In order to create the below two images, user needs to download core [Gramine re
     $ docker push <dockerhubusername>/<aks-secret-prov-server-img>
     ```
 
-5. Deploy `<aks-secret-prov-server-img>` in AKS confidential compute cluster:
+3. Deploy `<aks-secret-prov-server-img>` in AKS confidential compute cluster:
     - Reference deployment file:
         `gsc/examples/aks-attestation/aks-secret-prov-server-deployment.yaml`
 
 ### Creating client image
 
-1. Make sure Gramine is built with `meson setup ... -Ddcap=enabled`.
+1. The base-image-generation-script.sh script will create client image with the name
+   aks-secret-prov-client-img:latest.
 
-2. Create base ra-tls-secret-prov min client image:
-
-    ```sh
-    $ cd gramine/CI-Examples/ra-tls-secret-prov
-    $ make clean && make secret_prov_min_client
-    $ cd gramine
-    $ docker build -t <base-secret-prov-client-img> \
-        -f <path-to-gsc>/examples/aks-attestation/aks-secret-prov-client.dockerfile .
-    ```
-
-3. Prepare client to connect with remote ra-tls-secret-prov server hosted inside AKS cluster:
-    - Provide server dns name `<AKS-DNS-NAME>` as `loader.env.SECRET_PROVISION_SERVERS` value
-      inside `gsc/examples/aks-attestation/aks-secret-prov-client.manifest` file.
-
-4. Create GSC image for ra-tls-secret-prov min client:
+2. Create GSC image for ra-tls-secret-prov min client:
 
     ```sh
     $ cd gsc

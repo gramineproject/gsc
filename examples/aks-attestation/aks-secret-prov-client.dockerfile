@@ -19,14 +19,12 @@ RUN apt-get update \
     libsgx-dcap-ql \
     libsgx-quote-ex
 
-# Build environment of this Dockerfile should point to the root of Gramine directory
-
 RUN mkdir -p /ra-tls-secret-prov
 
-COPY CI-Examples/ra-tls-secret-prov /ra-tls-secret-prov
+COPY gramine/CI-Examples/ra-tls-secret-prov /ra-tls-secret-prov
+
+COPY gramine/CI-Examples/ra-tls-secret-prov/secret_prov_min_client /usr/local/bin
 
 WORKDIR /ra-tls-secret-prov
 
-ENV PATH = "${PATH}:/ra-tls-secret-prov"
-
-ENTRYPOINT ["/ra-tls-secret-prov/secret_prov_min_client"]
+ENTRYPOINT ["secret_prov_min_client"]
