@@ -216,16 +216,16 @@ def gsc_build(args):
         if 'sgx' in user_manifest_dict:
             if 'trusted_files' in user_manifest_dict['sgx']:
                 if isinstance(user_manifest_dict['sgx']['trusted_files'], dict):
-                    as_dict = dict_to_list(user_manifest_dict['sgx']['trusted_files'])
-                    user_manifest_dict['sgx']['trusted_file'] = as_dict
+                    as_list = dict_to_list(user_manifest_dict['sgx']['trusted_files'])
+                    user_manifest_dict['sgx']['trusted_file'] = as_list
             if 'allowed_files' in user_manifest_dict['sgx']:
                 if isinstance(user_manifest_dict['sgx']['allowed_files'], dict):
-                    as_dict = dict_to_list(user_manifest_dict['sgx']['allowed_files'])
-                    user_manifest_dict['sgx']['allowed_files'] = as_dict
+                    as_list = dict_to_list(user_manifest_dict['sgx']['allowed_files'])
+                    user_manifest_dict['sgx']['allowed_files'] = as_list
             if 'protected_files' in user_manifest_dict['sgx']:
                 if isinstance(user_manifest_dict['sgx']['protected_files'], dict):
-                    as_dict = dict_to_list(user_manifest_dict['sgx']['protected_files'])
-                    user_manifest_dict['sgx']['protected_files'] = as_dict
+                    as_list = dict_to_list(user_manifest_dict['sgx']['protected_files'])
+                    user_manifest_dict['sgx']['protected_files'] = as_list
 
         merged_manifest_dict = merge_two_dicts(user_manifest_dict, entrypoint_manifest_dict)
         toml.dump(merged_manifest_dict, entrypoint_manifest)
