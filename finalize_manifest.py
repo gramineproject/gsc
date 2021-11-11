@@ -5,12 +5,13 @@
 #                         Dmitrii Kuvaiskii <dmitrii.kuvaiskii@intel.com>
 
 import argparse
-import jinja2
 import os
 import re
 import subprocess
 import sys
-import toml    # pylint: disable=import-error
+
+import jinja2
+import toml
 
 def is_utf8(filename_bytes):
     try:
@@ -22,17 +23,9 @@ def is_utf8(filename_bytes):
 def extract_files_from_user_manifest(manifest):
     files = []
 
-    if 'trusted_files' in manifest['sgx']:
-        for tf in manifest['sgx']['trusted_files']:
-            files.append(tf)
-
-    if 'allowed_files' in manifest['sgx']:
-        for af in manifest['sgx']['allowed_files']:
-            files.append(af)
-
-    if 'protected_files' in manifest['sgx']:
-        for pf in manifest['sgx']['protected_files']:
-            files.append(pf)
+    files.extend(manifest['sgx'].get('trusted_files', []))
+    files.extend(manifest['sgx'].get('allowed_files', []))
+    files.extend(manifest['sgx'].get('protected_files',[]))
 
     return files
 
@@ -75,8 +68,7 @@ def generate_trusted_files(root_dir, already_added_files):
                 # we use TOML's basic single-line strings, can't have newlines
                 continue
 
-            escaped_filename = filename.translate(str.maketrans({'\\': r'\\', '"': r'\"'}))
-            trusted_file_entry = f'file:{escaped_filename}'
+            trusted_file_entry = f'file:{filename}'
             if trusted_file_entry in already_added_files:
                 # user manifest already contains this file (probably as allowed or protected)
                 continue
