@@ -126,16 +126,6 @@ def extract_build_args(args):
                 sys.exit(1)
     return buildargs_dict
 
-
-def dict_to_list(user_file_dict):
-    files = []
-    for user_file in user_file_dict.values():
-        if isinstance(user_file, str):
-            files.append(user_file)
-        else:
-            raise Exception(f'Unknown user file format: {user_file!r}')
-    return files
-
 def merge_two_dicts(dict1, dict2, path=[]):
     for key in dict2:
         if key in dict1:
@@ -216,16 +206,16 @@ def gsc_build(args):
         if 'sgx' in user_manifest_dict:
             if 'trusted_files' in user_manifest_dict['sgx']:
                 if isinstance(user_manifest_dict['sgx']['trusted_files'], dict):
-                    as_list = dict_to_list(user_manifest_dict['sgx']['trusted_files'])
-                    user_manifest_dict['sgx']['trusted_file'] = as_list
+                    tf_list = list(user_manifest_dict['sgx']['trusted_files'].values())
+                    user_manifest_dict['sgx']['trusted_files'] = tf_list
             if 'allowed_files' in user_manifest_dict['sgx']:
                 if isinstance(user_manifest_dict['sgx']['allowed_files'], dict):
-                    as_list = dict_to_list(user_manifest_dict['sgx']['allowed_files'])
-                    user_manifest_dict['sgx']['allowed_files'] = as_list
+                    af_list = list(user_manifest_dict['sgx']['allowed_files'].values())
+                    user_manifest_dict['sgx']['allowed_files'] = af_list
             if 'protected_files' in user_manifest_dict['sgx']:
                 if isinstance(user_manifest_dict['sgx']['protected_files'], dict):
-                    as_list = dict_to_list(user_manifest_dict['sgx']['protected_files'])
-                    user_manifest_dict['sgx']['protected_files'] = as_list
+                    pf_list = list(user_manifest_dict['sgx']['protected_files'].values())
+                    user_manifest_dict['sgx']['protected_files'] = pf_list
 
         merged_manifest_dict = merge_two_dicts(user_manifest_dict, entrypoint_manifest_dict)
         toml.dump(merged_manifest_dict, entrypoint_manifest)
