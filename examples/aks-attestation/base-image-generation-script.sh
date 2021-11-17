@@ -61,4 +61,4 @@ docker build -f aks-secret-prov-client.dockerfile -t aks-secret-prov-client-img 
 
 # Remove Gramine directory
 
-rm -r gramine/
+rm -rf gramine/
