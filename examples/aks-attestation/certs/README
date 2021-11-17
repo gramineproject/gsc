@@ -6,3 +6,7 @@ This directory contains pre-generated example certificates. In particular:
   Loaded in server (verifier), so it will send it to the client during TLS
   handshake. Common Name `ra-tls-server-aks-dns.eastus.cloudapp.azure.com`
 - `server2.key` -- RSA private key in PEM format. Loaded in server (verifier).
+
+Note: These certificates should not be used in production. Here, user should
+      update the server2-sha256.crt with ``Common Name`` pointing to the dns
+      name of the ra-tls-secret-prov server deployed at AKS cluster.

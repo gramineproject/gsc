@@ -1,3 +1,6 @@
+# This script assumes that in-kernel driver is installed on the host system.
+# Please refer https://gramine.readthedocs.io/en/latest/building.html#id2 for more details.
+
 # install Gramine dependencies
 
 apt-get install -y \
@@ -30,7 +33,7 @@ git clone https://github.com/gramineproject/gramine.git
 cd gramine/Pal/src/host/Linux-SGX/signer/
 openssl genrsa -3 -out enclave-key.pem 3072
 
-# Build Gramine with DCAP enabled mode
+# Build Gramine with DCAP enabled mode (assuming in-kernel driver)
 
 cd ../../../../../
 meson setup build/ --buildtype=release -Ddirect=enabled -Dsgx=enabled -Ddcap=enabled

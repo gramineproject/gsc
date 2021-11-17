@@ -10,16 +10,18 @@ deployed to the AKS cluster.
 
 ## Preparing client and server images
 
-This demonstration is created for ``gramine/CI-Examples/ra-tls-secret-prov`` sample. The sample
-contains client and server applications, where by-default server is running on localhost:4433. Here,
-the client sends its SGX quote to the server for verification. After successful quote verification,
-the server sends a secret to the client. To run these client and server applications inside AKS
-cluster, user needs to prepare two docker images, each for client and server application. Since, now
-the server will no longer run on localhost, instead it will run as part of a container inside AKS
-cluster, the server container should be assigned a dns name (e.g., `<AKS-DNS-NAME>`) for outside
-container visibility. The client will send requests to this dns name. Therefore, for demonstration
- we updated ``gramine/CI-Examples/ra-tls-secret-prov/certs`` directory certificates by replacing
-"Common Name" field in the server certificate (i.e., `server2-sha256.crt`) from `localhost` to
+This demonstration is based on ra-tls-secret-prov sample from
+``gramine/CI-Examples/ra-tls-secret-prov``. Familiarity with this sample is highly recommended
+before proceeding further.  The sample contains client and server applications, where by-default
+server is running on localhost:4433. Here, the client sends its SGX quote to the server for
+verification. After successful quote verification, the server sends a secret to the client. To run
+these client and server applications inside AKS cluster, user needs to prepare two docker images,
+each for client and server application. Since, now the server will no longer run on localhost,
+instead it will run as part of a container inside AKS cluster, the server container should be
+assigned a dns name (e.g., `<AKS-DNS-NAME>`) for outside container visibility. The client will send
+requests to this dns name. Therefore, for demonstration we updated
+``gramine/CI-Examples/ra-tls-secret-prov/certs`` directory certificates by replacing "Common Name"
+field in the server certificate (i.e., `server2-sha256.crt`) from `localhost` to
 `<AKS-DNS-NAME.*.cloudapp.azure.com>`.
 
 In order to create base client and server images for AKS environment, user can execute
