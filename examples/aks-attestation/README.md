@@ -80,13 +80,14 @@ and gsc-client image for AKS cluster.
 ## Deploying client and server images inside AKS Confidential Compute cluster
 
 AKS confidential compute cluster can be created using following
-[link](https://docs.microsoft.com/en-us/azure/confidential-computing/confidential-nodes-aks-get-started).
+[link](https://docs.microsoft.com/en-us/azure/confidential-computing/confidential-enclave-nodes-aks-get-started).
 
 Gramine performs out-of-proc mode DCAP quote generation. Out-of-proc mode quote generation requires aesmd
 service. To fulfill this requirement, AKS provides
-[sgxquotehelper daemonset](https://docs.microsoft.com/en-us/azure/confidential-computing/confidential-nodes-out-of-proc-attestation).
-This feature exposes aesmd service for the container node. The service will internally connect with
-az-dcap-client to fetch the platform collateral required for quote generation. In this demo, the
+[sgxquotehelper daemonset](https://docs.microsoft.com/en-us/azure/confidential-computing/confidential-nodes-aks-addon#out-of-proc-attestation-for-confidential-workloads)
+(can be enabled by ``--enable-sgxquotehelper`` during cluster creation). This feature exposes aesmd
+service for the container node. The service will internally connect with az-dcap-client to fetch the
+platform collateral required for quote generation. In this demo, the
 ``aks-secret-prov-client-deployment.yaml`` uses aesmd service exposed by AKS with the help of
 sgxquotehelper plugin.
 

@@ -14,8 +14,8 @@ RUN apt-get update \
 # version used for quote generation. User can replace the below package with the
 # latest package.
 
-RUN wget https://github.com/microsoft/Azure-DCAP-Client/releases/download/1.8/az-dcap-client_1.8_amd64_18.04.deb \
-    && dpkg -i az-dcap-client_1.8_amd64_18.04.deb
+RUN wget https://packages.microsoft.com/ubuntu/18.04/prod/pool/main/a/az-dcap-client/az-dcap-client_1.10_amd64.deb \
+ && dpkg -i az-dcap-client_1.10_amd64.deb
 
 # Installing DCAP Quote Verification Library
 RUN echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' \
