@@ -57,6 +57,7 @@ and gsc-client image for AKS cluster.
 
     ```sh
     $ cd gsc
+    $ cp config.yaml.template config.yaml (we tested aks-gsc-secret-prov-client-img for DCAP 1.11)
     $ openssl genrsa -3 -out enclave-key.pem 3072
     $ ./gsc build <base-secret-prov-client-img> \
         examples/aks-attestation/aks-secret-prov-client.manifest
