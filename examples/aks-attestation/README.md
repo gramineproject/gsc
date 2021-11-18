@@ -25,8 +25,8 @@ field in the server certificate (i.e., `server2-sha256.crt`) from `localhost` to
 `<AKS-DNS-NAME.*.cloudapp.azure.com>`.
 
 In order to create base client and server images for AKS environment, user can execute
-base-image-generation-script.sh script. Since, both client and server applications will run
-inside containers in AKS cluster, and the client wants to send its SGX quote to the server for
+base-image-generation-script.sh script (with sudo). Since, both client and server applications will
+run inside containers in AKS cluster, and the client wants to send its SGX quote to the server for
 verification, therefore the user needs to graminize the client application, so that it can leverage
 SGX capabilities from within a container. Hence, the following two steps create base server image
 and gsc-client image for AKS cluster.
