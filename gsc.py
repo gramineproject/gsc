@@ -196,9 +196,11 @@ def gsc_build(args):
     base_image_dict = toml.loads(base_image_environment)
 
     user_manifest_contents = ''
-    if os.path.exists(args.manifest):
-        with open(args.manifest, 'r') as user_manifest_file:
-            user_manifest_contents = user_manifest_file.read()
+    if not os.path.exists(args.manifest):
+        raise FileNotFoundError(f'Manifest file {args.manifest} does not exist')
+    with open(args.manifest, 'r') as user_manifest_file:
+        user_manifest_contents = user_manifest_file.read()
+
     user_manifest_dict = toml.loads(user_manifest_contents)
 
     # Support deprecated syntax: replace old-style TOML-dict (`sgx.trusted_files.key = "file:foo"`)
