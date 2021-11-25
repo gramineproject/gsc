@@ -25,23 +25,19 @@ RUN echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bio
 
 RUN apt-get update && apt-get install -y libsgx-dcap-quote-verify
 
-# Build environment of this Dockerfile should point to the root of Gramine directory
+WORKDIR /ra-tls-secret-prov
 
-RUN mkdir -p /ra-tls-secret-prov
-
-COPY gramine/CI-Examples/ra-tls-secret-prov /ra-tls-secret-prov
+COPY gramine/CI-Examples/ra-tls-secret-prov .
 
 COPY gramine/CI-Examples/ra-tls-secret-prov/secret_prov_server_dcap /usr/local/bin
 
-RUN mkdir -p /ra-tls-secret-prov/libs
+RUN mkdir libs
 
-COPY gramine/build/Pal/src/host/Linux-SGX/tools/ra-tls/libsecret_prov_verify_dcap.so /ra-tls-secret-prov/libs
-COPY gramine/build/Pal/src/host/Linux-SGX/tools/common/libsgx_util.so /ra-tls-secret-prov/libs
-COPY gramine/build/subprojects/mbedtls-mbedtls-2.26.0/libmbedcrypto_gramine.so.6 /ra-tls-secret-prov/libs
-COPY gramine/build/subprojects/mbedtls-mbedtls-2.26.0/libmbedtls_gramine.so.13 /ra-tls-secret-prov/libs
-COPY gramine/build/subprojects/mbedtls-mbedtls-2.26.0/libmbedx509_gramine.so.1 /ra-tls-secret-prov/libs
-
-WORKDIR /ra-tls-secret-prov
+COPY gramine/build/Pal/src/host/Linux-SGX/tools/ra-tls/libsecret_prov_verify_dcap.so libs
+COPY gramine/build/Pal/src/host/Linux-SGX/tools/common/libsgx_util.so libs
+COPY gramine/build/subprojects/mbedtls-mbedtls-2.26.0/libmbedcrypto_gramine.so.6 libs
+COPY gramine/build/subprojects/mbedtls-mbedtls-2.26.0/libmbedtls_gramine.so.13 libs
+COPY gramine/build/subprojects/mbedtls-mbedtls-2.26.0/libmbedx509_gramine.so.1 libs
 
 ENV LD_LIBRARY_PATH = "${LD_LIBRARY_PATH}:/ra-tls-secret-prov/libs"
 

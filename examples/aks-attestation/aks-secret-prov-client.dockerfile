@@ -19,12 +19,10 @@ RUN apt-get update \
     libsgx-dcap-ql \
     libsgx-quote-ex
 
-RUN mkdir -p /ra-tls-secret-prov
+WORKDIR /ra-tls-secret-prov
 
-COPY gramine/CI-Examples/ra-tls-secret-prov /ra-tls-secret-prov
+COPY gramine/CI-Examples/ra-tls-secret-prov .
 
 COPY gramine/CI-Examples/ra-tls-secret-prov/secret_prov_min_client /usr/local/bin
-
-WORKDIR /ra-tls-secret-prov
 
 ENTRYPOINT ["secret_prov_min_client"]
