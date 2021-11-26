@@ -13,7 +13,6 @@ import shutil
 import struct
 import sys
 import tempfile
-import errno
 import docker  # pylint: disable=import-error
 import jinja2
 import toml    # pylint: disable=import-error
