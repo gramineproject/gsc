@@ -13,7 +13,7 @@ import shutil
 import struct
 import sys
 import tempfile
-
+import errno
 import docker  # pylint: disable=import-error
 import jinja2
 import toml    # pylint: disable=import-error
@@ -197,8 +197,7 @@ def gsc_build(args):
 
     user_manifest_contents = ''
     if not os.path.exists(args.manifest):
-        raise Exception(f'Manifest file {args.manifest} does not exist')
-
+        raise FileNotFoundError(f'Manifest file {args.manifest} does not exist')
     with open(args.manifest, 'r') as user_manifest_file:
         user_manifest_contents = user_manifest_file.read()
 
