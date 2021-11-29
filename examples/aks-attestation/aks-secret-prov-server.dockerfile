@@ -27,7 +27,8 @@ RUN apt-get update && apt-get install -y libsgx-dcap-quote-verify
 
 WORKDIR /ra-tls-secret-prov
 
-COPY gramine/CI-Examples/ra-tls-secret-prov .
+COPY gramine/CI-Examples/ra-tls-secret-prov/certs ./certs
+COPY gramine/CI-Examples/ra-tls-secret-prov/files ./files
 
 COPY gramine/CI-Examples/ra-tls-secret-prov/secret_prov_server_dcap /usr/local/bin
 
