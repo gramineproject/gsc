@@ -25,13 +25,4 @@ COPY gramine/CI-Examples/ra-tls-secret-prov/certs ./certs
 
 COPY gramine/CI-Examples/ra-tls-secret-prov/secret_prov_min_client /usr/local/bin
 
-RUN mkdir libs
-
-COPY gramine/build/Pal/src/host/Linux-SGX/tools/ra-tls/libsecret_prov_attest.so libs
-COPY gramine/build/subprojects/mbedtls-mbedtls-2.26.0/libmbedcrypto_gramine.so.6 libs
-COPY gramine/build/subprojects/mbedtls-mbedtls-2.26.0/libmbedtls_gramine.so.13 libs
-COPY gramine/build/subprojects/mbedtls-mbedtls-2.26.0/libmbedx509_gramine.so.1 libs
-
-ENV LD_LIBRARY_PATH = "${LD_LIBRARY_PATH}:/ra-tls-secret-prov/libs"
-
 ENTRYPOINT ["secret_prov_min_client"]
