@@ -10,7 +10,7 @@ deployed to the AKS cluster.
 
 ## Preparing client and server images
 
-This demonstration is based on the ra-tls-secret-prov example from
+This demonstration is based on the `ra-tls-secret-prov` example from
 https://github.com/gramineproject/gramine/tree/master/CI-Examples/ra-tls-secret-prov. Familiarity
 with this example is highly recommended before proceeding further. The sample contains client and
 server applications, where by default server is running on localhost:4433. In the example, the
@@ -22,10 +22,10 @@ container inside the AKS cluster. The server container should be assigned a DNS 
 (e.g., `<AKS-DNS-NAME>`) to be accessible from the outside of the container. The client will send
 requests to this DNS name. Therefore, for demonstration we updated the example certificates from
 https://github.com/gramineproject/gramine/tree/master/CI-Examples/ra-tls-secret-prov/certs by
-replacing "Common Name" field in the server certificate (i.e., `server2-sha256.crt`) from
+replacing the "Common Name" field in the server certificate (i.e., `server2-sha256.crt`) from
 `localhost` to `<AKS-DNS-NAME.*.cloudapp.azure.com>`.
 
-In order to create base client and server images for the AKS environment, user can execute
+In order to create base client and server images for the AKS environment, user can execute the
 `base-image-generation-script.sh` script (with sudo). Since both client and server applications will
 run inside containers in the AKS cluster, and the client application will send its SGX quote to the
 server for verification, therefore the user needs to graminize the client application. Hence, the
@@ -37,7 +37,7 @@ AKS cluster.
 1. The `base-image-generation-script.sh` script will create the native Docker server image with the
    name `aks-secret-prov-server-img:latest`.
 
-2. Push server image to Docker Hub or your preferred registry:
+2. Push the server image to Docker Hub or your preferred registry:
 
     ```sh
     $ docker tag aks-secret-prov-server-img:latest \
@@ -45,9 +45,9 @@ AKS cluster.
     $ docker push <dockerhubusername>/aks-secret-prov-server-img:latest
     ```
 
-3. Deploy `aks-secret-prov-server-img:latest` in AKS confidential compute cluster:
+3. Deploy `aks-secret-prov-server-img:latest` in the AKS confidential compute cluster:
     - Reference deployment file:
-        `gsc/examples/aks-attestation/aks-secret-prov-server-deployment.yaml`
+        `aks-secret-prov-server-deployment.yaml`
 
 ### Creating client image
 
@@ -75,27 +75,27 @@ AKS cluster.
 
 6. Deploy `gsc-aks-secret-prov-client-img:latest` in AKS confidential compute cluster:
     - Reference deployment file:
-        `gsc/examples/aks-attestation/aks-secret-prov-client-deployment.yaml`
+        `aks-secret-prov-client-deployment.yaml`
 
 **NOTE**: We tested this example with DCAP driver 1.11 specified in the GSC configuration file.
 
 ## Deploying client and server images in AKS Confidential Compute cluster
 
-AKS confidential compute cluster can be created using following
+AKS confidential compute cluster can be created using the following
 [link](https://docs.microsoft.com/en-us/azure/confidential-computing/confidential-enclave-nodes-aks-get-started).
 
-Gramine performs out-of-proc mode DCAP quote generation. Out-of-proc mode quote generation requires aesmd
-service. To fulfill this requirement, AKS provides
+Gramine performs out-of-proc mode DCAP quote generation. Out-of-proc mode quote generation requires
+aesmd service. To fulfill this requirement, AKS provides the
 [sgxquotehelper daemonset](https://docs.microsoft.com/en-us/azure/confidential-computing/confidential-nodes-aks-addon#out-of-proc-attestation-for-confidential-workloads)
 (can be enabled by `--enable-sgxquotehelper` during cluster creation). This feature exposes aesmd
 service for the container node. The service will internally connect with az-dcap-client to fetch the
 platform collateral required for quote generation. In this demo, the
-`aks-secret-prov-client-deployment.yaml` uses aesmd service exposed by AKS with the help of
+`aks-secret-prov-client-deployment.yaml` uses aesmd service exposed by AKS with the help of the
 sgxquotehelper plugin.
 
-In the ra-tls-secret-prov example, the client will generate out-of-proc mode sgx quote that will be
-embedded inside RA-TLS certificate. On receiving the quote, the server will internally verify it
-using libsgx-dcap-quote-verify library via az-dcap-client library.
+In our example, the client will generate the SGX quote that will be embedded inside the RA-TLS
+certificate. On receiving the quote, the server will internally verify it using the
+libsgx-dcap-quote-verify library via the az-dcap-client library.
 
 ### Deployment
 

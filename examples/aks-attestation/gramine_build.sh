@@ -27,10 +27,10 @@ sudo python3 -B -m pip install 'toml>=0.10' 'meson>=0.55'
 # Download Gramine
 
 git clone https://github.com/gramineproject/gramine.git
+cd gramine
 
 # Generate Signing Key
 
-cd gramine
 openssl genrsa -3 -out Pal/src/host/Linux-SGX/signer/enclave-key.pem 3072
 
 # Build Gramine with DCAP enabled mode (assuming in-kernel driver)

@@ -3,8 +3,7 @@
 if [ -d "gramine" ]; then
     echo "\n\n ***** gramine directory exists, proceeding to image generation ***** \n\n"
 else
-    chmod u+x gramine_build.sh
-    ./gramine_build.sh
+    bash ./gramine_build.sh
 fi
 
 # Create Server image
