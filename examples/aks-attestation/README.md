@@ -26,11 +26,13 @@ replacing the "Common Name" field in the server certificate (i.e., `server2-sha2
 `localhost` to `<AKS-DNS-NAME.*.cloudapp.azure.com>`.
 
 In order to create base client and server images for the AKS environment, user can execute the
-`base-image-generation-script.sh` script (with sudo). Since both client and server applications will
+`base-image-generation-script.sh` script. Since both client and server applications will
 run inside containers in the AKS cluster, and the client application will send its SGX quote to the
 server for verification, therefore the user needs to graminize the client application. Hence, the
 following two steps create a native Docker server image and a graminized GSC client image for the
 AKS cluster.
+
+**NOTE**: This example is Ubuntu-specific (tested version is Ubuntu 18.04).
 
 ### Creating server image
 

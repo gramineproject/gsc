@@ -34,11 +34,11 @@ COPY gramine/CI-Examples/ra-tls-secret-prov/secret_prov_server_dcap /usr/local/b
 
 RUN mkdir libs
 
-COPY gramine/build/Pal/src/host/Linux-SGX/tools/ra-tls/libsecret_prov_verify_dcap.so libs
-COPY gramine/build/Pal/src/host/Linux-SGX/tools/common/libsgx_util.so libs
-COPY gramine/build/subprojects/mbedtls-mbedtls-2.26.0/libmbedcrypto_gramine.so.6 libs
-COPY gramine/build/subprojects/mbedtls-mbedtls-2.26.0/libmbedtls_gramine.so.13 libs
-COPY gramine/build/subprojects/mbedtls-mbedtls-2.26.0/libmbedx509_gramine.so.1 libs
+COPY gramine/meson_build_output/lib/x86_64-linux-gnu/libsecret_prov_verify_dcap.so libs
+COPY gramine/meson_build_output/lib/x86_64-linux-gnu/libsgx_util.so libs
+COPY gramine/meson_build_output/lib/x86_64-linux-gnu/libmbedcrypto_gramine.so.* libs
+COPY gramine/meson_build_output/lib/x86_64-linux-gnu/libmbedtls_gramine.so.* libs
+COPY gramine/meson_build_output/lib/x86_64-linux-gnu/libmbedx509_gramine.so.* libs
 
 ENV LD_LIBRARY_PATH = "${LD_LIBRARY_PATH}:/ra-tls-secret-prov/libs"
 

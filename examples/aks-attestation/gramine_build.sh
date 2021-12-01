@@ -28,6 +28,7 @@ sudo python3 -B -m pip install 'toml>=0.10' 'meson>=0.55'
 
 git clone https://github.com/gramineproject/gramine.git
 cd gramine
+mkdir -p $PWD/meson_build_output
 
 # Generate Signing Key
 
@@ -35,9 +36,10 @@ openssl genrsa -3 -out Pal/src/host/Linux-SGX/signer/enclave-key.pem 3072
 
 # Build Gramine with DCAP enabled mode (assuming in-kernel driver)
 
-meson setup build/ --buildtype=release -Ddirect=enabled -Dsgx=enabled -Ddcap=enabled
+meson setup build/ --prefix="$PWD/meson_build_output" --buildtype=release -Ddirect=enabled \
+  -Dsgx=enabled -Ddcap=enabled
 ninja -C build/
-sudo ninja -C build/ install
+ninja -C build/ install
 
 # Copy dummy server certificate with Common Name as "<AKS-DNS-NAME.*.cloudapp.azure.com>
 cd ../

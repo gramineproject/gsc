@@ -1,7 +1,7 @@
 # Download and build Gramine directory
 
 if [ -d "gramine" ]; then
-    echo "\n\n ***** gramine directory exists, proceeding to image generation ***** \n\n"
+    echo "***** gramine directory exists, proceeding to image generation *****"
 else
     bash ./gramine_build.sh
 fi
