@@ -32,7 +32,7 @@ server for verification, therefore the user needs to graminize the client applic
 following two steps create a native Docker server image and a graminized GSC client image for the
 AKS cluster.
 
-**NOTE**: This example is Ubuntu-specific (tested version is Ubuntu 18.04).
+Note: This example is Ubuntu-specific (tested version is Ubuntu 18.04).
 
 ### Creating server image
 
@@ -79,7 +79,7 @@ AKS cluster.
     - Reference deployment file:
         `aks-secret-prov-client-deployment.yaml`
 
-**NOTE**: We tested this example with DCAP driver 1.11 specified in the GSC configuration file.
+Note: We tested this example with DCAP driver 1.11 specified in the GSC configuration file.
 
 ## Deploying client and server images in AKS Confidential Compute cluster
 
