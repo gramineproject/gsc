@@ -28,7 +28,7 @@ sudo python3 -B -m pip install 'toml>=0.10' 'meson>=0.55'
 
 git clone https://github.com/gramineproject/gramine.git
 cd gramine
-mkdir -p $PWD/meson_build_output
+mkdir -p meson_build_output
 
 # Generate Signing Key
 
