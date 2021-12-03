@@ -13,12 +13,10 @@ RUN apt-get update \
 # Here, the version of az-dcap-client should be in sync with the az-dcap-client
 # version used for quote generation. User can replace the below package with the
 # latest package.
-
 RUN wget https://packages.microsoft.com/ubuntu/18.04/prod/pool/main/a/az-dcap-client/az-dcap-client_1.10_amd64.deb \
  && dpkg -i az-dcap-client_1.10_amd64.deb
 
 # Installing DCAP Quote Verification Library
-
 RUN echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' \
     > /etc/apt/sources.list.d/intel-sgx.list \
     && wget https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key \
