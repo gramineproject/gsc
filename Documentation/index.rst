@@ -4,11 +4,6 @@
 :program:`gsc` -- Gramine Shielded Containers
 =============================================
 
-.. warning::
-    GSC is still under development and must not be used in production! Please
-    see `issue #13 <https://github.com/gramineproject/gsc/issues/13>`__ for a
-    description of missing features and security caveats.
-
 Synopsis
 ========
 
@@ -299,8 +294,8 @@ in :file:`config.yaml.template`.
 
 .. describe:: Distro
 
-   Defines Linux distribution to be used to build Gramine in. Currently the
-   only supported value is ``ubuntu18.04``.
+   Defines Linux distribution to be used to build Gramine in. Currently tested
+   distros are Ubuntu 18.04 and Ubuntu 20.04. Default value is ``ubuntu:18.04``.
 
 .. describe:: Gramine.Repository
 
@@ -377,9 +372,24 @@ sign the image via a :command:`gsc sign-image` command.
 
    This environment variable specifies the pal loader.
 
+GSC requires a custom seccomp profile while running with Linux PAL, which has to be
+specified at Docker run time. There are two options:
+
+#. Pass `unconfined` to run the container without the default seccomp profile.
+   This option is generally considered insecure, since this results in containers
+   running with unrestricted system calls (all system calls are allowed which
+   increases the attack surface of the Linux Kernel).
+
+#. Pass the custom seccomp profile
+   https://github.com/gramineproject/gramine/blob/master/Scripts/docker_seccomp.json.
+
+   With this option, Docker containers restrict themselves to a rather narrow set
+   of allowed system calls, keeping the attack surface of the Linux kernel small.
+   All the necessary capabilities required for GSC to function are still enabled.
+
 .. code-block:: sh
 
-   docker run ... --env GSC_PAL=Linux gsc-<image-name> ...
+   docker run ... --env GSC_PAL=Linux --security-opt seccomp=<profile> gsc-<image-name> ...
 
 Example
 =======
@@ -454,10 +464,10 @@ This document focuses on the most important limitations of GSC. `Issue #13
 <https://github.com/gramineproject/gsc/issues/13>`__ provides the complete list
 of known limitations and serves as a discussion board for workarounds.
 
-Dependency on Ubuntu 18.04
---------------------------
+Dependency on Ubuntu
+--------------------
 
-Docker images not based on Ubuntu 18.04 may not be compatible with GSC. GSC
+Docker images not based on Ubuntu may not be compatible with GSC. GSC
 relies on Gramine to execute Linux applications inside Intel SGX enclaves and
 the installation of prerequisites depends on package manager and package
 repositories. GSC can simply be extended to support other distributions by
