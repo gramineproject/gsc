@@ -18,6 +18,7 @@ RUN wget https://packages.microsoft.com/ubuntu/18.04/prod/pool/main/a/az-dcap-cl
  && dpkg -i az-dcap-client_1.10_amd64.deb
 
 # Installing DCAP Quote Verification Library
+
 RUN echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' \
     > /etc/apt/sources.list.d/intel-sgx.list \
     && wget https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key \
