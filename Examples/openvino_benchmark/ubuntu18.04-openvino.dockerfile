@@ -48,8 +48,8 @@ RUN cd /opt/intel/openvino_2021/deployment_tools/open_model_zoo/tools/downloader
         python3 ./converter.py --mo /opt/intel/openvino_2021/deployment_tools/model_optimizer/mo.py --name $model_name -d /model -o /model; \
     done
 
-ENV LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/intel/openvino_2021/deployment_tools/inference_engine/external/tbb/lib:/opt/intel/openvino_2021/deployment_tools/inference_engine/lib/intel64:/opt/intel/openvino_2021/deployment_tools/ngraph/lib
+ENV LD_LIBRARY_PATH=/opt/intel/openvino_${BUILD_ID}/deployment_tools/inference_engine/external/tbb/lib:/opt/intel/openvino_${BUILD_ID}/deployment_tools/inference_engine/lib/intel64:/opt/intel/openvino_${BUILD_ID}/deployment_tools/ngraph/lib:$LD_LIBRARY_PATH
 
-RUN echo "source /opt/intel/openvino_2021/bin/setupvars.sh" | tee -a /root/.bashrc
+RUN echo "source /opt/intel/openvino_${BUILD_ID}/bin/setupvars.sh" > /root/.bashrc
 
 ENTRYPOINT ["./benchmark_app"]
