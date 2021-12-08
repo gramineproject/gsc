@@ -58,6 +58,8 @@ Note: This example is Ubuntu-specific (tested version is Ubuntu 18.04).
 
 2. Create the GSC client image:
 
+    Note: We tested this example with DCAP driver 1.11 specified in the GSC configuration file.
+
     ```sh
     $ cd gsc
     $ cp config.yaml.template config.yaml
@@ -78,8 +80,6 @@ Note: This example is Ubuntu-specific (tested version is Ubuntu 18.04).
 6. Deploy `gsc-aks-secret-prov-client-img:latest` in AKS confidential compute cluster:
     - Reference deployment file:
         `aks-secret-prov-client-deployment.yaml`
-
-Note: We tested this example with DCAP driver 1.11 specified in the GSC configuration file.
 
 ## Deploying client and server images in AKS Confidential Compute cluster
 
