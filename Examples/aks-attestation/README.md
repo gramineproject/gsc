@@ -15,19 +15,21 @@ https://github.com/gramineproject/gramine/tree/master/CI-Examples/ra-tls-secret-
 with this example is highly recommended before proceeding further. The sample contains client and
 server applications, where by default server is running on localhost:4433. In the example, the
 client sends its SGX quote to the server for verification. After successful quote verification, the
-server sends a secret to the client. To run these client and server applications inside the AKS
-cluster, user needs to prepare two docker images, one for the client and one for the server. In our
-AKS attestation example, the server will no longer run on localhost, instead it will run in a Docker
-container inside the AKS cluster. The server container should be assigned a DNS name
-(e.g., `<AKS-DNS-NAME>`) to be accessible from the outside of the container. The client will send
-requests to this DNS name. Therefore, for demonstration we updated the example certificates from
+server sends a secret to the client.
+
+To run these client and server applications inside the AKS cluster, user needs to prepare two Docker
+images, one for the client and one for the server. In our AKS attestation example, the server will
+no longer run on localhost, instead it will run in a Docker container inside the AKS cluster. The
+server container should be assigned a DNS name (e.g., `<AKS-DNS-NAME>`) to be accessible from the
+outside of the container. The client will send requests to this DNS name. Therefore, for
+demonstration we updated the example certificates from
 https://github.com/gramineproject/gramine/tree/master/CI-Examples/ra-tls-secret-prov/certs by
 replacing the "Common Name" field in the server certificate (i.e., `server2-sha256.crt`) from
 `localhost` to `<AKS-DNS-NAME.*.cloudapp.azure.com>`.
 
-In order to create base client and server images for the AKS environment, user can execute the
-`base-image-generation-script.sh` script. Since both client and server applications will
-run inside containers in the AKS cluster, and the client application will send its SGX quote to the
+In order to create base client and server Docker images for the AKS environment, user can execute
+the `base-image-generation-script.sh` script. Since both client and server applications will run
+inside containers in the AKS cluster, and the client application will send its SGX quote to the
 server for verification, therefore the user needs to graminize the client application. Hence, the
 following two steps create a native Docker server image and a graminized GSC client image for the
 AKS cluster.
@@ -56,14 +58,11 @@ Note: This example is Ubuntu-specific (tested version is Ubuntu 18.04).
 1. The `base-image-generation-script.sh` script will create the native Docker client image with the
    name `aks-secret-prov-client-img:latest`.
 
-2. Create the GSC client image:
-
-    Note: We tested this example with DCAP driver 1.11 specified in the GSC configuration file.
+2. Create the GSC client image (note that we tested this example with DCAP driver 1.11 specified in
+   the GSC configuration file):
 
     ```sh
     $ cd gsc
-    $ cp config.yaml.template config.yaml
-    $ openssl genrsa -3 -out enclave-key.pem 3072
     $ ./gsc build aks-secret-prov-client-img:latest \
         Examples/aks-attestation/aks-secret-prov-client.manifest
     $ ./gsc sign-image aks-secret-prov-client-img:latest enclave-key.pem
@@ -87,12 +86,12 @@ AKS confidential compute cluster can be created using the following
 [link](https://docs.microsoft.com/en-us/azure/confidential-computing/confidential-enclave-nodes-aks-get-started).
 
 Gramine performs out-of-proc mode DCAP quote generation. Out-of-proc mode quote generation requires
-aesmd service. To fulfill this requirement, AKS provides the
+AESMD service. To fulfill this requirement, AKS provides the
 [sgxquotehelper daemonset](https://docs.microsoft.com/en-us/azure/confidential-computing/confidential-nodes-aks-addon#out-of-proc-attestation-for-confidential-workloads)
-(can be enabled by `--enable-sgxquotehelper` during cluster creation). This feature exposes aesmd
+(can be enabled by `--enable-sgxquotehelper` during cluster creation). This feature exposes AESMD
 service for the container node. The service will internally connect with az-dcap-client to fetch the
 platform collateral required for quote generation. In this demo, the
-`aks-secret-prov-client-deployment.yaml` uses aesmd service exposed by AKS with the help of the
+`aks-secret-prov-client-deployment.yaml` file uses AESMD service exposed by AKS with the help of the
 sgxquotehelper plugin.
 
 In our example, the client will generate the SGX quote that will be embedded inside the RA-TLS
