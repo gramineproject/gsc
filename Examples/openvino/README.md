@@ -4,7 +4,7 @@ For additional information on supported models, how to install, run and optimize
 please see
 https://github.com/sahason/examples/tree/sahason/ov_benchmark/openvino#readme.
 
-## Building graminize Docker image
+## Building graminized Docker image
 
 1. Build Docker image:
 ```bash
