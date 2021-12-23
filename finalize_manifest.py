@@ -87,6 +87,11 @@ def generate_library_paths():
 
     # Library paths start without whitespace (in contrast to libraries found under this path)
     ld_paths = (line for line in ld_paths if not re.match(r'(^\s)', line))
+
+    # ldconfig utility in Ubuntu 21.04 produces output lines like
+    # “/usr/local/lib: (from /etc/ld.so.conf.d/libc.conf:2)” – must take only the first part
+    # of this line (the actual path name)
+    ld_paths = ((line.split('(from')[0]).rstrip() for line in ld_paths)
     return ''.join(ld_paths) + os.getenv('LD_LIBRARY_PATH', default='')
 
 
