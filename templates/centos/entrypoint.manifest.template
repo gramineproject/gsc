@@ -1,0 +1,32 @@
+#loader.entrypoint = "file:/gramine/meson_build_output/lib/x86_64-linux-gnu/gramine/libsysdb.so"
+loader.entrypoint = "file:/gramine/meson_build_output/lib64/gramine/libsysdb.so"
+libos.entrypoint = "/{{binary}}"
+
+loader.env.LD_LIBRARY_PATH = "/gramine/meson_build_output/lib64/gramine/runtime/glibc:/usr/lib64:{{"{{library_paths}}"}}"
+
+loader.env.PATH = "{{"{{env_path}}"}}"
+loader.log_level = {% if debug %} "all" {% else %} "error" {% endif %}
+
+fs.root.type = "chroot"
+fs.root.path = "/"
+fs.root.uri = "file:/"
+
+# Gramine's default working dir is '/', so change the working directory to the desired one
+fs.start_dir = "{{working_dir}}"
+
+sgx.nonpie_binary = true
+
+{% if insecure_args %}
+# !! INSECURE !! Allow passing command-line arguments from the host without validation.
+# Most Docker images rely on runtime arguments and hence, a more general technique is required.
+# The issue is documented at https://github.com/gramineproject/gsc/issues/13.
+loader.argv0_override = "{{binary}}"
+loader.insecure__use_cmdline_argv = true
+{% else %}
+loader.argv_src_file = "file:/trusted_argv"
+sgx.trusted_files = [
+  "file:/trusted_argv",
+]
+{% endif %}
+
+# All trusted files and the user defined manifest specifications should be after this line

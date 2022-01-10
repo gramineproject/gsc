@@ -1,0 +1,70 @@
+# Currently tested base OS image is CentOS 8.
+FROM {{Distro}} AS gramine
+
+RUN sed 's/enabled=0/enabled=1/g' /etc/yum.repos.d/CentOS-Linux-PowerTools.repo  | tee /etc/yum.repos.d/CentOS-Linux-PowerTools.repo
+RUN cat /etc/yum.repos.d/CentOS-Linux-PowerTools.repo
+
+RUN yum update -y \
+    && env yum install -y \
+        epel-release \
+        autoconf \
+        bison \
+        ncurses-devel \
+        bison \
+        flex \
+        make \
+        elfutils-libelf-devel \
+        openssl-devel \
+        rpm-build \
+        curl \
+        gawk \
+        git \
+        openssl-devel \
+        protobuf-devel \
+        protobuf-c-devel \
+        libcurl-devel \
+        httpd \
+        libevent-devel \
+        patch \
+        gcc-c++ \
+        ninja-build \
+        pkg-config \
+        protobuf-c-compiler \
+        python3 \
+        python3-pip \
+        python3-protobuf \
+        wget \
+    && python3 -B -m pip install 'toml>=0.10' 'meson>=0.55'
+
+RUN git clone {{Gramine.Repository}} /gramine
+
+RUN cd /gramine \
+    && git fetch origin {{Gramine.Branch}} \
+    && git checkout {{Gramine.Branch}}
+
+{% if SGXDriver.Repository %}
+RUN cd /gramine \
+    && git clone {{SGXDriver.Repository}} driver \
+    && cd driver \
+    && git checkout {{SGXDriver.Branch}}
+{% else %}
+RUN mkdir -p /gramine/driver/asm \
+    && cd /gramine/driver/asm \
+    && wget --timeout=10 -O sgx.h \
+        https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain/arch/x86/include/uapi/asm/sgx.h?h=v5.11 \
+    && sha256sum sgx.h | grep -q a34a997ade42b61376b1c5d3d50f839fd28f2253fa047cb9c0e68a1b00477956
+{% endif %}
+
+RUN cd /gramine \
+    && meson setup build/ --prefix="/gramine/meson_build_output" \
+       --buildtype={% if debug %}debug{% else %}release{% endif %} \
+       -Ddirect=enabled -Dsgx=enabled \
+       {% if "SGXDataCenterAttestationPrimitives" in SGXDriver.Repository %} \
+       -Dsgx_driver=dcap1.10 -Dsgx_driver_include_path=/gramine/driver/driver/linux/include \
+       {% elif "linux-sgx-driver" in SGXDriver.Repository %} \
+       -Dsgx_driver=oot -Dsgx_driver_include_path=/gramine/driver \
+       {% else %} \
+       -Dsgx_driver=upstream -Dsgx_driver_include_path=/gramine/driver \
+       {% endif %} \
+    && ninja -C build \
+    && ninja -C build install
