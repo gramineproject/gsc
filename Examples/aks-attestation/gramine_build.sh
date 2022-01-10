@@ -1,7 +1,7 @@
 # This script assumes that in-kernel driver is installed on the host system.
-# Please refer to https://gramine.readthedocs.io/en/latest/building.html#id2 for more details.
+# Please refer to https://gramine.readthedocs.io/en/latest/devel/building.html#id2 for more details.
 
-# install Gramine dependencies
+# Install Gramine dependencies
 sudo apt-get install -y \
         autoconf \
         bison \
@@ -24,11 +24,11 @@ sudo apt-get install -y \
 sudo python3 -B -m pip install 'toml>=0.10' 'meson>=0.55'
 
 # Download Gramine
-git clone https://github.com/gramineproject/gramine.git
+git clone https://github.com/gramineproject/gramine.git --depth=1
 cd gramine
 mkdir -p meson_build_output
 
-# Generate Signing Key
+# Generate signing key
 openssl genrsa -3 -out Pal/src/host/Linux-SGX/signer/enclave-key.pem 3072
 
 # Install DCAP dependencies

@@ -1,4 +1,4 @@
-# Gramine Attestation Inside AKS cluster
+# Gramine attestation inside AKS cluster
 
 This guide demonstrates how Gramine DCAP attestation quote can be generated and verified from
 within an AKS cluster. Here, we provide an end-to-end example to help Cloud Solution Providers
@@ -50,8 +50,7 @@ Note: This example is Ubuntu-specific (tested version is Ubuntu 18.04).
     ```
 
 3. Deploy `aks-secret-prov-server-img:latest` in the AKS confidential compute cluster:
-    - Reference deployment file:
-        `aks-secret-prov-server-deployment.yaml`
+    - Reference deployment file: `aks-secret-prov-server-deployment.yaml`
 
 ### Creating client image
 
@@ -77,10 +76,9 @@ Note: This example is Ubuntu-specific (tested version is Ubuntu 18.04).
     ```
 
 6. Deploy `gsc-aks-secret-prov-client-img:latest` in AKS confidential compute cluster:
-    - Reference deployment file:
-        `aks-secret-prov-client-deployment.yaml`
+    - Reference deployment file: `aks-secret-prov-client-deployment.yaml`
 
-## Deploying client and server images in AKS Confidential Compute cluster
+## Deploying client and server images in AKS confidential compute cluster
 
 AKS confidential compute cluster can be created using the following
 [link](https://docs.microsoft.com/en-us/azure/confidential-computing/confidential-enclave-nodes-aks-get-started).
