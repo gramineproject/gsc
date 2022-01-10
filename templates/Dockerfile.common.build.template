@@ -2,39 +2,14 @@
 {% if Gramine.Image %}
 FROM gsc-{{Gramine.Image}} AS gramine
 {% else %}
-{% include "Dockerfile.ubuntu.compile.template" %}
+{% include compile_template %}
 {% endif %}
 
 # Combine Gramine image with the original app image
 FROM {{app_image}}
 
-RUN apt-get update \
-    && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        binutils \
-        libprotobuf-c-dev \
-        locales \
-        locales-all \
-        openssl \
-        python3 \
-        python3-pip \
-        python3-protobuf \
-    && python3 -B -m pip install click jinja2 protobuf 'toml>=0.10'
-
-{% if debug %}
-RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        gdb \
-        less \
-        libunwind8 \
-        python3-pyelftools \
-        python3-pytest \
-        strace \
-        vim
-{% endif %}
-
-RUN locale-gen en_US.UTF-8
-ENV LC_ALL en_US.UTF-8
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US.UTF-8
+# Install distro-specific packages to run Gramine (e.g., python3, protobuf, toml, etc.)
+{% block install %}{% endblock %}
 
 # Copy path-specific installation of Gramine
 COPY --from=gramine /gramine/meson_build_output /gramine/meson_build_output

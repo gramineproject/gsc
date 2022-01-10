@@ -1,0 +1,38 @@
+{% extends "Dockerfile.common.compile.template" %}
+
+{% block install %}
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* &&\
+    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-* &&\
+    sed -i 's/enabled=0/enabled=1/g' /etc/yum.repos.d/CentOS-Linux-PowerTools.repo
+
+RUN dnf update -y \
+    &&  dnf install -y \
+        autoconf \
+        bison \
+        curl \
+        epel-release \
+        elfutils-libelf-devel \
+        flex \
+        gawk \
+        git \
+        gcc-c++ \
+        httpd \
+        libcurl-devel \
+        libevent-devel \
+        make \
+        ncurses-devel \
+        ninja-build \
+        openssl-devel \
+        openssl-devel \
+        protobuf-devel \
+        protobuf-c-devel \
+        patch \
+        protobuf-c-compiler \
+        python3 \
+        pkg-config \
+        python3-pip \
+        python3-protobuf \
+        rpm-build \
+        wget \
+    && python3 -B -m pip install 'toml>=0.10' 'meson>=0.55'
+{% endblock %}

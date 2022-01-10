@@ -1,0 +1,29 @@
+{% extends "Dockerfile.common.build.template" %}
+
+{% block install %}
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* &&\
+    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-* &&\
+    sed -i 's/enabled=0/enabled=1/g' /etc/yum.repos.d/CentOS-Linux-PowerTools.repo
+
+RUN dnf update -y \
+    &&  dnf install -y \
+        binutils \
+        epel-release \
+        openssl \
+        protobuf-c-devel \
+        python3 \
+        python3-pip \
+        python3-protobuf \
+    && python3 -B -m pip install click jinja2 protobuf 'toml>=0.10'
+
+{% if debug %}
+RUN dnf install -y \
+        gdb \
+        less \
+        libunwind \
+        python3-pyelftools \
+        python3-pytest \
+        strace \
+        vim
+{% endif %}
+{% endblock %}
