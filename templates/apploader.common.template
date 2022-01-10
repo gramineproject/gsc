@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+
+set -ex
+
+{% block path %} {% endblock %}
+
+# Set default PAL to Linux-SGX
+if [ -z "$GSC_PAL" ] || [ "$GSC_PAL" == "Linux-SGX" ]
+then
+    gramine-sgx-get-token --sig /entrypoint.sig --output /entrypoint.token
+    gramine-sgx /entrypoint {% if insecure_args %}{{binary_arguments}} "${@}"{% endif %}
+else
+    gramine-direct /entrypoint {{binary_arguments}} "${@}"
+fi

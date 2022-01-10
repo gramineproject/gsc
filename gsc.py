@@ -165,7 +165,7 @@ def gsc_build(args):
 
     # initialize Jinja env with configurations extracted from the original Docker image
 
-    env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates/'))
+    env = jinja2.Environment()
     env.globals.update(yaml.safe_load(args.config_file))
     env.globals.update(vars(args))
     env.globals.update({'app_image': original_image_name})
@@ -174,10 +174,15 @@ def gsc_build(args):
 
     os.makedirs(tmp_build_path, exist_ok=True)
 
-    # generate Dockerfile.build from Jinja-style templates/Dockerfile.ubuntu.build.template
+    distro = env.globals["Distro"]
+
+    distro, _ = distro.split(":")
+    env.loader =jinja2.FileSystemLoader([f'templates/{distro}', 'templates/'])
+
+    # generate Dockerfile.build from Jinja-style templates/<distro>/Dockerfile.build.template
     # using the user-provided config file with info on OS distro, Gramine version and SGX driver
     # and other env configurations generated above
-    build_template = env.get_template(f'Dockerfile.ubuntu.build.template')
+    build_template = env.get_template('Dockerfile.build.template')
     with open(tmp_build_path / 'Dockerfile.build', 'w') as dockerfile:
         dockerfile.write(build_template.render())
 
@@ -258,13 +263,17 @@ def gsc_build_gramine(args):
 
     print(f'Building base-Gramine image `{gramine_image_name}`...')
 
-    # generate Dockerfile.compile from Jinja-style templates/Dockerfile.ubuntu.compile.template
+    # generate Dockerfile.compile from Jinja-style templates/<distro>/Dockerfile.compile.template
     # using the user-provided config file with info on OS distro, Gramine version and SGX driver
     # and other user-provided args (see argparser::gsc_build_gramine below)
-    env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates/'))
+    env = jinja2.Environment()
     env.globals.update(config)
     env.globals.update(vars(args))
-    compile_template = env.get_template(f'Dockerfile.ubuntu.compile.template')
+    distro = env.globals["Distro"]
+    
+    distro, _ = distro.split(":")
+    env.loader = jinja2.FileSystemLoader([f'templates/{distro}', 'templates/'])
+    compile_template = env.get_template('Dockerfile.compile.template')
 
     os.makedirs(tmp_build_path, exist_ok=True)
     with open(tmp_build_path / 'Dockerfile.compile', 'w') as dockerfile:
@@ -301,11 +310,15 @@ def gsc_sign_image(args):
 
     print(f'Signing graminized Docker image `unsigned_image_name` -> `{signed_image_name}`...')
 
-    # generate Dockerfile.sign from Jinja-style templates/Dockerfile.ubuntu.sign.template
+    # generate Dockerfile.sign from Jinja-style templates/<distro>/Dockerfile.sign.template
     # using the user-provided config file with info on OS distro, Gramine version and SGX driver
-    env = jinja2.Environment(loader=jinja2.FileSystemLoader('templates/'))
+    env = jinja2.Environment()
     env.globals.update(yaml.safe_load(args.config_file))
-    sign_template = env.get_template(f'Dockerfile.ubuntu.sign.template')
+    distro = env.globals["Distro"]
+
+    distro, _ = distro.split(":")
+    env.loader = jinja2.FileSystemLoader([f'templates/{distro}', 'templates/'])
+    sign_template = env.get_template('Dockerfile.sign.template')
 
     os.makedirs(tmp_build_path, exist_ok=True)
     with open(tmp_build_path / 'Dockerfile.sign', 'w') as dockerfile:

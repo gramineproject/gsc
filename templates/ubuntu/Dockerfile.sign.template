@@ -1,0 +1,11 @@
+# Sign image in a separate stage to ensure that signing key is never part of the final image
+{% extends "Dockerfile.common.sign.template" %}
+
+{% block sign %}
+RUN export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib -type d -path '*/site-packages')" \
+    && gramine-sgx-sign \
+         --key /gsc-signer-key.pem \
+         --manifest /entrypoint.manifest \
+         --output /entrypoint.manifest.sgx
+
+{% endblock %}
