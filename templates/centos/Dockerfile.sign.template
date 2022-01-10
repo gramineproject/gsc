@@ -1,0 +1,4 @@
+# Sign image in a separate stage to ensure that signing key is never part of the final image
+{% extends "Dockerfile.common.sign.template" %}
+
+{% block path %} RUN export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib64 -type d -path '*/site-packages')" {% endblock %}
