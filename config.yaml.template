@@ -1,4 +1,5 @@
-# Specify the OS distro. Currently tested distros are Ubuntu 18.04 and Ubuntu 20.04.
+# Specify the OS distro. Currently tested distros are
+# ``ubuntu:18.04``, ``ubuntu:20.04``, ``ubuntu:21.04`` and ``centos:8``.
 Distro: "ubuntu:18.04"
 
 # If you're using your own fork and branch of Gramine, specify the GitHub link and the branch name
