@@ -1,0 +1,31 @@
+{% extends "Dockerfile.common.build.template" %}
+
+{% block install %}
+RUN apt-get update \
+    && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        binutils \
+        libprotobuf-c-dev \
+        locales \
+        locales-all \
+        openssl \
+        python3 \
+        python3-pip \
+        python3-protobuf \
+    && python3 -B -m pip install click jinja2 protobuf 'toml>=0.10'
+
+{% if debug %}
+RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        gdb \
+        less \
+        libunwind8 \
+        python3-pyelftools \
+        python3-pytest \
+        strace \
+        vim
+{% endif %}
+
+RUN locale-gen en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
+{% endblock %}
