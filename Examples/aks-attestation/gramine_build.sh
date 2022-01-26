@@ -1,5 +1,6 @@
 # This script assumes that in-kernel driver is installed on the host system.
-# Please refer to https://gramine.readthedocs.io/en/latest/devel/building.html#id2 for more details.
+# Please refer to https://gramine.readthedocs.io/en/latest/devel/building.html#install-the-intel-sgx-driver
+# for more details.
 
 # Install Gramine dependencies
 sudo apt-get install -y \

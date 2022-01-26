@@ -49,8 +49,8 @@ Note: This example is Ubuntu-specific (tested version is Ubuntu 18.04).
     $ docker push <dockerhubusername>/aks-secret-prov-server-img:latest
     ```
 
-3. Deploy `aks-secret-prov-server-img:latest` in the AKS confidential compute cluster:
-    - Reference deployment file: `aks-secret-prov-server-deployment.yaml`
+3. Deploy `aks-secret-prov-server-img:latest` in the AKS confidential compute cluster using reference
+   deployment file: `aks-secret-prov-server-deployment.yaml`
 
 ### Creating client (SGX application) image
 
@@ -75,8 +75,8 @@ Note: This example is Ubuntu-specific (tested version is Ubuntu 18.04).
     $ docker push <dockerhubusername>/gsc-aks-secret-prov-client-img:latest
     ```
 
-6. Deploy `gsc-aks-secret-prov-client-img:latest` in AKS confidential compute cluster:
-    - Reference deployment file: `aks-secret-prov-client-deployment.yaml`
+6. Deploy `gsc-aks-secret-prov-client-img:latest` in AKS confidential compute cluster using
+   reference deployment file: `aks-secret-prov-client-deployment.yaml`
 
 ## Deploying client and server images in AKS confidential compute cluster
 
