@@ -5,10 +5,10 @@ within an AKS cluster. Here, we provide an end-to-end example to help Cloud Solu
 integrate Gramine’s RA-TLS attestation and secret provisioning feature with a confidential compute
 cluster managed by Azure Kubernetes Service. This guide contains necessary reference wrappers that
 enable Gramine to use AKS components such as AESMD and DCAP quote provider libraries. This guide
-also describes a microservice deployment for the RA-TLS verifier (server) that can be readily
-deployed to the AKS cluster.
+also describes a microservice deployment for the RA-TLS verifier (secret provisioning service) that
+can be readily deployed to the AKS cluster.
 
-## Preparing client and server images
+## Preparing client (SGX application) and server (secret provisioning service) images
 
 This demonstration is based on the `ra-tls-secret-prov` example from
 https://github.com/gramineproject/gramine/tree/master/CI-Examples/ra-tls-secret-prov. Familiarity
@@ -36,7 +36,7 @@ AKS cluster.
 
 Note: This example is Ubuntu-specific (tested version is Ubuntu 18.04).
 
-### Creating server image
+### Creating server (secret provisioning service) image
 
 1. The `base-image-generation-script.sh` script will create the native Docker server image with the
    name `aks-secret-prov-server-img:latest`.
@@ -52,7 +52,7 @@ Note: This example is Ubuntu-specific (tested version is Ubuntu 18.04).
 3. Deploy `aks-secret-prov-server-img:latest` in the AKS confidential compute cluster:
     - Reference deployment file: `aks-secret-prov-server-deployment.yaml`
 
-### Creating client image
+### Creating client (SGX application) image
 
 1. The `base-image-generation-script.sh` script will create the native Docker client image with the
    name `aks-secret-prov-client-img:latest`.
@@ -102,7 +102,8 @@ libsgx-dcap-quote-verify library via the az-dcap-client library.
 $ kubectl apply -f aks-secret-prov-server-deployment.yaml
 ```
 
-Once the server container is in running state, start the client container as shown below:
+Once the server (secret provisioning service) container is in running state, start the client
+(SGX application) container as shown below:
 
 ```sh
 $ kubectl apply -f aks-secret-prov-client-deployment.yaml
