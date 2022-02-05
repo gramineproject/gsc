@@ -111,8 +111,13 @@ def main(args=None):
     rendered_manifest = env.get_template(manifest).render()
     rendered_manifest_dict = toml.loads(rendered_manifest)
     already_added_files = extract_files_from_user_manifest(rendered_manifest_dict)
-    trusted_files = generate_trusted_files(args.dir, already_added_files)
-    rendered_manifest_dict['sgx'].setdefault('trusted_files', []).extend(trusted_files)
+
+    if 'allow_all_but_log' not in rendered_manifest_dict['sgx'].get('file_check_policy', ''):
+        trusted_files = generate_trusted_files(args.dir, already_added_files)
+        rendered_manifest_dict['sgx'].setdefault('trusted_files', []).extend(trusted_files)
+    else:
+        print(f'\t[from inside Docker container] Skipping trusted files generation. This image must not be used in production.')
+
     with open(manifest, 'w') as manifest_file:
         toml.dump(rendered_manifest_dict, manifest_file)
     print(f'\t[from inside Docker container] Successfully finalized `{manifest}`.')
