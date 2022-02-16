@@ -4,23 +4,25 @@ For additional information on supported models, how to install, run and optimize
 please see
 https://github.com/sahason/examples/tree/sahason/ov_benchmark/openvino#readme.
 
+Currently tested distros are `ubuntu 18.04` and `ubuntu 20.04`.
+
 ## Building graminized Docker image
 
 1. Build Docker image:
 ```bash
-docker build --rm -t ubuntu18.04-openvino -f ubuntu18.04-openvino.dockerfile .
+docker build --rm -t <distro>-openvino -f <distro>-openvino.dockerfile .
 ```
 
 2. Graminize the Docker image using `gsc build`:
 ```bash
 cd ../..
-./gsc build --insecure-args ubuntu18.04-openvino \
-    Examples/openvino/ubuntu18.04-openvino.manifest
+./gsc build --insecure-args <distro>-openvino \
+    Examples/openvino/<distro>-openvino.manifest
 ```
 
 3. Sign the graminized Docker image using `gsc sign-image`:
 ```bash
-./gsc sign-image ubuntu18.04-openvino enclave-key.pem
+./gsc sign-image <distro>-openvino enclave-key.pem
 ```
 
 ## Running the benchmark in GSC
@@ -30,7 +32,7 @@ cd ../..
 ```bash
 $ docker run --cpuset-cpus="0-35,72-107" --cpuset-mems=0 \
     --device /dev/sgx_enclave \
-    gsc-ubuntu18.04-openvino -i <image files> \
+    gsc-<distro>-openvino -i <image files> \
     -m model/<public | intel>/<model_dir>/<INT8 | FP16 | FP32>/<model_xml_file> \
     -d CPU -b 1 -t 20 -nstreams 72 -nthreads 72 -nireq 72
 ```
@@ -40,7 +42,7 @@ $ docker run --cpuset-cpus="0-35,72-107" --cpuset-mems=0 \
 ```bash
 $ docker run --cpuset-cpus="0-35,72-107" --cpuset-mems="0" \
     --device /dev/sgx_enclave \
-    gsc-ubuntu18.04-openvino -i <image files> \
+    gsc-<distro>-openvino -i <image files> \
     -m model/<public | intel>/<model_dir>/<INT8 | FP16 | FP32>/<model_xml_file> \
     -d CPU -b 1 -t 20 -api sync
 ```
@@ -50,7 +52,7 @@ $ docker run --cpuset-cpus="0-35,72-107" --cpuset-mems="0" \
 To run the benchmark in a native Docker container (outside Gramine), run the
 above commands with the following modifications:
 - remove `--device=/dev/sgx_enclave`,
-- replace `gsc-ubuntu18.04-openvino` with `ubuntu18.04-openvino`.
+- replace `gsc-<distro>-openvino` with `<distro>-openvino`.
 
 ## Notes
 The above `docker run` commands are for a 36-core system. Please check
