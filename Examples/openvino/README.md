@@ -2,7 +2,7 @@
 
 For additional information on supported models, how to install, run and optimize OpenVINO,
 please see
-https://github.com/sahason/examples/tree/sahason/ov_benchmark/openvino#readme.
+https://github.com/gramineproject/examples/blob/master/openvino/README.md.
 
 Currently tested distros are `ubuntu 18.04` and `ubuntu 20.04`.
 
@@ -56,5 +56,5 @@ above commands with the following modifications:
 
 ## Notes
 The above `docker run` commands are for a 36-core system. Please check
-https://github.com/sahason/examples/tree/sahason/ov_benchmark/openvino#readme for an
+https://github.com/gramineproject/examples/blob/master/openvino/README.md for an
 overview of options to achieve optimal performance on different systems.
