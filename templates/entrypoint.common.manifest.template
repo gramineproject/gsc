@@ -7,7 +7,6 @@ loader.env.PATH = "{{"{{env_path}}"}}"
 loader.log_level = {% if debug %} "all" {% else %} "error" {% endif %}
 
 fs.root.type = "chroot"
-fs.root.path = "/"
 fs.root.uri = "file:/"
 
 # Gramine's default working dir is '/', so change the working directory to the desired one
