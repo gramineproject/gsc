@@ -9,6 +9,7 @@ RUN apt-get update \
         locales-all \
         openssl \
         python3 \
+        python3-cryptography \
         python3-pip \
         python3-protobuf \
     && python3 -B -m pip install click jinja2 protobuf 'toml>=0.10'

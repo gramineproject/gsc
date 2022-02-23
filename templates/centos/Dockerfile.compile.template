@@ -10,12 +10,12 @@ RUN dnf update -y \
         autoconf \
         bison \
         curl \
-        epel-release \
         elfutils-libelf-devel \
+        epel-release \
         flex \
         gawk \
-        git \
         gcc-c++ \
+        git \
         httpd \
         libcurl-devel \
         libevent-devel \
@@ -23,13 +23,13 @@ RUN dnf update -y \
         ncurses-devel \
         ninja-build \
         openssl-devel \
-        openssl-devel \
-        protobuf-devel \
-        protobuf-c-devel \
         patch \
-        protobuf-c-compiler \
-        python3 \
         pkg-config \
+        protobuf-c-compiler \
+        protobuf-c-devel \
+        protobuf-devel \
+        python3 \
+        python3-cryptography \
         python3-pip \
         python3-protobuf \
         rpm-build \
