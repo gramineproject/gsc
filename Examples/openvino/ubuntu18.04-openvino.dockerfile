@@ -11,10 +11,7 @@ RUN apt-get update && \
     numactl \
     python3 \
     python3-pip \
-    python3-setuptools \
-    wget && \
-    python3 -m pip install --upgrade pip && \
-    pip3 install cryptography
+    wget
 
 RUN curl -o GPG-PUB-KEY-INTEL-OPENVINO-2021 \
     "https://apt.repos.intel.com/openvino/2021/GPG-PUB-KEY-INTEL-OPENVINO-2021" && \
