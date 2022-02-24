@@ -34,7 +34,7 @@ ENV PATH="/gramine/meson_build_output/bin:$PATH"
 
 # Mark apploader.sh executable, finalize manifest, and remove intermediate scripts
 RUN chmod u+x /apploader.sh \
-    && python3 -B /finalize_manifest.py \
+    && /usr/bin/python3 -B /finalize_manifest.py \
     && rm -f /finalize_manifest.py
 
 # Define default command
