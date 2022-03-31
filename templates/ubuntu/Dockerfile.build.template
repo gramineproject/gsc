@@ -12,7 +12,7 @@ RUN apt-get update \
         python3-cryptography \
         python3-pip \
         python3-protobuf \
-    && python3 -B -m pip install click jinja2 protobuf 'toml>=0.10'
+    && python3 -B -m pip install click cryptography jinja2 protobuf 'toml>=0.10'
 
 {% if debug %}
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
