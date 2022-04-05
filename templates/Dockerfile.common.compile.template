@@ -1,4 +1,4 @@
-{% if Registry is defined %}
+{% if Registry|length %}
 FROM {{Registry}}/{{Distro}} AS gramine
 {% else %}
 FROM {{Distro}} AS gramine
