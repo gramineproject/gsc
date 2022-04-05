@@ -300,9 +300,9 @@ in :file:`config.yaml.template`.
 
 .. describe:: Registry
 
-   Defines the registry and repository where the Linux distribution image
-   is. Only needed if the image in `Distro` requires to be prepended with this
-   information.
+   Defines the registry and repository where the Linux distribution
+   image is located. Only needed if the image in `Distro` requires to
+   be prepended with this information.
 
 .. describe:: Gramine.Repository
 
