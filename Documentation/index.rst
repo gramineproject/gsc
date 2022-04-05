@@ -298,6 +298,12 @@ in :file:`config.yaml.template`.
    distros are Ubuntu 18.04, Ubuntu 20.04, Ubuntu 21.04 and CentOS 8. Default
    value is ``ubuntu:18.04``.
 
+.. describe:: Registry
+
+   Defines the registry and repository where the Linux distribution
+   image is located. Only needed if the image in `Distro` requires to
+   be prepended with this information.
+
 .. describe:: Gramine.Repository
 
    Source repository of Gramine. Default value:
