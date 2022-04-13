@@ -1,2 +1,7 @@
 sphinx==1.8.0
 sphinx_rtd_theme<1
+
+# jinja 3.1.0 removed quite a few functions used by sphinx
+# https://jinja.palletsprojects.com/en/3.1.x/changes/#version-3-1-0
+# https://github.com/pallets/jinja/pull/1544
+jinja2<3.1
