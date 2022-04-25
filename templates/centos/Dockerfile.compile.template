@@ -21,6 +21,7 @@ RUN dnf update -y \
         libevent-devel \
         make \
         ncurses-devel \
+        nasm \
         ninja-build \
         openssl-devel \
         patch \

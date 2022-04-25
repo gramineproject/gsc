@@ -13,6 +13,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
         libcurl4-openssl-dev \
         libprotobuf-c-dev \
         linux-headers-generic \
+        nasm \
         ninja-build \
         pkg-config \
         protobuf-c-compiler \
