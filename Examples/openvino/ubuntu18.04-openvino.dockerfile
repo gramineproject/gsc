@@ -8,6 +8,7 @@ RUN apt-get update && \
     curl \
     git \
     gnupg \
+    nasm \
     numactl \
     python3 \
     python3-pip \
