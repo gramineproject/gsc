@@ -42,7 +42,6 @@ def build_docker_image(docker_api, build_path, image_name, dockerfile, **kwargs)
     stream = docker_api.build(path=build_path, tag=image_name, dockerfile=dockerfile,
                               decode=True, **kwargs)
     for chunk in stream:
-        encoding = sys.stdout.encoding if sys.stdout.encoding is not None else 'UTF-8'
         if 'stream' in chunk:
             for line in chunk['stream'].splitlines():
                 print(line)
