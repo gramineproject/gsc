@@ -39,12 +39,13 @@ def get_docker_image(docker_socket, image_name):
 
 def build_docker_image(docker_api, build_path, image_name, dockerfile, **kwargs):
     build_path = str(build_path) # Docker API doesn't understand PathLib's PosixPath type
-    stream = docker_api.build(path=build_path, tag=image_name, dockerfile=dockerfile, decode=True,
-                              **kwargs)
+    stream = docker_api.build(path=build_path, tag=image_name, dockerfile=dockerfile,
+                              decode=True, **kwargs)
     for chunk in stream:
         encoding = sys.stdout.encoding if sys.stdout.encoding is not None else 'UTF-8'
         if 'stream' in chunk:
-            print(chunk)
+            for line in chunk['stream'].splitlines():
+                print(line)
 
 
 def extract_binary_cmd_from_image_config(config, env):
