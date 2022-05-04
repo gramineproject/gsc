@@ -12,7 +12,11 @@ FROM {{app_image}}
 {% block install %}{% endblock %}
 
 # Copy path-specific installation of Gramine
+{% if debug %}
+COPY --from=gramine /gramine/ /gramine/
+{% else %}
 COPY --from=gramine /gramine/meson_build_output /gramine/meson_build_output
+{% endif %}
 
 # Copy helper scripts and Gramine manifest
 COPY *.py /
