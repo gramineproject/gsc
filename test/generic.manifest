@@ -1,3 +1,6 @@
+# Some workloads like Python may generate huge manifest files
+loader.pal_internal_mem_size = "128M"
+
 sgx.enclave_size = "4G"
 sgx.thread_num = 8
 
