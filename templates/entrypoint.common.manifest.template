@@ -1,4 +1,4 @@
-libos.entrypoint = "/{{binary}}"
+libos.entrypoint = "/gramine/app_files/{{binary}}"
 
 # Add distro-specific `loader.entrypoint` and `loader.env.LD_LIBRARY_PATH`
 {% block loader %}{% endblock %}
@@ -22,9 +22,9 @@ sgx.debug = {% if debug %} true {% else %} false {% endif %}
 loader.argv0_override = "{{binary}}"
 loader.insecure__use_cmdline_argv = true
 {% else %}
-loader.argv_src_file = "file:/trusted_argv"
+loader.argv_src_file = "file:/gramine/app_files/trusted_argv"
 sgx.trusted_files = [
-  "file:/trusted_argv",
+  "file:/gramine/app_files/trusted_argv",
 ]
 {% endif %}
 

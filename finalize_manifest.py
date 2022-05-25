@@ -35,11 +35,15 @@ def generate_trusted_files(root_dir, already_added_files):
                                 r'boot/.*'
                                 r'|\.dockerenv'
                                 r'|\.dockerinit'
-                                r'|etc/mtab'
                                 r'|dev/.*'
+                                r'|etc/gshadow.*'
+                                r'|etc/mtab'
+                                r'|etc/\.pwd\.lock'
                                 r'|etc/rc(\d|.)\.d/.*'
+                                r'|etc/security/.*'
+                                r'|etc/shadow.*'
                                 r'|gramine/python/.*'
-                                r'|finalize_manifest\.py'
+                                r'|gramine/app_files/finalize_manifest\.py'
                                 r'|proc/.*'
                                 r'|sys/.*'
                                 r'|var/.*)$')
@@ -82,7 +86,7 @@ def generate_trusted_files(root_dir, already_added_files):
 
 def generate_library_paths():
     encoding = sys.stdout.encoding if sys.stdout.encoding is not None else 'UTF-8'
-    ld_paths = subprocess.check_output('ldconfig -v', stderr=subprocess.PIPE, shell=True)
+    ld_paths = subprocess.check_output('ldconfig -v -N -X', stderr=subprocess.PIPE, shell=True)
     ld_paths = ld_paths.decode(encoding).splitlines()
 
     # Library paths start without whitespace (in contrast to libraries found under this path)
@@ -107,7 +111,7 @@ def main(args=None):
     env = jinja2.Environment(loader=jinja2.FileSystemLoader('/'))
     env.globals.update({'library_paths': generate_library_paths(), 'env_path': os.getenv('PATH')})
 
-    manifest = '/entrypoint.manifest'
+    manifest = '/gramine/app_files/entrypoint.manifest'
     rendered_manifest = env.get_template(manifest).render()
     rendered_manifest_dict = toml.loads(rendered_manifest)
     already_added_files = extract_files_from_user_manifest(rendered_manifest_dict)
