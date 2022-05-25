@@ -5,5 +5,5 @@ sgx.enclave_size = "4G"
 sgx.thread_num = 8
 
 sgx.trusted_files = [
-  "file:/entrypoint.manifest",  # unused entry, only to test merging of manifests
+  "file:/gramine/app_files/entrypoint.manifest",  # unused entry, only to test merging of manifests
 ]
