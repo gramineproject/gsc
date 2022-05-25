@@ -124,6 +124,12 @@ def extract_build_args(args):
                 sys.exit(1)
     return buildargs_dict
 
+def extract_user_from_image_config(config):
+    user = config['User']
+    if not user:
+        user = "root"
+    return user
+
 def merge_two_dicts(dict1, dict2, path=[]):
     for key in dict2:
         if key in dict1:
@@ -167,6 +173,8 @@ def gsc_build(args):
     env.globals.update(yaml.safe_load(args.config_file))
     env.globals.update(vars(args))
     env.globals.update({'app_image': original_image_name})
+    original_image_user = extract_user_from_image_config(original_image.attrs['Config'])
+    env.globals.update({'app_user': original_image_user})
     extract_binary_cmd_from_image_config(original_image.attrs['Config'], env)
     extract_working_dir_from_image_config(original_image.attrs['Config'], env)
 

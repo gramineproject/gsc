@@ -107,7 +107,7 @@ def main(args=None):
     env = jinja2.Environment(loader=jinja2.FileSystemLoader('/'))
     env.globals.update({'library_paths': generate_library_paths(), 'env_path': os.getenv('PATH')})
 
-    manifest = '/entrypoint.manifest'
+    manifest = '/gramine/app_files/entrypoint.manifest'
     rendered_manifest = env.get_template(manifest).render()
     rendered_manifest_dict = toml.loads(rendered_manifest)
     already_added_files = extract_files_from_user_manifest(rendered_manifest_dict)
