@@ -124,6 +124,12 @@ def extract_build_args(args):
                 sys.exit(1)
     return buildargs_dict
 
+def extract_user_from_image_config(config, env):
+    user = config['User']
+    if not user:
+        user = 'root'
+    env.globals.update({'app_user': user})
+
 def merge_two_dicts(dict1, dict2, path=[]):
     for key in dict2:
         if key in dict1:
@@ -167,6 +173,7 @@ def gsc_build(args):
     env.globals.update(yaml.safe_load(args.config_file))
     env.globals.update(vars(args))
     env.globals.update({'app_image': original_image_name})
+    extract_user_from_image_config(original_image.attrs['Config'], env)
     extract_binary_cmd_from_image_config(original_image.attrs['Config'], env)
     extract_working_dir_from_image_config(original_image.attrs['Config'], env)
 
@@ -383,11 +390,14 @@ def gsc_info_image(args):
 
     # Create temporary directory on the host for sigstruct file
     with tempfile.TemporaryDirectory() as tmpdirname:
+        # Grant owner, group and everyone else read-write-execute permissions on temporary dir, so
+        # that even non-root users in Docker images can copy `entrypoint.sig` into it
+        os.chmod(tmpdirname,0o777)
         # Copy sigstruct file from Docker container into temporary directory on the host
         docker_socket.containers.run(args.image,
-                                 '\'cp entrypoint.sig /tmp/host/ 2>/dev/null || :\'',
-                                 entrypoint=['sh', '-c'], remove=True,
-                                 volumes={tmpdirname: {'bind': '/tmp/host', 'mode': 'rw'}})
+            '\'cp /gramine/app_files/entrypoint.sig /tmp/host/ 2>/dev/null || :\'',
+            entrypoint=['sh', '-c'], remove=True,
+            volumes={tmpdirname: {'bind': '/tmp/host', 'mode': 'rw'}})
         sigstruct = {}
         with open(os.path.join(tmpdirname, "entrypoint.sig"), 'rb') as sig:
             attr = read_sigstruct(sig.read())
