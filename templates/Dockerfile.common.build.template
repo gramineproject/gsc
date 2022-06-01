@@ -11,10 +11,21 @@ FROM {{app_image}}
 # App image "user" is stored, and execution will continue as root to install packages.
 # In the signed graminized image, the "user" will be restored.
 ENV app_user={{app_user}}
+
+# Temporarily switch to the root user to install packages
 USER root
 
 # Install distro-specific packages to run Gramine (e.g., python3, protobuf, toml, etc.)
 {% block install %}{% endblock %}
+
+# Create a directory that will store apploader.sh and entrypoint files.
+RUN mkdir -p /gramine/app_files
+
+# Make the app image user owner of /gramine/app_files directory
+RUN chown {{app_user}} /gramine/app_files/
+
+# Switch back to original app_image user
+USER {{app_user}}
 
 # Copy path-specific installation of Gramine
 {% if debug %}
@@ -23,28 +34,19 @@ COPY --from=gramine /gramine/ /gramine/
 COPY --from=gramine /gramine/meson_build_output /gramine/meson_build_output
 {% endif %}
 
-# Create a directory that will store apploader.sh and entrypoint files.
-RUN mkdir -p /gramine/app_files
-
-# Make the app image user owner of /gramine/app_files directory
-RUN chown $app_user /gramine/app_files/
-
-# Grant the owner of the directory (i.e., the app image user here) all the permissions
-RUN chmod u+rwx /gramine/app_files/
-
 # Copy helper scripts and Gramine manifest
-COPY *.py /
-COPY apploader.sh /gramine/app_files/
-COPY entrypoint.manifest /gramine/app_files/
+COPY --chown={{app_user}} *.py /gramine/app_files/
+COPY --chown={{app_user}} apploader.sh /gramine/app_files/
+COPY --chown={{app_user}} entrypoint.manifest /gramine/app_files/
 
 # Generate trusted arguments if required
 {% if not insecure_args %}
 RUN /gramine/meson_build_output/bin/gramine-argv-serializer \
-        {{binary}} {{binary_arguments}} "{{"\" \"".join(cmd)}}" > /trusted_argv
+        {{binary}} {{binary_arguments}} "{{"\" \"".join(cmd)}}" > /gramine/app_files/trusted_argv
 {% endif %}
 
 # Docker entrypoint/cmd typically contains only the basename of the executable so create a symlink
-RUN cd / \
+RUN cd /gramine/app_files/ \
     && which {{binary}} | xargs ln -s || true
 
 # Include Meson build output directory in $PATH
@@ -52,8 +54,8 @@ ENV PATH="/gramine/meson_build_output/bin:$PATH"
 
 # Mark apploader.sh executable, finalize manifest, and remove intermediate scripts
 RUN chmod u+x /gramine/app_files/apploader.sh \
-    && /usr/bin/python3 -B /finalize_manifest.py \
-    && rm -f /finalize_manifest.py
+    && /usr/bin/python3 -B /gramine/app_files/finalize_manifest.py \
+    && rm -f /gramine/app_files/finalize_manifest.py
 
 # Define default command
 ENTRYPOINT ["/bin/bash", "/gramine/app_files/apploader.sh"]
