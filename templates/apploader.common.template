@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-set -ex
+{% if debug %}
+set -x
+{% endif %}
+set -e
 
 # Export distro-specific paths (typically `PYTHONPATH` and `PKG_CONFIG_PATH`)
 {% block path %}{% endblock %}
@@ -8,7 +11,7 @@ set -ex
 # Default to Linux-SGX if no PAL was specified
 if [ -z "$GSC_PAL" ] || [ "$GSC_PAL" == "Linux-SGX" ]
 then
-    gramine-sgx-get-token --sig /entrypoint.sig --output /entrypoint.token
+    gramine-sgx-get-token --quiet --sig /entrypoint.sig --output /entrypoint.token
     gramine-sgx /entrypoint {% if insecure_args %}{{binary_arguments}} "${@}"{% endif %}
 else
     gramine-direct /entrypoint {{binary_arguments}} "${@}"
