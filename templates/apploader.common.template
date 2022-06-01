@@ -8,7 +8,9 @@ set -ex
 # Default to Linux-SGX if no PAL was specified
 if [ -z "$GSC_PAL" ] || [ "$GSC_PAL" == "Linux-SGX" ]
 then
+    {% if not skip_token_generation %}
     gramine-sgx-get-token --sig /entrypoint.sig --output /entrypoint.token
+    {% endif %}
     gramine-sgx /entrypoint {% if insecure_args %}{{binary_arguments}} "${@}"{% endif %}
 else
     gramine-direct /entrypoint {{binary_arguments}} "${@}"

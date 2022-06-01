@@ -101,6 +101,11 @@ Gramine image.
    Allow untrusted arguments to be specified at :command:`docker run`. Otherwise
    any arguments specified during :command:`docker run` are ignored.
 
+.. option:: --skip-token-generation
+
+   Allows to skip SGX token generation (via :command:`gramine-sgx-get-token`).
+   Useful for DCAP platforms and read-only filesystems.
+
 .. option:: --no-cache
 
    Disable Docker's caches during :command:`gsc build`. This builds the

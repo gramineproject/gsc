@@ -425,6 +425,9 @@ sub_build.add_argument('-L', '--linux', action='store_true',
 sub_build.add_argument('--insecure-args', action='store_true',
     help='Allow to specify untrusted arguments during Docker run. '
          'Otherwise arguments are ignored.')
+sub_build.add_argument('--skip-token-generation', action='store_true',
+    help='Allows to skip SGX token generation (via `gramine-sgx-get-token`). '
+         'Useful for DCAP platforms and read-only filesystems.')
 sub_build.add_argument('-nc', '--no-cache', action='store_true',
     help='Build graminized Docker image without any cached images.')
 sub_build.add_argument('--rm', action='store_true',
