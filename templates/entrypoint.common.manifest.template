@@ -28,14 +28,4 @@ sgx.trusted_files = [
 ]
 {% endif %}
 
-# These files are added to handle the permission denied error for non-root user images
-sgx.allowed_files = [
-  "file:/etc/gshadow",
-  "file:/etc/gshadow-",
-  "file:/etc/.pwd.lock",
-  "file:/etc/security/opasswd",
-  "file:/etc/shadow",
-  "file:/etc/shadow-",
-]
-
 # All trusted files and the user defined manifest specifications should be after this line
