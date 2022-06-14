@@ -8,10 +8,6 @@ FROM gsc-{{Gramine.Image}} AS gramine
 # Combine Gramine image with the original app image
 FROM {{app_image}}
 
-# App image "user" is stored, and execution will continue as root to install packages.
-# In the signed graminized image, the "user" will be restored.
-ENV app_user={{app_user}}
-
 # Temporarily switch to the root user to install packages
 USER root
 

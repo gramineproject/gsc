@@ -127,7 +127,7 @@ def extract_build_args(args):
 def extract_user_from_image_config(config, env):
     user = config['User']
     if not user:
-        user = "root"
+        user = 'root'
     env.globals.update({'app_user': user})
 
 def merge_two_dicts(dict1, dict2, path=[]):
