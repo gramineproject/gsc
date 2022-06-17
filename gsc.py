@@ -390,6 +390,8 @@ def gsc_info_image(args):
 
     # Create temporary directory on the host for sigstruct file
     with tempfile.TemporaryDirectory() as tmpdirname:
+        # Grant temporary directory all the permissions for non-root user image access
+        os.chmod(tmpdirname,0o777)
         # Copy sigstruct file from Docker container into temporary directory on the host
         docker_socket.containers.run(args.image,
             '\'cp /gramine/app_files/entrypoint.sig /tmp/host/ 2>/dev/null || :\'',
