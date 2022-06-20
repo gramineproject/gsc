@@ -4,6 +4,14 @@ loader.pal_internal_mem_size = "128M"
 sgx.enclave_size = "4G"
 sgx.thread_num = 8
 
+
+# Uncomment these for remote attestation
+#loader.env.SECRET_PROVISION_SERVERS = { passthrough = true }
+#loader.env.SECRET_PROVISION_CONSTRUCTOR = "1"
+#loader.env.SECRET_PROVISION_CA_CHAIN_PATH = "/ca.crt"
+#sgx.remote_attestation = true
+
+
 sgx.trusted_files = [
   "file:/entrypoint.manifest",  # unused entry, only to test merging of manifests
 ]

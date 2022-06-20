@@ -3,6 +3,7 @@ libos.entrypoint = "/{{binary}}"
 # Add distro-specific `loader.entrypoint` and `loader.env.LD_LIBRARY_PATH`
 {% block loader %}{% endblock %}
 
+loader.env.LD_PRELOAD = "/gramine/meson_build_output/lib/x86_64-linux-gnu/libsecret_prov_attest.so"
 loader.env.PATH = "{{"{{env_path}}"}}"
 loader.log_level = {% if debug %} "all" {% else %} "error" {% endif %}
 
