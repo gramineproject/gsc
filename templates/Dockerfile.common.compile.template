@@ -30,6 +30,7 @@ RUN cd /gramine \
     && meson setup build/ --prefix="/gramine/meson_build_output" \
        --buildtype={% if debug %}debug{% else %}release{% endif %} \
        -Ddirect=enabled -Dsgx=enabled \
+       {% if Distro.startswith('ubuntu') %}-Ddcap=enabled{% endif %} \
        {% if "SGXDataCenterAttestationPrimitives" in SGXDriver.Repository %} \
        -Dsgx_driver=dcap1.10 -Dsgx_driver_include_path=/gramine/driver/driver/linux/include \
        {% elif "linux-sgx-driver" in SGXDriver.Repository %} \

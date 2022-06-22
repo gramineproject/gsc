@@ -24,4 +24,13 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
         python3-protobuf \
         wget \
     && /usr/bin/python3 -B -m pip install 'toml>=0.10' 'meson>=0.55'
+
+COPY intel-sgx-deb.key /
+
+RUN echo 'deb [arch=amd64] https://download.01.org/intel-sgx/sgx_repo/ubuntu bionic main' \
+    > /etc/apt/sources.list.d/intel-sgx.list \
+    && apt-key add intel-sgx-deb.key
+
+RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
+    && env DEBIAN_FRONTEND=noninteractive apt-get install -y libsgx-dcap-quote-verify-dev
 {% endblock %}
