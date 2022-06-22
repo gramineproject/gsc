@@ -10,7 +10,7 @@ Registry: ""
 # below; typically, you want to keep the default values though
 Gramine:
     Repository: "https://github.com/gramineproject/gramine.git"
-    Branch:     "master"
+    Branch:     "v1.2"
 
 # Specify the Intel SGX driver installed on your machine (more specifically, on the machine where
 # the graminized Docker container will run); there are several variants of the SGX driver:
