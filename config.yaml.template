@@ -7,10 +7,10 @@ Distro: "ubuntu:18.04"
 Registry: ""
 
 # If you're using your own fork and branch of Gramine, specify the GitHub link and the branch name
-# below; typically, you want to keep the default values though
+# below; typically, you want to keep the default values though, pointing to the stable release commit
 Gramine:
     Repository: "https://github.com/gramineproject/gramine.git"
-    Branch:     "master"
+    Branch:     "fd2e30274a2c0eb5aa7f9b95938f185345965eb4"
 
 # Specify the Intel SGX driver installed on your machine (more specifically, on the machine where
 # the graminized Docker container will run); there are several variants of the SGX driver:
