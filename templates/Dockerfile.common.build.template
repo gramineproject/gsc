@@ -25,9 +25,9 @@ USER {{app_user}}
 
 # Copy path-specific installation of Gramine
 {% if debug %}
-COPY --from=gramine /gramine/ /gramine/
+COPY --from=gramine --chown={{app_user}} /gramine/ /gramine/
 {% else %}
-COPY --from=gramine /gramine/meson_build_output /gramine/meson_build_output
+COPY --from=gramine --chown={{app_user}} /gramine/meson_build_output /gramine/meson_build_output
 {% endif %}
 
 # Copy helper scripts and Gramine manifest
