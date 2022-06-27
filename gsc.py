@@ -47,10 +47,17 @@ def build_docker_image(docker_api, build_path, image_name, dockerfile, **kwargs)
                 print(line)
 
 
-def extract_binary_cmd_from_image_config(config, env):
+def extract_binary_info_from_image_config(config, env):
     entrypoint = config['Entrypoint'] or []
     num_starting_entrypoint_items = len(entrypoint)
     cmd = config['Cmd'] or []
+    working_dir = config['WorkingDir'] or ''
+
+    # Canonize working dir
+    if working_dir == '':
+        working_dir = '/'
+    elif working_dir[-1] != '/':
+        working_dir = working_dir + '/'
 
     # Some Docker images only use the optional CMD and have an empty entrypoint;
     # GSC has to make it explicit to prepare scripts and Intel SGX signatures
@@ -59,8 +66,11 @@ def extract_binary_cmd_from_image_config(config, env):
         print('Could not find the entrypoint binary to the application image.')
         sys.exit(1)
 
-    # Set binary to first executable in entrypoint
-    binary = os.path.basename(entrypoint[0])
+    # Set binary to first executable in entrypoint and expand to full absolute path (if binary is
+    # represented as relative path, e.g. `./my_app` or `some_dir/my_app`)
+    binary = entrypoint[0]
+    if not binary.startswith('/') and '/' in binary:
+        binary = working_dir + binary
 
     # Check if we have fixed binary arguments as part of entrypoint
     if num_starting_entrypoint_items > 1:
@@ -77,16 +87,14 @@ def extract_binary_cmd_from_image_config(config, env):
     cmd = entrypoint[last_bin_arg + 1:] if len(entrypoint) > last_bin_arg + 1 else ''
     cmd = [s.replace('\\', '\\\\').replace('"', '\\"') for s in cmd]
 
-    env.globals.update({'binary': binary, 'binary_arguments': binary_arguments, 'cmd': cmd})
+    env.globals.update({
+        'binary': binary,
+        'binary_arguments': binary_arguments,
+        'binary_basename': os.path.basename(binary),
+        'cmd': cmd,
+        'working_dir': working_dir
+    })
 
-
-def extract_working_dir_from_image_config(config, env):
-    working_dir = config['WorkingDir']
-    if working_dir == '':
-        working_dir = '/'
-    elif working_dir[-1] != '/':
-        working_dir = working_dir + '/'
-    env.globals.update({'working_dir': working_dir})
 
 def extract_environment_from_image_config(config):
     env_list = config['Env']
@@ -174,8 +182,7 @@ def gsc_build(args):
     env.globals.update(vars(args))
     env.globals.update({'app_image': original_image_name})
     extract_user_from_image_config(original_image.attrs['Config'], env)
-    extract_binary_cmd_from_image_config(original_image.attrs['Config'], env)
-    extract_working_dir_from_image_config(original_image.attrs['Config'], env)
+    extract_binary_info_from_image_config(original_image.attrs['Config'], env)
 
     os.makedirs(tmp_build_path, exist_ok=True)
 
