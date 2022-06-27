@@ -232,7 +232,7 @@ def gsc_build(args):
     # copy helper script to finalize the manifest from within graminized Docker image
     shutil.copyfile('finalize_manifest.py', tmp_build_path / 'finalize_manifest.py')
 
-    # Intel SGX GPG key to be added within graminized Docker image
+    # Intel SGX PGP key to be added within graminized Docker image
     shutil.copyfile('intel-sgx-deb.key', tmp_build_path / 'intel-sgx-deb.key')
 
     build_docker_image(docker_socket.api, tmp_build_path, unsigned_image_name, 'Dockerfile.build',
