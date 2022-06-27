@@ -29,7 +29,8 @@ RUN mkdir -p /gramine/driver/asm \
 RUN cd /gramine \
     && meson setup build/ --prefix="/gramine/meson_build_output" \
        --buildtype={% if debug %}debug{% else %}release{% endif %} \
-       -Ddirect=enabled -Dsgx=enabled -Ddcap=enabled \
+       -Ddirect=enabled -Dsgx=enabled \
+       {% if not "centos:8" in Distro %}-Ddcap=enabled{% endif %} \
        {% if "SGXDataCenterAttestationPrimitives" in SGXDriver.Repository %} \
        -Dsgx_driver=dcap1.10 -Dsgx_driver_include_path=/gramine/driver/driver/linux/include \
        {% elif "linux-sgx-driver" in SGXDriver.Repository %} \

@@ -36,13 +36,4 @@ RUN dnf update -y \
         rpm-build \
         wget \
     && /usr/bin/python3 -B -m pip install 'toml>=0.10' 'meson>=0.55'
-
-RUN mkdir /opt/intel && cd /opt/intel \
-    && wget https://download.01.org/intel-sgx/latest/linux-latest/distro/rhel8.4-server/sgx_rpm_local_repo.tgz \
-    && sha256sum sgx_rpm_local_repo.tgz \
-    && tar xvf sgx_rpm_local_repo.tgz \
-    && dnf update -y \
-    && dnf -y --nogpgcheck --repofrompath=SGX,/opt/intel/sgx_rpm_local_repo install libsgx-dcap-quote-verify
-
-RUN ln -s /usr/lib64/libsgx_dcap_quoteverify.so.1 /usr/lib64/libsgx_dcap_quoteverify.so
 {% endblock %}
