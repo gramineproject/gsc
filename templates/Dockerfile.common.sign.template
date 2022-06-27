@@ -3,10 +3,11 @@ FROM {{image}} as unsigned_image
 
 COPY gsc-signer-key.pem /gramine/app_files/gsc-signer-key.pem
 
-RUN {% block path %}{% endblock %} gramine-sgx-sign \
-      --key /gramine/app_files/gsc-signer-key.pem \
-      --manifest /gramine/app_files/entrypoint.manifest \
-      --output /gramine/app_files/entrypoint.manifest.sgx
+RUN export PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python && \
+      {% block path %}{% endblock %} gramine-sgx-sign \
+        --key /gramine/app_files/gsc-signer-key.pem \
+        --manifest /gramine/app_files/entrypoint.manifest \
+        --output /gramine/app_files/entrypoint.manifest.sgx
 
 # This trick removes all temporary files from the previous commands (including gsc-signer-key.pem)
 FROM {{image}}

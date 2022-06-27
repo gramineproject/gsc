@@ -11,7 +11,7 @@ set -e
 # Default to Linux-SGX if no PAL was specified
 if [ -z "$GSC_PAL" ] || [ "$GSC_PAL" == "Linux-SGX" ]
 then
-    gramine-sgx-get-token --quiet \
+    PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python gramine-sgx-get-token --quiet \
         --sig /gramine/app_files/entrypoint.sig --output /gramine/app_files/entrypoint.token
     gramine-sgx /gramine/app_files/entrypoint \
         {% if insecure_args %}{{binary_arguments}} "${@}"{% endif %}
