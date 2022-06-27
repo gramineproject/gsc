@@ -60,6 +60,7 @@ def extract_binary_cmd_from_image_config(config, env):
         sys.exit(1)
 
     # Set binary to first executable in entrypoint
+    binary_full_path = entrypoint[0]
     binary = os.path.basename(entrypoint[0])
 
     # Check if we have fixed binary arguments as part of entrypoint
@@ -77,7 +78,12 @@ def extract_binary_cmd_from_image_config(config, env):
     cmd = entrypoint[last_bin_arg + 1:] if len(entrypoint) > last_bin_arg + 1 else ''
     cmd = [s.replace('\\', '\\\\').replace('"', '\\"') for s in cmd]
 
-    env.globals.update({'binary': binary, 'binary_arguments': binary_arguments, 'cmd': cmd})
+    env.globals.update({
+        'binary_full_path': binary_full_path,
+        'binary': binary,
+        'binary_arguments': binary_arguments,
+        'cmd': cmd
+    })
 
 
 def extract_working_dir_from_image_config(config, env):

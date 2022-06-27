@@ -43,7 +43,7 @@ RUN /gramine/meson_build_output/bin/gramine-argv-serializer \
 
 # Docker entrypoint/cmd typically contains only the basename of the executable so create a symlink
 RUN cd /gramine/app_files/ \
-    && which {{binary}} | xargs ln -s || true
+    && which {{binary_full_path}} | xargs ln -s || true
 
 # Include Meson build output directory in $PATH
 ENV PATH="/gramine/meson_build_output/bin:$PATH"
