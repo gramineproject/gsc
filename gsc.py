@@ -68,9 +68,9 @@ def extract_binary_info_from_image_config(config, env):
 
     # Set binary to first executable in entrypoint and expand to full absolute path (if binary is
     # represented as relative path, e.g. `./my_app` or `some_dir/my_app`)
-    binary_full_path = entrypoint[0]
-    if not binary_full_path.startswith('/') and '/' in binary_full_path:
-        binary_full_path = working_dir + binary_full_path
+    binary = entrypoint[0]
+    if not binary.startswith('/') and '/' in binary:
+        binary = working_dir + binary
 
     # Check if we have fixed binary arguments as part of entrypoint
     if num_starting_entrypoint_items > 1:
@@ -88,9 +88,9 @@ def extract_binary_info_from_image_config(config, env):
     cmd = [s.replace('\\', '\\\\').replace('"', '\\"') for s in cmd]
 
     env.globals.update({
-        'binary': os.path.basename(binary_full_path),
+        'binary': binary,
         'binary_arguments': binary_arguments,
-        'binary_full_path': binary_full_path,
+        'binary_basename': os.path.basename(binary),
         'cmd': cmd,
         'working_dir': working_dir
     })
