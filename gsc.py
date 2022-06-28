@@ -47,7 +47,7 @@ def build_docker_image(docker_api, build_path, image_name, dockerfile, **kwargs)
                 print(line)
 
 
-def extract_binary_cmd_workdir_from_image_config(config, env):
+def extract_binary_info_from_image_config(config, env):
     entrypoint = config['Entrypoint'] or []
     num_starting_entrypoint_items = len(entrypoint)
     cmd = config['Cmd'] or []
@@ -66,11 +66,11 @@ def extract_binary_cmd_workdir_from_image_config(config, env):
         print('Could not find the entrypoint binary to the application image.')
         sys.exit(1)
 
-    # Set binary to first executable in entrypoint
+    # Set binary to first executable in entrypoint and expand to full absolute path (if binary is
+    # represented as relative path, e.g. `./my_app` or `some_dir/my_app`)
     binary_full_path = entrypoint[0]
-    if binary_full_path.startswith('./'):
-        binary_full_path = working_dir +  binary_full_path[2:]
-    binary = os.path.basename(binary_full_path)
+    if not binary_full_path.startswith('/') and '/' in binary_full_path:
+        binary_full_path = working_dir + binary_full_path
 
     # Check if we have fixed binary arguments as part of entrypoint
     if num_starting_entrypoint_items > 1:
@@ -88,7 +88,7 @@ def extract_binary_cmd_workdir_from_image_config(config, env):
     cmd = [s.replace('\\', '\\\\').replace('"', '\\"') for s in cmd]
 
     env.globals.update({
-        'binary': binary,
+        'binary': os.path.basename(binary_full_path),
         'binary_arguments': binary_arguments,
         'binary_full_path': binary_full_path,
         'cmd': cmd,
@@ -182,7 +182,7 @@ def gsc_build(args):
     env.globals.update(vars(args))
     env.globals.update({'app_image': original_image_name})
     extract_user_from_image_config(original_image.attrs['Config'], env)
-    extract_binary_cmd_workdir_from_image_config(original_image.attrs['Config'], env)
+    extract_binary_info_from_image_config(original_image.attrs['Config'], env)
 
     os.makedirs(tmp_build_path, exist_ok=True)
 
