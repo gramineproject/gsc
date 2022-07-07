@@ -17,9 +17,13 @@ RUN curl -o GPG-PUB-KEY-INTEL-OPENVINO-2021 \
     "https://apt.repos.intel.com/openvino/2021/GPG-PUB-KEY-INTEL-OPENVINO-2021" && \
     apt-key add GPG-PUB-KEY-INTEL-OPENVINO-2021 && \
     echo "deb https://apt.repos.intel.com/openvino/2021 all main" \
-    | tee - a /etc/apt/sources.list.d/intel-openvino-2021.list && \
+    | tee -a /etc/apt/sources.list.d/intel-openvino-2021.list && \
     apt-get update && apt-get install -y --no-install-recommends "intel-openvino-dev-ubuntu20-2021.4.582" && \
     rm -rf /var/lib/apt/lists/*
+
+# Workaround for a failure due to update in major release of Protobuf from 3.20.1 to 4.21.0
+# see details at https://developers.google.com/protocol-buffers/docs/news/2022-05-06#python-updates
+ENV PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
 
 # Build apps
 RUN cd /opt/intel/openvino_2021.4.582/inference_engine/samples/cpp && \
