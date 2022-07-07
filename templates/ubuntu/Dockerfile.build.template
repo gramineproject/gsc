@@ -12,6 +12,7 @@ RUN apt-get update \
         python3-cryptography \
         python3-pip \
         python3-protobuf \
+        python3-pyelftools \
     && /usr/bin/python3 -B -m pip install click jinja2 protobuf 'toml>=0.10'
 
 {% if debug %}
@@ -19,7 +20,6 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         gdb \
         less \
         libunwind8 \
-        python3-pyelftools \
         python3-pytest \
         strace \
         vim

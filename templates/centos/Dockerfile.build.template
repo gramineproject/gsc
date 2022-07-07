@@ -15,6 +15,7 @@ RUN dnf update -y \
         python3-cryptography \
         python3-pip \
         python3-protobuf \
+        python3-pyelftools \
     && /usr/bin/python3 -B -m pip install click jinja2 protobuf 'toml>=0.10'
 
 {% if debug %}
@@ -22,7 +23,6 @@ RUN dnf install -y \
         gdb \
         less \
         libunwind \
-        python3-pyelftools \
         python3-pytest \
         strace \
         vim
