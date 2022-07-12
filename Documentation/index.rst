@@ -48,7 +48,7 @@ SGX software stack
 ------------------
 
 To run with Intel SGX, please install the corresponding software stack as
-described in https://gramine.readthedocs.io/en/latest/building.html.
+described in https://gramine.readthedocs.io/en/stable/devel/building.html.
 
 Host configuration
 ------------------
@@ -312,7 +312,7 @@ in :file:`config.yaml.template`.
 
 .. describe:: Gramine.Branch
 
-   Use this branch of the repository. Default value: master.
+   Use this release/branch of the repository. Default value: ``v1.2``.
 
 .. describe:: Gramine.Image
 
@@ -324,12 +324,12 @@ in :file:`config.yaml.template`.
 .. describe:: SGXDriver.Repository
 
    Source repository of the Intel SGX driver. Default value: ""
-   (in-kernel driver)
+   (in-kernel driver).
 
 .. describe:: SGXDriver.Branch
 
    Use this branch of the repository. Default value: ""
-   (in-kernel driver)
+   (in-kernel driver).
 
 Run graminized Docker images
 =============================
@@ -388,7 +388,7 @@ specified at Docker run time. There are two options:
    increases the attack surface of the Linux Kernel).
 
 #. Pass the custom seccomp profile
-   https://github.com/gramineproject/gramine/blob/master/Scripts/docker_seccomp.json.
+   https://github.com/gramineproject/gramine/blob/master/scripts/docker_seccomp.json.
 
    With this option, Docker containers restrict themselves to a rather narrow set
    of allowed system calls, keeping the attack surface of the Linux kernel small.
