@@ -38,7 +38,7 @@ COPY --chown={{app_user}} entrypoint.manifest /gramine/app_files/
 # Generate trusted arguments if required
 {% if not insecure_args %}
 RUN /gramine/meson_build_output/bin/gramine-argv-serializer \
-        {{binary}} {{binary_arguments}} "{{"\" \"".join(cmd)}}" > /gramine/app_files/trusted_argv
+        /gramine/app_files/{{binary_basename}} {{binary_arguments}} "{{"\" \"".join(cmd)}}" > /gramine/app_files/trusted_argv
 {% endif %}
 
 # Docker entrypoint/cmd typically contains only the basename of the executable so create a symlink
