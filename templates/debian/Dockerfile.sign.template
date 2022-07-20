@@ -9,7 +9,6 @@ RUN \
           toml \
        && apt-get remove -y binutils \
           expect \
-          libcurl4-openssl-dev \
           openssl \
           python3-pip \
           python3-protobuf \
