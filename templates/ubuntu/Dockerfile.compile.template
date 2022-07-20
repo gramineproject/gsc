@@ -10,7 +10,6 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
         curl \
         gawk \
         git \
-        libcurl4-openssl-dev \
         libprotobuf-c-dev \
         linux-headers-generic \
         nasm \
