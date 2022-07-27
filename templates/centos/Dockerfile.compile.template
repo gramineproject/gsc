@@ -36,5 +36,5 @@ RUN dnf update -y \
         python3-protobuf \
         rpm-build \
         wget \
-    && /usr/bin/python3 -B -m pip install 'toml>=0.10' 'meson>=0.55'
+    && /usr/bin/python3 -B -m pip install 'toml>=0.10' 'meson>=0.56'
 {% endblock %}
