@@ -42,7 +42,7 @@ $ docker run --cpuset-cpus="0-35,72-107" --cpuset-mems=0 \
 ```bash
 $ docker run --rm --device /dev/sgx_enclave gsc-ubuntu20.04-openvino \
     -m model/public/resnet-50-tf/FP16/resnet-50-tf.xml \
-    -d CPU -b 1 -t 20 -nstreams 72 -nthreads 72 -nireq 72
+    -d CPU -b 1 -t 20 -nstreams 2 -nthreads 2 -nireq 2
 ```
 
 ### Latency runs
