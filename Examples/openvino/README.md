@@ -10,7 +10,7 @@ Currently tested distro is Ubuntu 20.04.
 
 1. Build Docker image:
 ```bash
-docker build --rm -t ubuntu20.04-openvino -f ubuntu20.04-openvino.dockerfile .
+docker build --tag ubuntu20.04-openvino --file ubuntu20.04-openvino.dockerfile .
 ```
 
 2. Graminize the Docker image using `gsc build`:
@@ -40,7 +40,7 @@ $ docker run --cpuset-cpus="0-35,72-107" --cpuset-mems=0 \
 
 - For a quick test:
 ```bash
-$ docker run --device /dev/sgx_enclave gsc-ubuntu20.04-openvino \
+$ docker run --rm --device /dev/sgx_enclave gsc-ubuntu20.04-openvino \
     -m model/public/resnet-50-tf/FP16/resnet-50-tf.xml \
     -d CPU -b 1 -t 20 -nstreams 72 -nthreads 72 -nireq 72
 ```
@@ -58,7 +58,7 @@ $ docker run --cpuset-cpus="0-35,72-107" --cpuset-mems="0" \
 
 - For a quick test:
 ```bash
-$ docker run --device /dev/sgx_enclave gsc-ubuntu20.04-openvino \
+$ docker run --rm --device /dev/sgx_enclave gsc-ubuntu20.04-openvino \
     -m model/public/resnet-50-tf/FP16/resnet-50-tf.xml \
     -d CPU -b 1 -t 20 -api sync
 ```
