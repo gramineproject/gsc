@@ -1,12 +1,15 @@
 # Sign image in a separate stage to ensure that signing key is never part of the final image
 FROM {{image}} as unsigned_image
-
+ARG passphrase
 COPY gsc-signer-key.pem /gramine/app_files/gsc-signer-key.pem
+COPY sign.sh /gramine/app_files/sign.sh
+RUN chmod +x /gramine/app_files/sign.sh
 
-RUN {% block path %}{% endblock %} gramine-sgx-sign \
-      --key /gramine/app_files/gsc-signer-key.pem \
-      --manifest /gramine/app_files/entrypoint.manifest \
-      --output /gramine/app_files/entrypoint.manifest.sgx
+RUN {% block path %}{% endblock %} /gramine/app_files/sign.sh \
+      /gramine/app_files/gsc-signer-key.pem \
+      /gramine/app_files/entrypoint.manifest \
+      /gramine/app_files/entrypoint.manifest.sgx \
+      $passphrase
 
 # This trick removes all temporary files from the previous commands (including gsc-signer-key.pem)
 FROM {{image}}
