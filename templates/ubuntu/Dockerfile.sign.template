@@ -1,3 +1,1 @@
-{% extends "Dockerfile.common.sign.template" %}
-
-{% block path %}export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib -type d -path '*/site-packages')" &&{% endblock %}
+{% extends "debian/Dockerfile.sign.template" %}

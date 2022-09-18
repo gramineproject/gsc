@@ -1,0 +1,9 @@
+{% extends "apploader.common.template" %}
+
+{% block path %}
+# Include Meson build output Python dir in $PYTHONPATH, needed by gramine-sgx-get-token
+export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib -type d -path '*/site-packages')"
+
+# Include Meson build output packages dir in $PKG_CONFIG_PATH, contains mbedTLS and util libs
+export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}:$(find /gramine/meson_build_output/lib -type d -path '*/pkgconfig')"
+{% endblock %}

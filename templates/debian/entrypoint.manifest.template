@@ -1,0 +1,5 @@
+{% extends "entrypoint.common.manifest.template" %}
+
+{% block loader %}
+loader.entrypoint = "file:/gramine/meson_build_output/lib/x86_64-linux-gnu/gramine/libsysdb.so"
+{% endblock %}
