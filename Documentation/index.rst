@@ -152,6 +152,10 @@ of the signing key in them.
 
    Used to sign the Intel SGX enclave
 
+.. option:: -p
+
+   Provide passphrase for the enclave signing key (if applicable)
+
 .. program:: gsc-build-gramine
 
 :command:`gsc build-gramine` -- build Gramine-only Docker image
