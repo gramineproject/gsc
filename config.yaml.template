@@ -1,6 +1,7 @@
 # Specify the OS distro. Currently tested distros are
-# ``ubuntu:18.04``, ``ubuntu:20.04``, ``ubuntu:21.04``, ``debian:10``, ``debian11`` and
-# ``centos:8``.
+# - ubuntu:18.04, ubuntu:20.04, ubuntu:21.04
+# - debian:10, debian11
+# - centos:8
 Distro: "ubuntu:18.04"
 
 # If the image has a specific registry, define it here.
