@@ -144,6 +144,10 @@ of the signing key in them.
 
    Specify configuration file. Default: :file:`config.yaml`
 
+.. option:: -p
+
+   Provide passphrase for the enclave signing key (if applicable)
+
 .. option:: IMAGE-NAME
 
    Name of the application Docker image
@@ -151,10 +155,6 @@ of the signing key in them.
 .. option:: KEY-FILE
 
    Used to sign the Intel SGX enclave
-
-.. option:: -p
-
-   Provide passphrase for the enclave signing key (if applicable)
 
 .. program:: gsc-build-gramine
 
