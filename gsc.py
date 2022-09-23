@@ -301,6 +301,7 @@ def gsc_build_gramine(args):
               f'`{gramine_image_name}`.')
         return
 
+    shutil.copyfile('keys/intel-sgx-deb.key', tmp_build_path / 'intel-sgx-deb.key')
     build_docker_image(docker_socket.api, tmp_build_path, gramine_image_name, 'Dockerfile.compile',
                        rm=args.rm, nocache=args.no_cache, buildargs=extract_build_args(args))
 
