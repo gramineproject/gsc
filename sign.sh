@@ -8,10 +8,10 @@ set timeout -1
 set times 0
 set maxtimes 1
 expect "Enter pass phrase for [lindex $argv 0]" {
-      if { $times > $maxtimes } {
-          exit 0
-      }
-      send "[lindex $argv 3]\r"
-      set times [ expr $times + 1];
-      exp_continue
+    if {$times > $maxtimes} {
+        exit 0
+    }
+    send "[lindex $argv 3]\r"
+    set times [ expr $times + 1];
+    exp_continue
 }
