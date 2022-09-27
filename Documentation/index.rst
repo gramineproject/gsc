@@ -299,8 +299,8 @@ in :file:`config.yaml.template`.
 .. describe:: Distro
 
    Defines Linux distribution to be used to build Gramine in. Currently tested
-   distros are Ubuntu 18.04, Ubuntu 20.04, Ubuntu 21.04 and CentOS 8. Default
-   value is ``ubuntu:18.04``.
+   distros are Ubuntu 18.04, Ubuntu 20.04, Ubuntu 21.04, Debian 10, Debian 11
+   and CentOS 8. Default value is ``ubuntu:18.04``.
 
 .. describe:: Registry
 
@@ -316,7 +316,7 @@ in :file:`config.yaml.template`.
 
 .. describe:: Gramine.Branch
 
-   Use this release/branch of the repository. Default value: ``v1.2``.
+   Use this release/branch of the repository. Default value: ``v1.3``.
 
 .. describe:: Gramine.Image
 
@@ -528,12 +528,3 @@ you must manually add them to the manifest::
    sgx.trusted_files = [ "file:file1", "file:file2" ]
    or
    sgx.allowed_files = [ "file:file3", "file:file4" ]
-
-Docker images with non-executables as entrypoint
-------------------------------------------------
-
-Docker images may contain a script entrypoint which is not an ELF executable.
-:program:`gsc` fails to recognize such entrypoints and fails during the image
-build. A workaround relies on creating an image from the application image which
-has an entrypoint of the script interpreter with the script as an argument. This
-allows :program:`gsc` to start the interpreter instead of the script.
