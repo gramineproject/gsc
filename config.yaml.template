@@ -9,7 +9,11 @@ Distro: "ubuntu:18.04"
 Registry: ""
 
 # If you're using your own fork and branch of Gramine, specify the GitHub link and the branch name
-# below; typically, you want to keep the default values though
+# below; typically, you want to keep the default values though.
+#
+# It is also possible to specify the prebuilt Gramine Docker image (that was built previously via
+# the `gsc build-gramine` command). For this, remove Repository and Branch and instead write:
+#   Image:      "<prebuilt Gramine Docker image>"
 Gramine:
     Repository: "https://github.com/gramineproject/gramine.git"
     Branch:     "v1.2"
