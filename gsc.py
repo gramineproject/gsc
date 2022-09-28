@@ -172,13 +172,19 @@ def gsc_build(args):
         print(f'Cannot find original application Docker image `{original_image_name}`.')
         sys.exit(1)
 
+    config = yaml.safe_load(args.config_file)
+    if 'Image' in config['Gramine']:
+        gramine_image_name = gsc_image_name(config['Gramine']['Image'])
+        if get_docker_image(docker_socket, gramine_image_name) is None:
+            print(f'Cannot find base-Gramine Docker image `{gramine_image_name}`.')
+            sys.exit(1)
+
     print(f'Building unsigned graminized Docker image `{unsigned_image_name}` from original '
           f'application image `{original_image_name}`...')
 
     # initialize Jinja env with configurations extracted from the original Docker image
-
     env = jinja2.Environment()
-    env.globals.update(yaml.safe_load(args.config_file))
+    env.globals.update(config)
     env.globals.update(vars(args))
     env.globals.update({'app_image': original_image_name})
     extract_user_from_image_config(original_image.attrs['Config'], env)
@@ -255,7 +261,7 @@ def gsc_build(args):
 
     # Check if docker build failed
     if get_docker_image(docker_socket, unsigned_image_name) is None:
-        print(f'Failed to build unsigned graminized docker image `{unsigned_image_name}`.')
+        print(f'Failed to build unsigned graminized Docker image `{unsigned_image_name}`.')
         sys.exit(1)
 
     print(f'Successfully built an unsigned graminized Docker image `{unsigned_image_name}` from '
@@ -265,50 +271,58 @@ def gsc_build(args):
 # Command 2: Build a "base Gramine" Docker image with the compiled runtime of Gramine.
 def gsc_build_gramine(args):
     gramine_image_name = gsc_image_name(args.image)  # output base-Gramine image name
-    tmp_build_path = gsc_tmp_build_path(args.image)   # pathlib obj with build artifacts
+    tmp_build_path = gsc_tmp_build_path(args.image)  # pathlib obj with build artifacts
+
+    docker_socket = docker.from_env()
 
     config = yaml.safe_load(args.config_file)
     if 'Image' in config['Gramine']:
         print('`gsc build-gramine` does not allow `Gramine.Image` to be set.')
         sys.exit(1)
 
-    docker_socket = docker.from_env()
-
     if get_docker_image(docker_socket, gramine_image_name) is not None:
         print(f'Base-Gramine Docker image `{gramine_image_name}` already exists.')
         sys.exit(0)
 
-    print(f'Building base-Gramine image `{gramine_image_name}`...')
+    print(f'Building base-Gramine Docker image `{gramine_image_name}`...')
 
-    # generate Dockerfile.compile from Jinja-style templates/<distro>/Dockerfile.compile.template
-    # using the user-provided config file with info on OS distro, Gramine version and SGX driver
-    # and other user-provided args (see argparser::gsc_build_gramine below)
+    # initialize Jinja env with user-provided configurations
     env = jinja2.Environment()
     env.globals.update(config)
     env.globals.update(vars(args))
+
+    os.makedirs(tmp_build_path, exist_ok=True)
+
     distro = env.globals['Distro']
 
     distro, _ = distro.split(':')
     env.loader = jinja2.FileSystemLoader('templates/')
-    compile_template = env.get_template(f'{distro}/Dockerfile.compile.template')
 
-    os.makedirs(tmp_build_path, exist_ok=True)
+    # generate Dockerfile.compile from Jinja-style templates/<distro>/Dockerfile.compile.template
+    # using the user-provided config file with info on OS distro, Gramine version and SGX driver
+    # and other user-provided args (see argparser::gsc_build_gramine below)
+    compile_template = env.get_template(f'{distro}/Dockerfile.compile.template')
     with open(tmp_build_path / 'Dockerfile.compile', 'w') as dockerfile:
         dockerfile.write(compile_template.render())
 
     if args.file_only:
-        print(f'Successfully created Dockerfile.compile for base-Gramine image '
-              f'`{gramine_image_name}`.')
-        return
+        print(f'Successfully created Dockerfile.compile for base-Gramine Docker image '
+              f'`{gramine_image_name}` under `{tmp_build_path}`.')
+        sys.exit(0)
+
+    # Intel's SGX PGP RSA-1024 key signing the intel-sgx/sgx_repo repository. Expires 2023-05-24.
+    # Available at https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key
+    shutil.copyfile('keys/intel-sgx-deb.key', tmp_build_path / 'intel-sgx-deb.key')
 
     build_docker_image(docker_socket.api, tmp_build_path, gramine_image_name, 'Dockerfile.compile',
                        rm=args.rm, nocache=args.no_cache, buildargs=extract_build_args(args))
 
+    # Check if docker build failed
     if get_docker_image(docker_socket, gramine_image_name) is None:
-        print(f'Failed to build a base-Gramine image `{gramine_image_name}`.')
+        print(f'Failed to build a base-Gramine Docker image `{gramine_image_name}`.')
         sys.exit(1)
 
-    print(f'Successfully built a base-Gramine image `{gramine_image_name}`.')
+    print(f'Successfully built a base-Gramine Docker image `{gramine_image_name}`.')
 
 
 # Command 3: Sign Docker image which was previously built via `gsc build`.
