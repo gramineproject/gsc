@@ -339,7 +339,7 @@ def gsc_sign_image(args):
               f'You must first build this image via `gsc build` command.')
         sys.exit(1)
 
-    print(f'Signing graminized Docker image `unsigned_image_name` -> `{signed_image_name}`...')
+    print(f'Signing graminized Docker image `{unsigned_image_name}` -> `{signed_image_name}`...')
 
     # generate Dockerfile.sign from Jinja-style templates/<distro>/Dockerfile.sign.template
     # using the user-provided config file with info on OS distro, Gramine version and SGX driver
