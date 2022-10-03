@@ -336,6 +336,7 @@ def gsc_sign_image(args):
     distro, _ = distro.split(':')
     env.loader = jinja2.FileSystemLoader('templates/')
     sign_template = env.get_template(f'{distro}/Dockerfile.sign.template')
+    extract_user_from_image_config(unsigned_image.attrs['Config'], env)
 
     os.makedirs(tmp_build_path, exist_ok=True)
     with open(tmp_build_path / 'Dockerfile.sign', 'w') as dockerfile:
