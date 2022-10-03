@@ -4,7 +4,6 @@ COPY gsc-signer-key.pem /gramine/app_files/gsc-signer-key.pem
 
 ARG passphrase
 COPY sign.sh /gramine/app_files/sign.sh
-RUN chmod +x /gramine/app_files/sign.sh
 
 RUN {% block path %}{% endblock %} /gramine/app_files/sign.sh \
       /gramine/app_files/gsc-signer-key.pem \
