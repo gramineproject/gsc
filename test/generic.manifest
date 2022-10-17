@@ -2,7 +2,7 @@
 loader.pal_internal_mem_size = "128M"
 
 sgx.enclave_size = "4G"
-sgx.thread_num = 8
+sgx.max_threads = 8
 
 # FIXME: `toml` Python lib that was used in Gramine v1.3 and lower hangs/fails on non-homogeneous
 #        TOML arrays, so until we fully deprecate support for Gramine v1.3 in GSC, specify items in

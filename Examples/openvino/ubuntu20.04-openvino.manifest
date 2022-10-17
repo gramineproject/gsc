@@ -3,4 +3,4 @@ loader.env.KMP_AFFINITY = "granularity=fine,noverbose,compact,1,0"
 loader.pal_internal_mem_size = "128M"
 sgx.enclave_size = "32G"
 sgx.preheat_enclave = true
-sgx.thread_num = 196
+sgx.max_threads = 196
