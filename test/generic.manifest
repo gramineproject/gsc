@@ -2,7 +2,7 @@
 loader.pal_internal_mem_size = "128M"
 
 sgx.enclave_size = "4G"
-sgx.thread_num = 8
+sgx.max_threads = 8
 
 sgx.trusted_files = [
   "file:/gramine/app_files/entrypoint.manifest",  # unused entry, only to test merging of manifests
