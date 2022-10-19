@@ -33,6 +33,7 @@ def extract_files_from_user_manifest(manifest):
 def generate_trusted_files(root_dir, already_added_files):
     excluded_paths_regex = (r'^/('
                                 r'boot/.*'
+                                r'|\.cache/.*'
                                 r'|\.dockerenv'
                                 r'|\.dockerinit'
                                 r'|dev/.*'
