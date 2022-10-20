@@ -11,7 +11,8 @@ import subprocess
 import sys
 
 import jinja2
-import toml
+import tomli
+import tomli_w
 
 def is_utf8(filename_bytes):
     try:
@@ -75,7 +76,9 @@ def generate_trusted_files(root_dir, already_added_files):
                 # Python TOML parser has a bug that prevents it from correctly handling `\x`
                 # sequences in strings (see https://github.com/uiri/toml/issues/404). Fortunately,
                 # the only files that exhibit such pattern are systemd helper files which graminized
-                # apps will never access anyway. FIXME: Switch to another, less buggy TOML parser.
+                # apps will never access anyway.
+                # FIXME: Now we switched to `tomli`, but GSC can still use Gramine v1.3 or lower
+                #        which uses `toml`. When GSC removes support for v1.3, can remove this.
                 print(f'\t[from inside Docker container] File {filename} contains `\\x` sequence '
                        'and will be skipped from `sgx.trusted_files`!')
                 continue
@@ -121,7 +124,7 @@ def main(args=None):
 
     manifest = '/gramine/app_files/entrypoint.manifest'
     rendered_manifest = env.get_template(manifest).render()
-    rendered_manifest_dict = toml.loads(rendered_manifest)
+    rendered_manifest_dict = tomli.loads(rendered_manifest)
     already_added_files = extract_files_from_user_manifest(rendered_manifest_dict)
 
     if 'allow_all_but_log' not in rendered_manifest_dict['sgx'].get('file_check_policy', ''):
@@ -130,8 +133,8 @@ def main(args=None):
     else:
         print(f'\t[from inside Docker container] Skipping trusted files generation. This image must not be used in production.')
 
-    with open(manifest, 'w') as manifest_file:
-        toml.dump(rendered_manifest_dict, manifest_file)
+    with open(manifest, 'wb') as manifest_file:
+        tomli_w.dump(rendered_manifest_dict, manifest_file)
     print(f'\t[from inside Docker container] Successfully finalized `{manifest}`.')
 
 if __name__ == '__main__':
