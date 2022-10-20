@@ -16,7 +16,8 @@ import tempfile
 
 import docker  # pylint: disable=import-error
 import jinja2
-import toml    # pylint: disable=import-error
+import tomli   # pylint: disable=import-error
+import tomli_w # pylint: disable=import-error
 import yaml    # pylint: disable=import-error
 
 def gsc_image_name(original_image_name):
@@ -214,10 +215,10 @@ def gsc_build(args):
     #   - base Docker image's environment variables
     #   - additional, user-provided manifest options
     entrypoint_manifest_render = env.get_template(f'{distro}/entrypoint.manifest.template').render()
-    entrypoint_manifest_dict = toml.loads(entrypoint_manifest_render)
+    entrypoint_manifest_dict = tomli.loads(entrypoint_manifest_render)
 
     base_image_environment = extract_environment_from_image_config(original_image.attrs['Config'])
-    base_image_dict = toml.loads(base_image_environment)
+    base_image_dict = tomli.loads(base_image_environment)
 
     user_manifest_contents = ''
     if not os.path.exists(args.manifest):
@@ -225,7 +226,7 @@ def gsc_build(args):
     with open(args.manifest, 'r') as user_manifest_file:
         user_manifest_contents = user_manifest_file.read()
 
-    user_manifest_dict = toml.loads(user_manifest_contents)
+    user_manifest_dict = tomli.loads(user_manifest_contents)
 
     # Support deprecated syntax: replace old-style TOML-dict (`sgx.trusted_files.key = "file:foo"`)
     # with new-style TOML-array (`sgx.trusted_files = ["file:foo"]`) in the user manifest
@@ -246,8 +247,8 @@ def gsc_build(args):
     merged_manifest_dict = merge_two_dicts(user_manifest_dict, entrypoint_manifest_dict)
     merged_manifest_dict = merge_two_dicts(merged_manifest_dict, base_image_dict)
 
-    with open(tmp_build_path / 'entrypoint.manifest', 'w') as entrypoint_manifest:
-        toml.dump(merged_manifest_dict, entrypoint_manifest)
+    with open(tmp_build_path / 'entrypoint.manifest', 'wb') as entrypoint_manifest:
+        tomli_w.dump(merged_manifest_dict, entrypoint_manifest)
 
     # copy helper script to finalize the manifest from within graminized Docker image
     shutil.copyfile('finalize_manifest.py', tmp_build_path / 'finalize_manifest.py')
@@ -447,7 +448,7 @@ def gsc_info_image(args):
             print(f'Could not extract Intel SGX-related information from image {args.image}.')
             sys.exit(1)
 
-        print(toml.dumps(sigstruct))
+        print(tomli_w.dumps(sigstruct))
 
 
 argparser = argparse.ArgumentParser()
