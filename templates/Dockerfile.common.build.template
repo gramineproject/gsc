@@ -20,8 +20,14 @@ RUN mkdir -p /gramine/app_files
 # Make the app image user owner of /gramine/app_files directory
 RUN chown {{app_user}} /gramine/app_files/
 
+# Remove root-user cached files if any (may have been created during install step above)
+RUN rm -rf $HOME/.cache
+
 # Switch back to original app_image user
 USER {{app_user}}
+
+# Remove original-user cached files if any (some images have unclean state)
+RUN rm -rf $HOME/.cache
 
 # Copy path-specific installation of Gramine
 {% if debug %}
