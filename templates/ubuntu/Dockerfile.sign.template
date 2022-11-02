@@ -1,1 +1,0 @@
-{% extends "debian/Dockerfile.sign.template" %}

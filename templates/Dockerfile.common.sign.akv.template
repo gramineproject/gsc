@@ -1,15 +1,25 @@
 # Sign image in a separate stage to ensure that signing key is never part of the final image
 FROM {{image}} as unsigned_image
-COPY gsc-signer-key.pem /gramine/app_files/gsc-signer-key.pem
 
-ARG passphrase
+ARG key
 COPY sign.sh /gramine/app_files/sign.sh
 
+{% block install %}
+RUN apt-get update \
+        && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        curl \
+     && /usr/bin/python3 -B -m pip install azure-keyvault-keys azure-identity
+
+RUN curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+RUN az login
+
+#/gramine/app_files/{{key}} \
 RUN {% block path %}{% endblock %} /gramine/app_files/sign.sh \
-      /gramine/app_files/gsc-signer-key.pem \
+      akv \
+      $key \
       /gramine/app_files/entrypoint.manifest \
-      /gramine/app_files/entrypoint.manifest.sgx \
-      $passphrase
+      /gramine/app_files/entrypoint.manifest.sgx
+{% endblock %}
 
 # This trick removes all temporary files from the previous commands (including gsc-signer-key.pem
 # and passphrase)

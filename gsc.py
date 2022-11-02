@@ -349,26 +349,39 @@ def gsc_sign_image(args):
 
     distro, _ = distro.split(':')
     env.loader = jinja2.FileSystemLoader('templates/')
-    sign_template = env.get_template(f'{distro}/Dockerfile.sign.template')
+    sign_template = []
+    build_args = []
 
     os.makedirs(tmp_build_path, exist_ok=True)
-    with open(tmp_build_path / 'Dockerfile.sign', 'w') as dockerfile:
-        dockerfile.write(sign_template.render(image=unsigned_image_name))
 
     # copy user-provided signing key and signing Bash script to our tmp build dir (to copy them
     # later inside Docker image)
-    tmp_build_key_path = tmp_build_path / 'gsc-signer-key.pem'
+    if args.keytype == 'pem':
+        tmp_build_key_path = tmp_build_path / 'gsc-signer-key.pem'
+        shutil.copyfile(os.path.abspath(args.key), tmp_build_key_path)
+        sign_template = env.get_template(f'{distro}/Dockerfile.sign.local.template')
+        build_args = {"passphrase": args.passphrase}
+    elif args.keytype == 'akv':
+        sign_template = env.get_template(f'{distro}/Dockerfile.sign.akv.template')
+        build_args = {"key": args.key}
+    else:
+        print(f'Failed to build a signed graminized Docker image: Invalid keytype.')
+        sys.exit(1)
+
+    with open(tmp_build_path / 'Dockerfile.sign', 'w') as dockerfile:
+        dockerfile.write(sign_template.render(image=unsigned_image_name))
+
     tmp_build_sign_path = tmp_build_path / 'sign.sh'
-    shutil.copyfile(os.path.abspath(args.key), tmp_build_key_path)
     shutil.copy(os.path.abspath('sign.sh'), tmp_build_sign_path)
 
     try:
         # `forcerm` parameter forces removal of intermediate Docker images even after unsuccessful
         # builds, to not leave the signing key lingering in any Docker containers
         build_docker_image(docker_socket.api, tmp_build_path, signed_image_name, 'Dockerfile.sign',
-                           forcerm=True, buildargs={"passphrase": args.passphrase})
+                           forcerm=True, buildargs=build_args)
     finally:
-        os.remove(tmp_build_key_path)
+        if args.keytype == 'pem':
+            os.remove(tmp_build_key_path)
 
     if get_docker_image(docker_socket, signed_image_name) is None:
         print(f'Failed to build a signed graminized Docker image `{signed_image_name}`.')
@@ -500,7 +513,15 @@ sub_sign.set_defaults(command=gsc_sign_image)
 sub_sign.add_argument('-c', '--config_file', type=argparse.FileType('r', encoding='UTF-8'),
     default='config.yaml', help='Specify configuration file.')
 sub_sign.add_argument('image', help='Name of the application (base) Docker image.')
-sub_sign.add_argument('key', help='Key to sign the Intel SGX enclaves inside the Docker image.')
+sub_sign.add_argument('-t', '--keytype',
+                       default='pem',
+                       help='Key type to sign the Intel SGX enclaves inside the Docker '
+                      'image. \'pem\' for signing with local private key or \'akv\' for signing'
+                      'with Azure Key Vault\'s Managed HSM.')
+sub_sign.add_argument('-k', '--key',
+                      default='enclave-key.pem',
+                      help='Key to sign the Intel SGX enclaves inside the Docker image. '
+                      '.pem file for local signing or vault_url:keyname for signing with AKV.')
 sub_sign.add_argument('-p', '--passphrase', help='Passphrase for the signing key.')
 
 sub_info = subcommands.add_parser('info-image', help='Retrieve information about a graminized '
