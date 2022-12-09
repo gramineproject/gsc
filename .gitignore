@@ -21,3 +21,4 @@ __pycache__
 *.manifest.sgx
 *.sig
 *.token
+/templates/Dockerfile.sign.user.template
