@@ -16,6 +16,7 @@ import tempfile
 
 import docker  # pylint: disable=import-error
 import jinja2
+import shlex
 import tomli   # pylint: disable=import-error
 import tomli_w # pylint: disable=import-error
 import yaml    # pylint: disable=import-error
@@ -76,9 +77,7 @@ def extract_binary_info_from_image_config(config, env):
     # Check if we have fixed binary arguments as part of entrypoint
     if num_starting_entrypoint_items > 1:
         last_bin_arg = num_starting_entrypoint_items
-        escaped_args = [s.replace('\\', '\\\\').replace('"', '\\"')
-                        for s in entrypoint[1:last_bin_arg]]
-        binary_arguments = '"' + '" "'.join(escaped_args) + '"'
+        binary_arguments = entrypoint[1:last_bin_arg]
     else:
         last_bin_arg = 0
         binary_arguments = ''
@@ -86,7 +85,6 @@ def extract_binary_info_from_image_config(config, env):
     # Place the remaining optional arguments previously specified as command in the new command.
     # Necessary since the first element of the command may be the binary of the resulting image.
     cmd = entrypoint[last_bin_arg + 1:] if len(entrypoint) > last_bin_arg + 1 else ''
-    cmd = [s.replace('\\', '\\\\').replace('"', '\\"') for s in cmd]
 
     env.globals.update({
         'binary': binary,
@@ -185,6 +183,7 @@ def gsc_build(args):
 
     # initialize Jinja env with configurations extracted from the original Docker image
     env = jinja2.Environment()
+    env.filters['shlex_quote'] = shlex.quote
     env.globals.update(config)
     env.globals.update(vars(args))
     env.globals.update({'app_image': original_image_name})
