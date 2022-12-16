@@ -76,7 +76,9 @@ def extract_binary_info_from_image_config(config, env):
     # Check if we have fixed binary arguments as part of entrypoint
     if num_starting_entrypoint_items > 1:
         last_bin_arg = num_starting_entrypoint_items
-        binary_arguments = entrypoint[1:last_bin_arg]
+        escaped_args = [s.replace('\\', '\\\\').replace('"', '\\"')
+                        for s in entrypoint[1:last_bin_arg]]
+        binary_arguments = '"' + '" "'.join(escaped_args) + '"'
     else:
         last_bin_arg = 0
         binary_arguments = ''
