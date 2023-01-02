@@ -14,9 +14,14 @@ Registry: ""
 # It is also possible to specify the prebuilt Gramine Docker image (that was built previously via
 # the `gsc build-gramine` command). For this, remove Repository and Branch and instead write:
 #   Image:      "<prebuilt Gramine Docker image>"
+#
+# GSC releases are guaranteed to work with corresponding Gramine releases (and GSC master
+# branch is guaranteed to work with current Gramine master branch). Therefore, in case of
+# issues, specify Gramine Branch that corresponds to your current GSC release (e.g. "v1.3.1"
+# for GSC v1.3.1).
 Gramine:
     Repository: "https://github.com/gramineproject/gramine.git"
-    Branch:     "v1.3.1"
+    Branch:     "master"
 
 # Specify the Intel SGX driver installed on your machine (more specifically, on the machine where
 # the graminized Docker container will run); there are several variants of the SGX driver:
