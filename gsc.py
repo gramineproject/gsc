@@ -349,9 +349,8 @@ def gsc_sign_image(args):
     distro = env.globals['Distro']
 
     distro, _ = distro.split(':')
-    env.loader = jinja2.FileSystemLoader('templates/')
-    sign_template = []
-    build_args = []
+    sign_template = None
+    build_args = {}
 
     os.makedirs(tmp_build_path, exist_ok=True)
 
@@ -363,11 +362,13 @@ def gsc_sign_image(args):
         tmp_build_sign_path = tmp_build_path / 'sign.sh'
         shutil.copyfile(os.path.abspath(args.key), tmp_build_key_path)
         shutil.copy(os.path.abspath('sign.sh'), tmp_build_sign_path)
+        env.loader = jinja2.FileSystemLoader('templates/')
         sign_template = env.get_template(f'{distro}/Dockerfile.sign.template')
         build_args = {"passphrase": args.passphrase}
     else:
-        shutil.copy(args.template, 'templates/Dockerfile.sign.user.template')
-        sign_template = env.get_template(f'{distro}/Dockerfile.sign.user.template')
+        extract_user_from_image_config(unsigned_image.attrs['Config'], env)
+        env.loader = jinja2.FileSystemLoader(os.path.dirname(args.template))
+        sign_template = env.get_template(os.path.basename(args.template))
 
     with open(tmp_build_path / 'Dockerfile.sign', 'w') as dockerfile:
         dockerfile.write(sign_template.render(image=unsigned_image_name))
@@ -511,9 +512,10 @@ sub_sign.set_defaults(command=gsc_sign_image)
 sub_sign.add_argument('-c', '--config_file', type=argparse.FileType('r', encoding='UTF-8'),
     default='config.yaml', help='Specify configuration file.')
 sub_sign.add_argument('image', help='Name of the application (base) Docker image.')
-sub_sign.add_argument('-k', '--key', help='Key to sign the Intel SGX enclaves inside the Docker image.')
+sub_sign.add_argument('-k', '--key',
+    help='Key to sign the Intel SGX enclaves inside the Docker image.')
 sub_sign.add_argument('-t', '--template',
-                      help='Custom Dockerfile/template to use for signing, say, with a HSM.')
+                      help='Custom Dockerfile/template to use for signing, say, with an HSM.')
 sub_sign.add_argument('-p', '--passphrase', help='Passphrase for the signing key.')
 
 sub_info = subcommands.add_parser('info-image', help='Retrieve information about a graminized '

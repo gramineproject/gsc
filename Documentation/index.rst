@@ -139,23 +139,27 @@ Docker image called ``gsc-<IMAGE-NAME>``. :command:`gsc sign-image` always
 removes intermediate Docker images, if successful or not, to ensure the removal
 of the signing key in them.
 
-:command:`gsc sign-image` [*OPTIONS*] <*IMAGE-NAME*> <*KEY-FILE*>
+:command:`gsc sign-image` [*OPTIONS*] <*IMAGE-NAME*>
 
 .. option:: -c
 
    Specify configuration file. Default: :file:`config.yaml`
 
+.. option:: -k KEY-FILE
+
+   Provide key to sign the Intel SGX enclave.
+
 .. option:: -p
 
    Provide passphrase for the enclave signing key (if applicable)
 
+.. option:: -t
+
+   Provide Dockerfile to use for signing the enclave (e.g., with an HSM)
+
 .. option:: IMAGE-NAME
 
    Name of the application Docker image
-
-.. option:: KEY-FILE
-
-   Used to sign the Intel SGX enclave
 
 .. program:: gsc-build-gramine
 
@@ -275,9 +279,10 @@ follows three main stages and produces an image named ``gsc-<image-name>``.
    tool to generate SIGSTRUCT files for SGX enclave initialization. This tool
    also generates an SGX-specific manifest file.  The required signing key is
    provided by the user via the :command:`gsc sign-image` command and copied
-   into this Docker build stage. The generated image is called
-   ``gsc-<image-name>`` and includes all necessary files to start an Intel SGX
-   enclave.
+   into this Docker build stage. The users can also supply their own Dockerfile
+   templates using `--template` option of this command to sign (e.g. with HSM).
+   The generated image is called ``gsc-<image-name>`` and includes all necessary
+   files to start an Intel SGX enclave.
 
 In the future we plan to provide prebuilt Gramine images for popular
 cloud-provider offerings.
