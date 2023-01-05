@@ -147,7 +147,7 @@ of the signing key in them.
 
 .. option:: -k
 
-   Used to sign the Intel SGX enclave
+   Key file used to sign the Intel SGX enclave
 
 .. option:: -p
 
