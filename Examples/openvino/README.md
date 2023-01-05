@@ -16,13 +16,14 @@ docker build --tag ubuntu20.04-openvino --file ubuntu20.04-openvino.dockerfile .
 2. Graminize the Docker image using `gsc build`:
 ```bash
 cd ../..
-./gsc build --insecure-args ubuntu20.04-openvino \
-    Examples/openvino/ubuntu20.04-openvino.manifest
+./gsc build --insecure-args \
+    --manifest Examples/openvino/ubuntu20.04-openvino.manifest \
+    ubuntu20.04-openvino
 ```
 
 3. Sign the graminized Docker image using `gsc sign-image`:
 ```bash
-./gsc sign-image ubuntu20.04-openvino enclave-key.pem
+./gsc sign-image --key enclave-key.pem ubuntu20.04-openvino
 ```
 
 ## Running the benchmark in GSC

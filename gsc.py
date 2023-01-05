@@ -472,8 +472,8 @@ sub_build.add_argument('--build-arg', action='append', default=[],
     help='Set build-time variables (same as "docker build --build-arg").')
 sub_build.add_argument('-c', '--config_file', type=argparse.FileType('r', encoding='UTF-8'),
     default='config.yaml', help='Specify configuration file.')
+sub_build.add_argument('-m', '--manifest', help='Manifest file to use.');
 sub_build.add_argument('image', help='Name of the application Docker image.')
-sub_build.add_argument('manifest', help='Manifest file to use.')
 
 sub_build_gramine = subcommands.add_parser('build-gramine',
     help='Build base-Gramine Docker image')
@@ -501,7 +501,8 @@ sub_sign.set_defaults(command=gsc_sign_image)
 sub_sign.add_argument('-c', '--config_file', type=argparse.FileType('r', encoding='UTF-8'),
     default='config.yaml', help='Specify configuration file.')
 sub_sign.add_argument('image', help='Name of the application (base) Docker image.')
-sub_sign.add_argument('key', help='Key to sign the Intel SGX enclaves inside the Docker image.')
+sub_sign.add_argument('-k', '--key',
+    help='Key to sign the Intel SGX enclaves inside the Docker image.')
 sub_sign.add_argument('-p', '--passphrase', help='Passphrase for the signing key.')
 
 sub_info = subcommands.add_parser('info-image', help='Retrieve information about a graminized '

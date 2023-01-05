@@ -85,7 +85,7 @@ Builds an unsigned graminized Docker image of an application image called
 ``gsc-<IMAGE-NAME>-unsigned`` by compiling Gramine or relying on a prebuilt
 Gramine image.
 
-:command:`gsc build` [*OPTIONS*] <*IMAGE-NAME*> <*APP.MANIFEST*>
+:command:`gsc build` [*OPTIONS*] <*IMAGE-NAME*>
 
 .. option:: -d
 
@@ -121,13 +121,13 @@ Gramine image.
 
    Specify configuration file. Default: :file:`config.yaml`.
 
+.. option:: -m
+
+   Manifest file (Gramine configuration).
+
 .. option:: IMAGE-NAME
 
    Name of the application Docker image.
-
-.. option:: APP.MANIFEST
-
-   Manifest file (Gramine configuration).
 
 .. program:: gsc-sign-image
 
@@ -139,11 +139,15 @@ Docker image called ``gsc-<IMAGE-NAME>``. :command:`gsc sign-image` always
 removes intermediate Docker images, if successful or not, to ensure the removal
 of the signing key in them.
 
-:command:`gsc sign-image` [*OPTIONS*] <*IMAGE-NAME*> <*KEY-FILE*>
+:command:`gsc sign-image` [*OPTIONS*] <*IMAGE-NAME*>
 
 .. option:: -c
 
    Specify configuration file. Default: :file:`config.yaml`
+
+.. option:: -k
+
+   Used to sign the Intel SGX enclave
 
 .. option:: -p
 
@@ -152,10 +156,6 @@ of the signing key in them.
 .. option:: IMAGE-NAME
 
    Name of the application Docker image
-
-.. option:: KEY-FILE
-
-   Used to sign the Intel SGX enclave
 
 .. program:: gsc-build-gramine
 
@@ -437,13 +437,13 @@ This example assumes that all prerequisites are installed and configured.
 
    .. code-block:: sh
 
-      ./gsc build --insecure-args python test/generic.manifest
+      ./gsc build --insecure-args --manifest test/generic.manifest python
 
 #. Sign the graminized Docker image using :command:`gsc sign-image`:
 
    .. code-block:: sh
 
-      ./gsc sign-image python enclave-key.pem
+      ./gsc sign-image --key enclave-key.pem python
 
 #. Retrieve SGX-related information from graminized image using :command:`gsc info-image`:
 
