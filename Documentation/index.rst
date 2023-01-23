@@ -529,3 +529,14 @@ you must manually add them to the manifest::
    sgx.trusted_files = [ "file:file1", "file:file2" ]
    or
    sgx.allowed_files = [ "file:file3", "file:file4" ]
+
+Issues with hostname and DNS
+----------------------------
+
+If your application queries the hostname or DNS information, you must manually
+add the following option to the manifest::
+
+    sys.enable_extra_runtime_domain_names_conf = true
+
+For more information on this option, refer to
+https://gramine.readthedocs.io/en/stable/manifest-syntax.html#domain-names-configuration.
