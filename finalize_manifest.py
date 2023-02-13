@@ -52,17 +52,14 @@ def generate_trusted_files(root_dir, already_added_files):
 
     num_trusted = 0
     trusted_files = []
-    dirs = set()
     for dirpath, dirnames, files in os.walk(root_dir.encode('UTF-8'), followlinks=True):
         scandirs = []
         for dirname in dirnames:
-            dir = os.path.join(dirpath, dirname)
-            if exclude_re.match(dir.decode('UTF-8')):
+            abs_dir = os.path.join(dirpath, dirname)
+            if exclude_re.match(abs_dir.decode('UTF-8')):
                 # exclude special paths from list of trusted files
                 continue
-            if dir not in dirs:
-                dirs.add(dir)
-                scandirs.append(dirname)
+            scandirs.append(dirname)
         dirnames[:] = scandirs
 
         for file in files:
