@@ -266,10 +266,11 @@ follows three main stages and produces an image named ``gsc-<image-name>``.
    vary across different deployment machines. GSC combines these variables and
    list of trusted files into a new manifest file. In a last step the entrypoint
    is changed to launch the :file:`apploader.sh` script which generates an Intel
-   SGX token and starts the :program:`gramine-sgx` loader. Note that the
-   generated image (``gsc-<image-name>-unsigned``) cannot successfully load an
-   Intel SGX enclave, since essential files and the signature of the enclave are
-   still missing (see next stage).
+   SGX token (only if needed, on non-FLC platforms) and starts the
+   :program:`gramine-sgx` loader. Note that the generated image
+   (``gsc-<image-name>-unsigned``) cannot successfully load an Intel SGX
+   enclave, since essential files and the signature of the enclave are still
+   missing (see next stage).
 
 #. **Signing the Intel SGX enclave.** The third stage uses Gramine's signer
    tool to generate SIGSTRUCT files for SGX enclave initialization. This tool
