@@ -52,11 +52,14 @@ def generate_trusted_files(root_dir, already_added_files):
 
     num_trusted = 0
     trusted_files = []
+
+    # WARNING: below loop does not remove cycles (which can happen due to symlinks), but we assume
+    # that Docker images (excluding paths/files listed in `excluded_paths_regex`) don't have cycles.
     for dirpath, dirnames, files in os.walk(root_dir.encode('UTF-8'), followlinks=True):
         scandirs = []
         for dirname in dirnames:
-            abs_dir = os.path.join(dirpath, dirname)
-            if exclude_re.match(abs_dir.decode('UTF-8')):
+            to_be_walked_dir = os.path.join(dirpath, dirname)
+            if exclude_re.match(to_be_walked_dir.decode('UTF-8')):
                 # exclude special paths from list of trusted files
                 continue
             scandirs.append(dirname)
