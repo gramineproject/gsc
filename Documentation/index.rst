@@ -257,24 +257,22 @@ follows three main stages and produces an image named ``gsc-<image-name>``.
 #. **Graminizing the application image.** The second stage copies the important
    Gramine artifacts (e.g., the runtime and signer tool) from the first stage
    (or if the first stage was skipped, it pulls a prebuilt Docker image defined
-   via the configuration file).  It then prepares image-specific variables such
+   via the configuration file). It then prepares image-specific variables such
    as the executable path and the library path, and scans the entire image to
-   generate a list of trusted files.  GSC excludes files and paths starting with
-   :file:`/boot`, :file:`/dev`, :file:`.dockerenv`, :file:`.dockerinit`,
-   :file:`/etc/mtab`, :file:`/etc/rc`, :file:`/proc`, :file:`/sys`, and
-   :file:`/var`, since checksums are required which either don't exist or may
-   vary across different deployment machines. GSC combines these variables and
-   list of trusted files into a new manifest file. In a last step the entrypoint
-   is changed to launch the :file:`apploader.sh` script which generates an Intel
-   SGX token (only if needed, on non-FLC platforms) and starts the
-   :program:`gramine-sgx` loader. Note that the generated image
-   (``gsc-<image-name>-unsigned``) cannot successfully load an Intel SGX
-   enclave, since essential files and the signature of the enclave are still
-   missing (see next stage).
+   generate a list of trusted files. GSC excludes some system files and paths
+   (for the exact list, see :ref:`excluded-paths`), since checksums are required
+   which either don't exist or may vary across different deployment machines.
+   GSC combines these variables and list of trusted files into a new manifest
+   file. In a last step the entrypoint is changed to launch the
+   :file:`apploader.sh` script which generates an Intel SGX token (only if
+   needed, on non-FLC platforms) and starts the :program:`gramine-sgx` loader.
+   Note that the generated image (``gsc-<image-name>-unsigned``) cannot
+   successfully load an Intel SGX enclave, since essential files and the
+   signature of the enclave are still missing (see next stage).
 
 #. **Signing the Intel SGX enclave.** The third stage uses Gramine's signer
    tool to generate SIGSTRUCT files for SGX enclave initialization. This tool
-   also generates an SGX-specific manifest file.  The required signing key is
+   also generates an SGX-specific manifest file. The required signing key is
    provided by the user via the :command:`gsc sign-image` command and copied
    into this Docker build stage. The generated image is called
    ``gsc-<image-name>`` and includes all necessary files to start an Intel SGX
@@ -518,14 +516,35 @@ either in environment variables or mounted as files. GSC is currently unaware of
 such files and hence, cannot mark them trusted. Similar to trusted data, these
 files may be added to the manifest.
 
+.. _excluded-paths:
+
 Access to files in excluded paths
 ---------------------------------
 
-The manifest generation excludes all files and paths starting with :file:`/boot`
-, :file:`/dev`, :file:`.dockerenv`, :file:`.dockerinit`, :file:`/etc/mtab`,
-:file:`/etc/rc`, :file:`/proc`, :file:`/sys`, and :file:`/var` from the list of
-trusted files. If your application relies on some files in these directories,
-you must manually add them to the manifest::
+The manifest generation excludes the following files and paths from the list of
+trusted files:
+
+- :file:`/boot/*`
+- :file:`/dev/*`
+- :file:`/efi/*`
+- :file:`/media/*`
+- :file:`/mnt/*`
+- :file:`/proc/*`
+- :file:`/run/*`
+- :file:`/sys/*`
+- :file:`/tmp/*`
+- :file:`/var/*`
+- security-critical files under :file:`/etc/`:
+
+  - :file:`/etc/.pwd.lock`
+  - :file:`/etc/gshadow`
+  - :file:`/etc/mtab`
+  - :file:`/etc/rc*`
+  - :file:`/etc/security`
+  - :file:`/etc/shadow`
+
+If your application relies on some files in these directories, you must manually
+add them to the manifest::
 
    sgx.trusted_files = [ "file:file1", "file:file2" ]
    or
