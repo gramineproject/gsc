@@ -63,6 +63,8 @@ def generate_trusted_files(root_dir, already_added_files):
                 # exclude special paths from list of trusted files
                 continue
             scandirs.append(dirname)
+        # slice assignment, to modify `dirnames` in place (so that os.walk() will recurse only
+        # into the subdirs whose names remain in `dirnames`)
         dirnames[:] = scandirs
 
         for file in files:
