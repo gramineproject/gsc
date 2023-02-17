@@ -97,10 +97,20 @@ Gramine image.
 
 :command:`gsc build` [*OPTIONS*] <*IMAGE-NAME*> <*APP.MANIFEST*>
 
-.. option:: -d
+.. option:: -b <buildtype>, --buildtype <buildtype>
 
-   Compile Gramine with debug flags and debug output. If configured to use a
-   prebuilt Gramine image, the image has to support this option.
+   Use <buildtype> value ``release``, ``debug`` or ``debugoptimized`` to
+   compile Gramine in the corresponding mode. Default: ``release``.
+
+..
+  TODO: Drop `-d` option with GSC v1.6 release
+
+.. option:: -d, --debug
+
+   Compile Gramine with debug flags and debug output.
+
+   .. deprecated:: 1.5
+      Use :option:`--buildtype`.
 
 .. option:: -L
 
@@ -178,10 +188,20 @@ parameter `Gramine.Image`.
 
 :command:`gsc build-gramine` [*OPTIONS*] <*IMAGE-NAME*>
 
-.. option:: -d
+.. option:: -b <buildtype>, --buildtype <buildtype>
 
-   Compile Gramine with debug flags and debug output. Allows :command:`gsc
-   build` commands to include debug runtime using :option:`-d <gsc-build -d>`.
+   Use <buildtype> value ``release``, ``debug`` or ``debugoptimized`` to
+   compile Gramine in the corresponding mode. Default: ``release``.
+
+..
+  TODO: Drop `-d` option with GSC v1.6 release
+
+.. option:: -d, --debug
+
+   Compile Gramine with debug flags and debug output.
+
+   .. deprecated:: 1.5
+      Use :option:`--buildtype`.
 
 .. option:: -L
 
