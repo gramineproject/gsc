@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-{% if debug == "debug" %}
+{% if debug != "release" %}
 set -x
 {% endif %}
 set -e
