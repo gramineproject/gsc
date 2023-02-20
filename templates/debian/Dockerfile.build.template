@@ -21,7 +21,7 @@ RUN apt-get update \
 # For compatibility with Gramine v1.3 or lower
 RUN /usr/bin/python3 -B -m pip install 'toml>=0.10'
 
-{% if debug %}
+{% if debug == "debug" %}
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         gdb \
         less \

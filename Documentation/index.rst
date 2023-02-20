@@ -89,11 +89,11 @@ Gramine image.
 
 .. option:: -d
 
-   Compile Gramine with ``release``, ``debug`` and ``debugoptimized`` built types.
-   Gramine compiles in ``release`` when ``-d`` flag is not specified. Specify
-   ``-d`` for ``debug`` and ``-d debugoptimized`` for ``debugoptimized``.
-   If configured to use a prebuilt Gramine image, the image has to support these
-   options.
+   Compile Gramine in ``release``, ``debug`` or ``debugoptimized`` mode:
+
+   - no option specified means ``release`` mode,
+   - ``-d`` means ``debug`` mode,
+   - ``-d [release | debug | debugoptimized]`` means corresponding mode.
 
 .. option:: -L
 
@@ -173,9 +173,12 @@ parameter `Gramine.Image`.
 
 .. option:: -d
 
-   Compile Gramine with ``release``, ``debug`` and ``debugoptimized`` built types.
-   Gramine compiles in ``release`` when ``-d`` flag is not specified. Specify
-   ``-d`` for ``debug`` and ``-d debugoptimized`` for ``debugoptimized``.
+   Compile Gramine in ``release``, ``debug`` or ``debugoptimized`` mode:
+
+   - no option specified means ``release`` mode,
+   - ``-d`` means ``debug`` mode,
+   - ``-d [release | debug | debugoptimized]`` means corresponding mode.
+
    Allows :command:`gsc build` commands to include debug runtime using
    :option:`-d <gsc-build -d>`.
 

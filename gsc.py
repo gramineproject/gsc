@@ -456,9 +456,9 @@ subcommands.required = True
 
 sub_build = subcommands.add_parser('build', help='Build graminized Docker image')
 sub_build.set_defaults(command=gsc_build)
-sub_build.add_argument('-d', '--build_type', nargs='?', const='debug', default='release',
+sub_build.add_argument('-d', '--debug', nargs='?', const='debug', default='release',
     choices=['release', 'debug', 'debugoptimized'],
-    help='Compile Gramine with release, debug and debugoptimized built types.')
+    help='Compile Gramine in release, debug or debugoptimized mode.')
 sub_build.add_argument('-L', '--linux', action='store_true',
     help='Compile Gramine with Linux PAL in addition to Linux-SGX PAL.')
 sub_build.add_argument('--insecure-args', action='store_true',
@@ -478,9 +478,9 @@ sub_build.add_argument('manifest', help='Manifest file to use.')
 sub_build_gramine = subcommands.add_parser('build-gramine',
     help='Build base-Gramine Docker image')
 sub_build_gramine.set_defaults(command=gsc_build_gramine)
-sub_build_gramine.add_argument('-d', '--build_type', nargs='?', const='debug', default='release',
+sub_build_gramine.add_argument('-d', '--debug', nargs='?', const='debug', default='release',
     choices=['release', 'debug', 'debugoptimized'],
-    help='Compile Gramine with release, debug and debugoptimized built types.')
+    help='Compile Gramine in release, debug or debugoptimized mode.')
 sub_build_gramine.add_argument('-L', '--linux', action='store_true',
     help='Compile Gramine with Linux PAL in addition to Linux-SGX PAL.')
 sub_build_gramine.add_argument('-nc', '--no-cache', action='store_true',
