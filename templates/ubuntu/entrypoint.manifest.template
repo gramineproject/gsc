@@ -1,8 +1,1 @@
-{% extends "entrypoint.common.manifest.template" %}
-
-{% block loader %}
-loader.entrypoint = "file:/gramine/meson_build_output/lib/x86_64-linux-gnu/gramine/libsysdb.so"
-
-# ldconfig in Ubuntu 21.04 doesn't produce "/usr/lib/x86_64-linux-gnu" so add it explicitly
-loader.env.LD_LIBRARY_PATH = "/gramine/meson_build_output/lib/x86_64-linux-gnu/gramine/runtime/glibc:/usr/lib/x86_64-linux-gnu:{{"{{library_paths}}"}}"
-{% endblock %}
+{% extends "debian/entrypoint.manifest.template" %}
