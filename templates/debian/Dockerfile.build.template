@@ -16,10 +16,13 @@ RUN apt-get update \
         python3-protobuf \
         python3-pyelftools \
     && /usr/bin/python3 -B -m pip install click jinja2 protobuf \
-                                          'tomli>=1.1.0' 'tomli-w>=0.4.0'
-
+                                          'tomli>=1.1.0' 'tomli-w>=0.4.0' \
 # For compatibility with Gramine v1.3 or lower
-RUN /usr/bin/python3 -B -m pip install 'toml>=0.10'
+    && /usr/bin/python3 -B -m pip install 'toml>=0.10' \
+    && locale-gen en_US.UTF-8 \
+    && apt remove -y python3-pip locales locales-all  && apt autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
+
 
 {% if debug %}
 RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
@@ -31,8 +34,4 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         vim
 {% endif %}
 
-RUN locale-gen en_US.UTF-8
-ENV LC_ALL en_US.UTF-8
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US.UTF-8
 {% endblock %}
