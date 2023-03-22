@@ -26,6 +26,15 @@ via the ``gsc build`` command. When the graminized image should run within an
 Intel SGX enclave, the image has to be signed via a ``gsc sign-image`` command.
 Subsequently, the image can be run using ``docker run``.
 
+**NOTE**: As part of the ``gsc build`` step, GSC generates the manifest file
+with a list of trusted files (files with integrity protection). This list
+contains *all* files present in the original Docker image. Therefore, GSC's
+manifest creation capability depends on packaging of original Docker image: if
+the original Docker image is bloated (contains unnecessary files), then the
+generated manifest will also be bloated. Though this doesn't worsen security
+guarantees of Gramine/GSC, it may affect startup performance. Please exercise
+care in pulling in only the dependencies truly required for your Docker image.
+
 Gramine and GSC documentation
 =============================
 
