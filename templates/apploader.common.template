@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-{% if debug != "release" %}
+{% if buildtype != "release" %}
 set -x
 {% endif %}
 set -e

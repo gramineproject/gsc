@@ -30,7 +30,7 @@ USER {{app_user}}
 RUN rm -rf $HOME/.cache
 
 # Copy path-specific installation of Gramine
-{% if debug != "release" %}
+{% if buildtype != "release" %}
 COPY --from=gramine --chown={{app_user}} /gramine/ /gramine/
 {% else %}
 COPY --from=gramine --chown={{app_user}} /gramine/meson_build_output /gramine/meson_build_output

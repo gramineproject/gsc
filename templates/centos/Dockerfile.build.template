@@ -25,7 +25,7 @@ RUN /usr/bin/python3 -B -m pip install 'toml>=0.10'
 # Install pyelftools after the installation of epel-release as it is provided by the EPEL repo
 RUN dnf install -y python3-pyelftools
 
-{% if debug != "release" %}
+{% if buildtype != "release" %}
 RUN dnf install -y \
         gdb \
         less \
