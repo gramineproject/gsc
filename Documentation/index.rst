@@ -89,7 +89,8 @@ Gramine image.
 
 .. option:: -b [release | debug | debugoptimized]
 
-   Compile Gramine in ``release``, ``debug`` or ``debugoptimized`` mode. Default: ``release``.
+   Compile Gramine in ``release``, ``debug`` or ``debugoptimized`` mode.
+   Default: ``release``.
 
 ..
   TODO: Drop `-d` option with GSC v1.6 release
@@ -176,7 +177,8 @@ parameter `Gramine.Image`.
 
 .. option:: -b [release | debug | debugoptimized]
 
-   Compile Gramine in ``release``, ``debug`` or ``debugoptimized`` mode. Default: ``release``.
+   Compile Gramine in ``release``, ``debug`` or ``debugoptimized`` mode.
+   Default: ``release``.
 
 ..
   TODO: Drop `-d` option with GSC v1.6 release
