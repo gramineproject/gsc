@@ -28,12 +28,13 @@ the image can be run using :command:`docker run`.
 
 **NOTE**: As part of the :command:`gsc build` step, GSC generates the manifest
 file with a list of trusted files (files with integrity protection). This list
-contains *all* files present in the original Docker image. Therefore, GSC's
-manifest creation capability depends on packaging of original Docker image: if
-the original Docker image is bloated (contains unnecessary files), then the
-generated manifest will also be bloated. Though this doesn't worsen security
-guarantees of Gramine/GSC, it may affect startup performance. Please exercise
-care in pulling in only the dependencies truly required for your Docker image.
+contains hashes of *all* files present in the original Docker image. Therefore,
+GSC's manifest creation capability depends on packaging of the original Docker
+image: if the original Docker image is bloated (contains unnecessary files),
+then the generated manifest will also be bloated. Though this doesn't worsen
+security guarantees of Gramine/GSC, it may affect startup performance. Please
+exercise care in pulling in only the dependencies truly required for your Docker
+image.
 
 Prerequisites
 =============
