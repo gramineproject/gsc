@@ -89,8 +89,8 @@ Gramine image.
 
 .. option:: -b <buildtype>, --buildtype <buildtype>
 
-   Compile Gramine in ``release``, ``debug`` or ``debugoptimized`` mode using
-   <buildtype> value ``release``, ``debug`` or ``debugoptimized`` respectively.
+   Use <buildtype> value ``release``, ``debug`` or ``debugoptimized`` to
+   compile Gramine in the corresponding mode.
 
    Default: ``release``.
 
@@ -182,8 +182,8 @@ parameter `Gramine.Image`.
 
 .. option:: -b <buildtype>, --buildtype <buildtype>
 
-   Compile Gramine in ``release``, ``debug`` or ``debugoptimized`` mode using
-   <buildtype> value ``release``, ``debug`` or ``debugoptimized`` respectively.
+   Use <buildtype> value ``release``, ``debug`` or ``debugoptimized`` to
+   compile Gramine in the corresponding mode.
 
    Default: ``release``.
 
