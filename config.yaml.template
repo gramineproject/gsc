@@ -1,4 +1,8 @@
-# Specify the OS distro. Currently tested distros are
+# Specify the OS distro that is used to build Gramine, i.e., the distro from where the Gramine build
+# gets all tools and dependencies from. This distro should match the distro underlying the
+# application's Docker image; otherwise the results may be unpredictable.
+#
+# Currently supported distros are:
 # - ubuntu:18.04, ubuntu:20.04, ubuntu:21.04
 # - debian:10, debian:11
 # - centos:8
