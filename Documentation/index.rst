@@ -93,7 +93,7 @@ Gramine image.
    compile Gramine in the corresponding mode. Default: ``release``.
 
 ..
-  TODO: Drop `-d` option with GSC v1.7 release
+  TODO: Drop `-d` option with GSC v1.6 release
 
 .. option:: -d, --debug
 
@@ -184,7 +184,7 @@ parameter `Gramine.Image`.
    compile Gramine in the corresponding mode. Default: ``release``.
 
 ..
-  TODO: Drop `-d` option with GSC v1.7 release
+  TODO: Drop `-d` option with GSC v1.6 release
 
 .. option:: -d, --debug
 
