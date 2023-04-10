@@ -14,6 +14,7 @@ RUN {% block path %}{% endblock %} /gramine/app_files/sign.sh \
 # This trick removes all temporary files from the previous commands (including gsc-signer-key.pem
 # and passphrase)
 FROM {{image}}
-
+ARG remove_depends
 COPY --from=unsigned_image /gramine/app_files/*.sig /gramine/app_files/
 COPY --from=unsigned_image /gramine/app_files/*.sgx /gramine/app_files/
+{% block uninstall %}{% endblock %}

@@ -366,7 +366,7 @@ def gsc_sign_image(args):
         # `forcerm` parameter forces removal of intermediate Docker images even after unsuccessful
         # builds, to not leave the signing key lingering in any Docker containers
         build_docker_image(docker_socket.api, tmp_build_path, signed_image_name, 'Dockerfile.sign',
-                           forcerm=True, buildargs={"passphrase": args.passphrase})
+                forcerm=True, buildargs={"passphrase": args.passphrase,"remove_depends":str(args.remove_gramine_deps)})
     finally:
         os.remove(tmp_build_key_path)
 
@@ -502,6 +502,7 @@ sub_sign.add_argument('-c', '--config_file', type=argparse.FileType('r', encodin
 sub_sign.add_argument('image', help='Name of the application (base) Docker image.')
 sub_sign.add_argument('key', help='Key to sign the Intel SGX enclaves inside the Docker image.')
 sub_sign.add_argument('-p', '--passphrase', help='Passphrase for the signing key.')
+sub_sign.add_argument('--remove_gramine_deps', action='store_true', help='Removes Gramine dependencies that are not needed at runtime')
 
 sub_info = subcommands.add_parser('info-image', help='Retrieve information about a graminized '
                                   'Docker image')

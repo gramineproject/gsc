@@ -8,7 +8,6 @@ RUN apt-get update \
         libcurl4-openssl-dev \
         libprotobuf-c-dev \
         locales \
-        locales-all \
         openssl \
         python3 \
         python3-cryptography \
@@ -19,8 +18,7 @@ RUN apt-get update \
                                           'tomli>=1.1.0' 'tomli-w>=0.4.0' \
 # For compatibility with Gramine v1.3 or lower
     && /usr/bin/python3 -B -m pip install 'toml>=0.10' \
-    && locale-gen en_US.UTF-8 \
-    && apt remove -y python3-pip locales locales-all  && apt autoremove -y \
+    && apt remove -y python3-pip  && apt autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
 
@@ -33,5 +31,8 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         strace \
         vim
 {% endif %}
-
+RUN locale-gen en_US.UTF-8
+ENV LC_ALL en_US.UTF-8
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US.UTF-8
 {% endblock %}

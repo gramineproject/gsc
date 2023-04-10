@@ -1,3 +1,5 @@
 {% extends "Dockerfile.common.sign.template" %}
-
+{% block uninstall %}
+RUN if [ "$remove_depends" = "True" ];then dnf update -y && dnf install -y python3-pip && pip3  uninstall -y tomli jinja2 click  && rpm -e --nodeps  python3-pip binutils epel-release expect python3-cryptography && dnf -y clean all && rm -rf /var/cache/dnf/*&& rm -rf /var/lib/dnf/system-upgrade/*;fi
+{% endblock %}
 {% block path %}export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib64 -type d -path '*/site-packages')" &&{% endblock %}

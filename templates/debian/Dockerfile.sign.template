@@ -1,3 +1,5 @@
 {% extends "Dockerfile.common.sign.template" %}
-
+{% block uninstall %}
+RUN if [ "$remove_depends" = "True" ];then apt update -y && apt install -y python3-pip && pip3 uninstall -y tomli jinja2 click &&apt remove -y python3-pip binutils python3-cryptography python3-pyelftools && apt autoremove -y && rm -rf /var/lib/apt/lists/*;fi
+{% endblock %}
 {% block path %}export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib -type d -path '*/site-packages')" &&{% endblock %}
