@@ -151,7 +151,7 @@ of the signing key in them.
 
 .. option:: --remove_gramine_deps
 
-   Removes Gramine dependencies that are not needed at runtime. Default value is False.
+   Removes Gramine dependencies that are not needed at runtime.
 
 .. option:: IMAGE-NAME
 
