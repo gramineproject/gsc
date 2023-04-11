@@ -70,7 +70,7 @@ def generate_trusted_files(root_dir, already_added_files):
         for file in files:
             filename = os.path.join(dirpath, file)
             if not os.path.isfile(filename):
-                # only regular files are added as trusted files
+                # only regular files are added as trusted files (other types are silently ignored)
                 continue
             if not is_utf8(filename):
                 # we append filenames as TOML strings which must be in UTF-8
@@ -95,6 +95,12 @@ def generate_trusted_files(root_dir, already_added_files):
                 #        which uses `toml`. When GSC removes support for v1.3, can remove this.
                 print(f'\t[from inside Docker container] File {filename} contains `\\x` sequence '
                        'and will be skipped from `sgx.trusted_files`!')
+                continue
+
+            if not os.access(filename, os.R_OK):
+                # only accessible files are added as trusted files (note that this check is below
+                # other checks, in particular the `exclude_re` check)
+                print(f'\t[from inside Docker container] File {filename} is inaccessible!')
                 continue
 
             trusted_file_entry = f'file:{filename}'
