@@ -69,7 +69,7 @@ def generate_trusted_files(root_dir, already_added_files):
 
         for file in files:
             filename = os.path.join(dirpath, file)
-            if not os.path.isfile(filename):
+            if not os.path.isfile(filename) or not os.access(filename, os.R_OK):
                 # only regular files are added as trusted files
                 continue
             if not is_utf8(filename):
