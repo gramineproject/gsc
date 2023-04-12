@@ -149,10 +149,6 @@ of the signing key in them.
 
    Provide passphrase for the enclave signing key (if applicable)
 
-.. option:: --remove_gramine_deps
-
-   Removes Gramine dependencies that are not needed at runtime.
-
 .. option:: IMAGE-NAME
 
    Name of the application Docker image

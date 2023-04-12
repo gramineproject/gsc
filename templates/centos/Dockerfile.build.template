@@ -16,17 +16,18 @@ RUN dnf update -y \
         python3-cryptography \
         python3-pip \
         python3-protobuf \
+# Combining all the installation and removal steps in single RUN command to reduce the layer size.
     && /usr/bin/python3 -B -m pip install click jinja2 protobuf \
                                           'tomli>=1.1.0' 'tomli-w>=0.4.0' \
     && dnf repolist \
 # For compatibility with Gramine v1.3 or lower
     && /usr/bin/python3 -B -m pip install 'toml>=0.10' \
+# Install pyelftools after the installation of epel-release as it is provided by the EPEL repo
     && dnf install -y python3-pyelftools \
     && rpm -e --nodeps  python3-pip && dnf -y clean all \
     && rm -rf /var/cache/dnf/* \
     && rm -rf /var/lib/dnf/system-upgrade/*
 
-# Install pyelftools after the installation of epel-release as it is provided by the EPEL repo
 
 {% if debug %}
 RUN dnf install -y \

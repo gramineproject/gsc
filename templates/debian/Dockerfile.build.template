@@ -31,6 +31,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         strace \
         vim
 {% endif %}
+
 RUN locale-gen en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 ENV LANG en_US.UTF-8
