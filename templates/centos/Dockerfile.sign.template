@@ -1,3 +1,19 @@
 {% extends "Dockerfile.common.sign.template" %}
 
+{% block uninstall %}
+RUN \
+       pip3 uninstall -y click jinja2 \
+          tomli tomli-w \
+          toml \
+       && dnf remove -y binutils \
+          epel-release \
+          expect \
+          openssl \
+          python3-protobuf \
+          python3-pyelftools \
+          python3-cryptography \
+          tcl \
+       && dnf -y clean all;
+{% endblock %}
+
 {% block path %}export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib64 -type d -path '*/site-packages')" &&{% endblock %}
