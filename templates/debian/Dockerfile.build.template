@@ -1,6 +1,9 @@
 {% extends "Dockerfile.common.build.template" %}
 
 {% block install %}
+# Combine all installation and removal steps in a single RUN command to reduce the final image size.
+# This is because each Dockerfile command creates a new layer which necessarily adds size to the
+# final image. This trick allows to decrease the image size by hundreds of MBs.
 RUN apt-get update \
     && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         binutils \
@@ -18,6 +21,7 @@ RUN apt-get update \
                                           'tomli>=1.1.0' 'tomli-w>=0.4.0' \
 # For compatibility with Gramine v1.3 or lower
     && /usr/bin/python3 -B -m pip install 'toml>=0.10' \
+# Since all needed pip packages are installed, we can uninstall python3-pip safely
     && apt remove -y python3-pip  && apt autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 

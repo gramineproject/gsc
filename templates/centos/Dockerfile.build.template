@@ -5,6 +5,9 @@ RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* &&\
     sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-* &&\
     sed -i 's/enabled=0/enabled=1/g' /etc/yum.repos.d/CentOS-Linux-PowerTools.repo
 
+# Combine all installation and removal steps in a single RUN command to reduce the final image size.
+# This is because each Dockerfile command creates a new layer which necessarily adds size to the
+# final image. This trick allows to decrease the image size by hundreds of MBs.
 RUN dnf update -y \
     &&  dnf install -y \
         binutils \
@@ -16,7 +19,6 @@ RUN dnf update -y \
         python3-cryptography \
         python3-pip \
         python3-protobuf \
-# Combining all the installation and removal steps in single RUN command to reduce the layer size.
     && /usr/bin/python3 -B -m pip install click jinja2 protobuf \
                                           'tomli>=1.1.0' 'tomli-w>=0.4.0' \
     && dnf repolist \
@@ -24,9 +26,8 @@ RUN dnf update -y \
     && /usr/bin/python3 -B -m pip install 'toml>=0.10' \
 # Install pyelftools after the installation of epel-release as it is provided by the EPEL repo
     && dnf install -y python3-pyelftools \
-    && rpm -e --nodeps  python3-pip && dnf -y clean all \
-    && rm -rf /var/cache/dnf/* \
-    && rm -rf /var/lib/dnf/system-upgrade/*
+# Since all needed pip packages are installed, we can uninstall python3-pip safely 
+    && rpm -e --nodeps  python3-pip && dnf -y clean all
 
 
 {% if debug %}
