@@ -169,6 +169,16 @@ of the signing key in them.
 
    Provide passphrase for the enclave signing key (if applicable)
 
+.. option:: -D, --define
+
+   Set image sign-time variables during :command:`gsc sign`.
+
+.. option:: --remove-gramine-deps
+
+   Remove Gramine dependencies that are not needed at runtime. This may have
+   a negative side effect of removing even those dependencies that are actually
+   needed by the original application. Use with care!
+
 .. option:: IMAGE-NAME
 
    Name of the application Docker image
