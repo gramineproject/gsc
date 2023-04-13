@@ -17,3 +17,5 @@ FROM {{image}}
 
 COPY --from=unsigned_image /gramine/app_files/*.sig /gramine/app_files/
 COPY --from=unsigned_image /gramine/app_files/*.sgx /gramine/app_files/
+
+{% block uninstall %}{% endblock %}

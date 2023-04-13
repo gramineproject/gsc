@@ -1,3 +1,23 @@
 {% extends "Dockerfile.common.sign.template" %}
 
+{% block uninstall %}
+ARG remove_gramine_deps
+RUN if [ "$remove_gramine_deps" = "True" ];then \
+       dnf update -y \
+       && dnf install -y python3-pip \
+       && pip3  uninstall -y click jinja2 tomli \
+       && rpm -e --nodeps binutils \
+          curl \
+          epel-release \
+          expect \
+          openssl \
+          python3-protobuf \
+          python3-pip \
+          python3-pyelftools \
+          python3-cryptography \
+          tcl \
+        && dnf -y clean all ;\
+fi
+{% endblock %}
+
 {% block path %}export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib64 -type d -path '*/site-packages')" &&{% endblock %}
