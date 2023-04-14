@@ -1,0 +1,11 @@
+# GSC Configuration
+loader.insecure__use_cmdline_argv = false
+
+# GSC Performance
+libos.check_invalid_pointers = false
+
+#Enclave parameters
+sgx.enclave_size = "4G"
+sys.stack.size = "2M"
+sgx.max_threads = 512
+loader.pal_internal_mem_size = "512M"
