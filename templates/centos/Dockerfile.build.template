@@ -26,8 +26,8 @@ RUN dnf update -y \
     && /usr/bin/python3 -B -m pip install 'toml>=0.10' \
 # Install pyelftools after the installation of epel-release as it is provided by the EPEL repo
     && dnf install -y python3-pyelftools \
-# Since all needed pip packages are installed, we can uninstall python3-pip safely 
-    && rpm -e --nodeps  python3-pip && dnf -y clean all
+# Since all needed pip packages are installed, we can uninstall python3-pip safely
+    && rpm -e --nodeps python3-pip && dnf -y clean all
 
 
 {% if debug %}
