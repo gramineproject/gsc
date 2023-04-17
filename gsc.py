@@ -331,6 +331,7 @@ def gsc_sign_image(args):
     signed_image_name = gsc_image_name(args.image)             # output image name
     tmp_build_path = gsc_tmp_build_path(args.image)            # pathlib obj with build artifacts
 
+    
     docker_socket = docker.from_env()
 
     unsigned_image = get_docker_image(docker_socket, unsigned_image_name)
@@ -345,6 +346,8 @@ def gsc_sign_image(args):
     # using the user-provided config file with info on OS distro, Gramine version and SGX driver
     env = jinja2.Environment()
     env.globals.update(yaml.safe_load(args.config_file))
+    env.globals.update(vars(args))
+    extract_user_from_image_config(unsigned_image.attrs['Config'], env)
     distro = env.globals['Distro']
 
     distro, _ = distro.split(':')
@@ -366,8 +369,7 @@ def gsc_sign_image(args):
         # `forcerm` parameter forces removal of intermediate Docker images even after unsuccessful
         # builds, to not leave the signing key lingering in any Docker containers
         build_docker_image(docker_socket.api, tmp_build_path, signed_image_name, 'Dockerfile.sign',
-                           forcerm=True, buildargs={"passphrase": args.passphrase,
-                           "remove_gramine_deps":str(args.remove_gramine_deps)})
+                           forcerm=True, buildargs={"passphrase": args.passphrase})
     finally:
         os.remove(tmp_build_key_path)
 
@@ -512,7 +514,7 @@ sub_sign.add_argument('image', help='Name of the application (base) Docker image
 sub_sign.add_argument('key', help='Key to sign the Intel SGX enclaves inside the Docker image.')
 sub_sign.add_argument('-p', '--passphrase', help='Passphrase for the signing key.')
 sub_sign.add_argument('--remove-gramine-deps', action='store_true',
-    help='Remove Gramine dependencies that are not needed at runtime')
+    help='Remove Gramine dependencies that are not needed at runtime.')
 
 sub_info = subcommands.add_parser('info-image', help='Retrieve information about a graminized '
                                   'Docker image')

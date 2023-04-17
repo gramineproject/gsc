@@ -173,7 +173,7 @@ of the signing key in them.
 
    Remove Gramine dependencies that are not needed at runtime. This may have
    a negative side effect of removing even those dependencies that are actually
-   needed by the original application.
+   needed by the original application. Use with care!
 
 .. option:: IMAGE-NAME
 

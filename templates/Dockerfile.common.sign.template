@@ -18,4 +18,10 @@ FROM {{image}}
 COPY --from=unsigned_image /gramine/app_files/*.sig /gramine/app_files/
 COPY --from=unsigned_image /gramine/app_files/*.sgx /gramine/app_files/
 
+# Temporarily switch to the root user to uninstall packages
+USER root
+
 {% block uninstall %}{% endblock %}
+
+# Switch back to original app_image user
+USER {{app_user}}

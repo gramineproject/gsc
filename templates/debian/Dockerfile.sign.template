@@ -1,10 +1,9 @@
 {% extends "Dockerfile.common.sign.template" %}
 
 {% block uninstall %}
-ARG remove_gramine_deps
-RUN if [ "$remove_gramine_deps" = "True" ];then \ 
-       apt update -y \
-       && apt install -y python3-pip \
+{% if remove_gramine_deps %}
+   RUN \
+       apt install -y python3-pip \
        && pip3 uninstall -y click jinja2 tomli \
        && apt remove -y binutils \
           expect \
@@ -15,8 +14,8 @@ RUN if [ "$remove_gramine_deps" = "True" ];then \
           python3-cryptography \
           python3-pyelftools \
        && apt autoremove -y \
-       && rm -rf /var/lib/apt/lists/*; \
-fi
+       && rm -rf /var/lib/apt/lists/*;
+{% endif %}
 {% endblock %}
 
 {% block path %}export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib -type d -path '*/site-packages')" &&{% endblock %}
