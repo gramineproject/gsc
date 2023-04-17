@@ -3,7 +3,8 @@
 {% block uninstall %}
 {% if remove_gramine_deps %}
 RUN \
-       dnf install -y python3-pip \
+       dnf update -y \
+       && dnf install -y python3-pip \
        && pip3  uninstall -y click jinja2 tomli \
        && rpm -e --nodeps binutils \
           curl \
