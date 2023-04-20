@@ -2,7 +2,7 @@
 
 {% block uninstall %}
 {% if remove_gramine_deps %}
-   RUN \
+RUN \
        apt update -y \
        && apt install -y python3-pip \
        && pip3 uninstall -y click jinja2 \

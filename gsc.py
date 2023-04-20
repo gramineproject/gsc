@@ -331,7 +331,6 @@ def gsc_sign_image(args):
     signed_image_name = gsc_image_name(args.image)             # output image name
     tmp_build_path = gsc_tmp_build_path(args.image)            # pathlib obj with build artifacts
 
-    
     docker_socket = docker.from_env()
 
     unsigned_image = get_docker_image(docker_socket, unsigned_image_name)
