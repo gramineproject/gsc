@@ -1,7 +1,6 @@
 {% extends "Dockerfile.common.sign.template" %}
 
 {% block uninstall %}
-{% if remove_gramine_deps %}
 RUN \
        apt update -y \
        && apt install -y python3-pip \
@@ -18,7 +17,6 @@ RUN \
           python3-pyelftools \
        && apt autoremove -y \
        && rm -rf /var/lib/apt/lists/*;
-{% endif %}
 {% endblock %}
 
 {% block path %}export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib -type d -path '*/site-packages')" &&{% endblock %}
