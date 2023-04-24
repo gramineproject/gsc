@@ -27,4 +27,3 @@ USER root
 # Switch back to original app_image user
 USER {{app_user}}
 {% endif %}
-
