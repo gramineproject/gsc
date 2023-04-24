@@ -22,12 +22,14 @@ RUN apt-get update \
 # For compatibility with Gramine v1.3 or lower
     && /usr/bin/python3 -B -m pip install 'toml>=0.10' \
 # Since all needed pip packages are installed, we can uninstall python3-pip safely
-    && apt remove -y python3-pip  && apt autoremove -y \
+    && apt remove -y python3-pip \ 
+    && apt autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
 
 {% if debug %}
-RUN env DEBIAN_FRONTEND=noninteractive apt-get install -y \
+RUN apt-get update \
+    && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         gdb \
         less \
         libunwind8 \
