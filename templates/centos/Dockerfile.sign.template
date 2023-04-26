@@ -4,7 +4,7 @@
 RUN \
        dnf update -y \
        && dnf install -y python3-pip \
-       && pip3  uninstall -y click jinja2 \
+       && pip3 uninstall -y click jinja2 \
           'tomli>=1.1.0' 'tomli-w>=0.4.0' \
           'toml>=0.10' \
        && rpm -e --nodeps binutils \
