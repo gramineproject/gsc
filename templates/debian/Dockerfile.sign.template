@@ -2,12 +2,12 @@
 
 {% block uninstall %}
 RUN \
-       apt update -y \
-       && apt install -y python3-pip \
+       apt-get update -y \
+       && apt-get install -y python3-pip \
        && pip3 uninstall -y click jinja2 \
           'tomli>=1.1.0' 'tomli-w>=0.4.0' \
           'toml>=0.10' \
-       && apt remove -y binutils \
+       && apt-get remove -y binutils \
           expect \
           libcurl4-openssl-dev \
           openssl \
@@ -15,7 +15,7 @@ RUN \
           python3-protobuf \
           python3-cryptography \
           python3-pyelftools \
-       && apt autoremove -y \
+       && apt-get autoremove -y \
        && rm -rf /var/lib/apt/lists/*;
 {% endblock %}
 
