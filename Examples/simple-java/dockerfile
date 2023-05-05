@@ -1,4 +1,7 @@
 FROM openjdk:11
+
 COPY GramineJavaExample.java .
+
 RUN javac GramineJavaExample.java
+
 CMD ["java", "GramineJavaExample"]
