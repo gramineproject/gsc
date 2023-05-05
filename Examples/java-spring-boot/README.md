@@ -1,7 +1,7 @@
 # Java Spring Boot example
 
 Spring Boot is a popular framework for building Java-based web applications. Running Spring Boot
-inside Gramine-SGX allows you to create web applications with an increased level of security. 
+inside Gramine-SGX allows you to create web applications with an increased level of security.
 For more information on Spring Boot, please visit https://spring.io/.
 
 ## Disclaimer
@@ -69,7 +69,7 @@ $ ./gsc build java-spring-boot Examples/java-spring-boot/java-spring-boot.manife
 7. Sign the graminized Docker image using gsc sign-image:
 
 ```bash
-$ ./gsc sign-image java-spring-boot  enclave-key.pem \
+$ ./gsc sign-image java-spring-boot enclave-key.pem \
         -c Examples/java-spring-boot/config.yaml
 ```
 
