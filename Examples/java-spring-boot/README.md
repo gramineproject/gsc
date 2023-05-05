@@ -63,14 +63,14 @@ $ cd ../..
 
 ```bash 
 $ ./gsc build java-spring-boot Examples/java-spring-boot/java-spring-boot.manifest \
-        -c Examples/java-spring-boot/config.yaml
+        -c <PATH-TO-CONFIG-FILE>
 ```
 
 7. Sign the graminized Docker image using gsc sign-image:
 
 ```bash
-$ ./gsc sign-image java-spring-boot enclave-key.pem \
-        -c Examples/java-spring-boot/config.yaml
+$ ./gsc sign-image java-spring-boot <PATH-TO-KEY-FILE> \
+        -c <PATH-TO-CONFIG-FILE>
 ```
 
 8. Run graminized image. The first parameter is responsible for adding a host device
@@ -83,9 +83,9 @@ run the command (the application may take a while to load):
 
 ```bash
 $ docker run --rm --device=/dev/sgx_enclave \
-            -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-            -p 8080:8080 \
-            -d gsc-java-spring-boot
+        -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+        -p 8080:8080 \
+        -d gsc-java-spring-boot
 ```
 
 * To run the image on a customized port using an environment variable, i.e. 9080,
@@ -93,10 +93,10 @@ run the following command (the application may take a while to load):
 
 ```bash
 $ docker run --rm --device=/dev/sgx_enclave \
-            -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-            -e SERVER_PORT=9080 \
-            -p 9080:9080 \
-            -d gsc-java-spring-boot
+        -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+        -e SERVER_PORT=9080 \
+        -p 9080:9080 \
+        -d gsc-java-spring-boot
 ```
 
 ## Result
