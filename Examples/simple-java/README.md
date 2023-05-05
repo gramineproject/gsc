@@ -37,15 +37,15 @@ $ cd ../..
 4. Graminize the Docker image using gsc build (this step can take some time!):
 
 ```sh
-$ ./gsc build gramine-simple-java Examples/gramine-simple-java/gramine-simple-java.manifest \
-        -c Examples/gramine-simple-java/config.yaml
+$ ./gsc build gramine-simple-java Examples/simple-java/gramine-simple-java.manifest \
+        -c <PATH-TO-CONFIG-FILE>
 ```
 
 5. Sign graminized Docker image using gsc sign-image:
 
 ```sh
-$ ./gsc sign-image gramine-simple-java enclave-key.pem \
-        -c Examples/gramine-simple-java/config.yaml
+$ ./gsc sign-image gramine-simple-java <PATH-TO-KEY-FILE> \
+        -c <PATH-TO-CONFIG-FILE>
 ```
 
 6. Run graminized image. The first parameter is responsible for adding a host device to
