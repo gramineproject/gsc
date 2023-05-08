@@ -29,7 +29,7 @@ $ cd gsc/Examples/java-simple/
 $ docker build -t java-simple .
 ```
 
-3. Go back under the gsc/... directory:
+3. Navigate to the `gsc/` directory:
 
 ```bash
 $ cd ../..
