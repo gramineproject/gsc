@@ -1,8 +1,9 @@
-# Simple java application example
+# Simple Java application example
 
 Java is one of the most popular programming languages in the world. By using the GSC tool, you can
-deploy containers with code that will increase the security level. For more information on Java,
-please visit https://www.oracle.com/pl/java/.
+deploy graminized containers with Java code. This is a trivial example on running
+a Java application using GSC. For more information on Java, please visit
+https://www.oracle.com/pl/java/.
 
 ## Disclaimer
 
@@ -16,43 +17,41 @@ please visit https://www.oracle.com/pl/java/.
 
 ## Build and run graminized Docker image
 
-1. Enter to simple-java directory:
+1. Navigate to the `java-simple/` directory:
 
-```sh
-$ cd gsc/Examples/gramine-simple-java/
+```bash
+$ cd gsc/Examples/java-simple/
 ```
 
 2. Build a Docker image:
 
-```sh
-$ docker build -t gramine-simple-java .
+```bash
+$ docker build -t java-simple .
 ```
 
 3. Go back under the gsc/... directory:
 
-```sh
+```bash
 $ cd ../..
 ```
 
 4. Graminize the Docker image using gsc build (this step can take some time!):
 
-```sh
-$ ./gsc build gramine-simple-java Examples/simple-java/gramine-simple-java.manifest \
+```bash
+$ ./gsc build java-simple Examples/java-simple/java-simple.manifest \
         -c <PATH-TO-CONFIG-FILE>
 ```
 
 5. Sign graminized Docker image using gsc sign-image:
 
-```sh
-$ ./gsc sign-image gramine-simple-java <PATH-TO-KEY-FILE> \
+```bash
+$ ./gsc sign-image java-simple <PATH-TO-KEY-FILE> \
         -c <PATH-TO-CONFIG-FILE>
 ```
 
-6. Run graminized image. The first parameter is responsible for adding a host device to
-the container, and this is the driver for SGX. The second parameter is used to bind mount
-a volume in the form of an ASEM service, which provides key provisioning and remote attestation:
+6. Run graminized image: 
 
-```sh
+```bash
 $ docker run --rm --device=/dev/sgx_enclave \
-        -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket gsc-gramine-simple-java
+        -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket gsc-java-simple
 ```
