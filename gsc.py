@@ -130,20 +130,18 @@ def extract_build_args(args):
                 print(f'Could not set build arg `{item}` from environment.')
                 sys.exit(1)
     return buildargs_dict
-def extract_sign_args(args):
-    signargs_dict = {}
+
+def extract_define_args(args):
+    defineargs_dict = {}
     for item in args.define:
         if '=' in item:
             key, value = item.split('=', maxsplit=1)
-            signargs_dict[key] = value
+            defineargs_dict[key] = value
         else:
-            # user specified --build-arg with key and without value, let's retrieve value from env
-            if item in os.environ:
-                signargs_dict[item] = os.environ[item]
-            else:
-                print(f'Could not set build arg `{item}` from environment.')
-                sys.exit(1)
-    return signargs_dict
+            #user specified --define with key and without value, exiting here.
+            print(f'Could not find define arg `{item}` value.')
+            sys.exit(1)
+    return defineargs_dict
 
 def extract_user_from_image_config(config, env):
     user = config['User']
@@ -360,7 +358,7 @@ def gsc_sign_image(args):
     env = jinja2.Environment()
     env.globals.update(yaml.safe_load(args.config_file))
     extract_user_from_image_config(unsigned_image.attrs['Config'], env)
-    env.globals['signargs']=extract_sign_args(args)
+    env.globals['args'] = extract_define_args(args)
     distro = env.globals['Distro']
 
     distro, _ = distro.split(':')
@@ -527,11 +525,12 @@ sub_sign.add_argument('image', help='Name of the application (base) Docker image
 sub_sign.add_argument('key', help='Key to sign the Intel SGX enclaves inside the Docker image.')
 sub_sign.add_argument('-p', '--passphrase', help='Passphrase for the signing key.')
 sub_sign.add_argument('-D','--define', action='append', default=[],
-    help='Set image sign-time variables (same as "docker build --build-arg").')
+    help='Set image sign-time variables.')
 sub_sign.add_argument('--remove-gramine-deps', action='append_const', dest='define',
-    const='remove_gramine_deps=true',help='Remove Gramine dependencies that are not needed at runtime.')
+    const='remove_gramine_deps=true', help='Remove Gramine dependencies that are not needed'
+                                           'at runtime.')
 sub_sign.add_argument('--no-remove-gramine-deps', action='append_const', dest='define',
-    const='remove_gramine_deps=false',help='Retain Gramine dependencies that are not needed at runtime.')
+    const='', help='Retain Gramine dependencies that are not needed at runtime.')
 sub_info = subcommands.add_parser('info-image', help='Retrieve information about a graminized '
                                   'Docker image')
 sub_info.set_defaults(command=gsc_info_image)

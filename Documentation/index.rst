@@ -171,8 +171,7 @@ of the signing key in them.
 
 .. option:: -D, --define
 
-   Set image sign-time variables during :command:`gsc sign` (same as
-   `docker build --build-arg`).
+   Set image sign-time variables during :command:`gsc sign`.
 
 .. option:: --remove-gramine-deps
 
