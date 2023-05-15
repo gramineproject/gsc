@@ -530,7 +530,8 @@ sub_sign.add_argument('--remove-gramine-deps', action='append_const', dest='defi
     const='remove_gramine_deps=true', help='Remove Gramine dependencies that are not needed'
                                            'at runtime.')
 sub_sign.add_argument('--no-remove-gramine-deps', action='append_const', dest='define',
-    const='', help='Retain Gramine dependencies that are not needed at runtime.')
+    const='remove_gramine_deps=false', help='Retain Gramine dependencies that are not needed' 
+                                            'at runtime.')
 sub_info = subcommands.add_parser('info-image', help='Retrieve information about a graminized '
                                   'Docker image')
 sub_info.set_defaults(command=gsc_info_image)
