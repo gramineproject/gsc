@@ -1,5 +1,5 @@
 /*
-    This is configuration file is used by Gradle, to define how to build and package a Java project.
+    This configuration file is used by Gradle, to define how to build and package a Java project.
     For more information on Gradle, please visit
     https://docs.gradle.org/current/userguide/tutorial_using_tasks.html.
 */
