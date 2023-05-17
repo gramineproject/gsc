@@ -17,39 +17,33 @@ https://www.oracle.com/pl/java/.
 
 ## Build and run graminized Docker image
 
-1. Navigate to the `java-simple/` directory:
-
-```bash
-$ cd gsc/Examples/java-simple/
-```
-
-2. Build a Docker image:
+1. Build a Docker image:
 
 ```bash
 $ docker build -t java-simple .
 ```
 
-3. Navigate to the `gsc/` directory:
+2. Navigate to the `gsc/` directory:
 
 ```bash
 $ cd ../..
 ```
 
-1. Graminize the Docker image (this step can take some time!):
+3. Graminize the Docker image (this step can take some time!):
 
 ```bash
 $ ./gsc build java-simple Examples/java-simple/java-simple.manifest \
         -c <PATH-TO-CONFIG-FILE>
 ```
 
-1. Sign graminized Docker image using:
+4. Sign graminized Docker image using:
 
 ```bash
 $ ./gsc sign-image java-simple <PATH-TO-KEY-FILE> \
         -c <PATH-TO-CONFIG-FILE>
 ```
 
-6. Run graminized image: 
+5. Run graminized image: 
 
 ```bash
 $ docker run --rm --device=/dev/sgx_enclave \
