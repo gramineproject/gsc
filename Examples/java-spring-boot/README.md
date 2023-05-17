@@ -6,7 +6,7 @@ For more information on Spring Boot, please visit https://spring.io/.
 
 ## Disclaimer
 
-* This generated confidential computing image is for non-production usage.
+* This generated image is for non-production usage.
 
 * Tested on:
   - Type: Azure Confidential Computing SGX Virtual Machine

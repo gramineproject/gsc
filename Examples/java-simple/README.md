@@ -7,7 +7,7 @@ https://www.oracle.com/pl/java/.
 
 ## Disclaimer
 
-* This generated confidential computing image is for non-production usage.
+* This generated image is for non-production usage.
 
 * Tested on:
   - Type: Azure Confidential Computing SGX Virtual Machine
