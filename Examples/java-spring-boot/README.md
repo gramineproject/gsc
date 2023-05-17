@@ -1,7 +1,7 @@
 # Java Spring Boot example
 
-Spring Boot is a popular framework for building Java-based web applications. Running Spring Boot
-inside Gramine-SGX allows you to create web applications with an increased level of security.
+Spring Boot is a popular framework for building Java-based web applications. By using the GSC tool,
+you can deploy Spring Boot web applications inside a Gramine SGX enclave graminized containers.
 For more information on Spring Boot, please visit https://spring.io/.
 
 ## Disclaimer
@@ -24,17 +24,17 @@ consume the files. Use the command below to install it:
 $ sudo apt-get install openjdk-11-jdk
 ```
 
-2. Follow the installation guide at https://gradle.org/install/ to install Gradle in version 7.6.
+2. Follow the installation guide at https://gradle.org/install/ to install Gradle v7.6.
 
 ## Build and run graminized Docker image
 
-1. Enter to java-spring-boot directory:
+1. Navigate to the `java-spring-boot/` directory:
 
 ```bash
 $ cd gsc/Examples/java-spring-boot/
 ```
 
-2. Building a project using Gradle:
+2. Build a project using Gradle:
 
 ```bash
 $ (cd spring-boot-web-service/; gradle build)
@@ -47,57 +47,54 @@ to build the image:
 $ docker build -t java-spring-boot .
 ```
 
-4. Cleaning up files that will be no longer used:
+4. Clean up files that will be no longer used:
 
 ```bash
 $ (cd spring-boot-web-service/; gradle clean)
 ```
 
-5. Go back under the gsc/... directory:
+5. Navigate to the `gsc/` directory:
 
 ```bash
 $ cd ../..
-``` 
+```
 
-6. Graminize the Docker image using gsc build (this step can take some time!):
+1. Graminize the Docker image (this step can take some time!):
 
-```bash 
+```bash
 $ ./gsc build java-spring-boot Examples/java-spring-boot/java-spring-boot.manifest \
         -c <PATH-TO-CONFIG-FILE>
 ```
 
-7. Sign the graminized Docker image using gsc sign-image:
+1. Sign the graminized Docker image:
 
 ```bash
 $ ./gsc sign-image java-spring-boot <PATH-TO-KEY-FILE> \
         -c <PATH-TO-CONFIG-FILE>
 ```
 
-8. Run graminized image. The first parameter is responsible for adding a host device
-to the container, and this is the driver for SGX. The second parameter is used to bind mount
-a volume in the form of an ASEM service, which provides key provisioning and remote attestation.
-The third parameter is the port on which the application will run:
+8. Run graminized image:
 
-* To run the image on the default port set to 8080,
-run the command (the application may take a while to load):
+      * To run the image on the default port set to 8080,
+   run the command (the application may take a while to load):
 
-```bash
-$ docker run --rm --device=/dev/sgx_enclave \
-        -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-        -p 8080:8080 \
-        -d gsc-java-spring-boot
-```
+        ```bash
+        $ docker run --rm --device=/dev/sgx_enclave \
+                -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+                -p 8080:8080 \
+                -d gsc-java-spring-boot
+        ```
 
-* To run the image on a customized port using an environment variable, i.e. 9080,
-run the following command (the application may take a while to load):
+      * To run the image on a customized port using an environment variable, i.e. 9080,
+      run the following command (the application may take a while to load):
 
-```bash
-$ docker run --rm --device=/dev/sgx_enclave \
-        -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-        -e SERVER_PORT=9080 \
-        -p 9080:9080 \
-        -d gsc-java-spring-boot
-```
+        ```bash
+        $ docker run --rm --device=/dev/sgx_enclave \
+                -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+                -e SERVER_PORT=9080 \
+                -p 9080:9080 \
+                -d gsc-java-spring-boot
+        ```
 
 ## Result
 
