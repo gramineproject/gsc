@@ -35,14 +35,14 @@ $ docker build -t java-simple .
 $ cd ../..
 ```
 
-4. Graminize the Docker image using gsc build (this step can take some time!):
+1. Graminize the Docker image (this step can take some time!):
 
 ```bash
 $ ./gsc build java-simple Examples/java-simple/java-simple.manifest \
         -c <PATH-TO-CONFIG-FILE>
 ```
 
-5. Sign graminized Docker image using gsc sign-image:
+1. Sign graminized Docker image using:
 
 ```bash
 $ ./gsc sign-image java-simple <PATH-TO-KEY-FILE> \
