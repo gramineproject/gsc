@@ -139,7 +139,7 @@ def extract_define_args(args):
             defineargs_dict[key] = value
         else:
             #user specified --define with key and without value, exiting here.
-            print(f'Could not find define arg `{item}` value.')
+            print(f'Invalid value for argument `{item}`, Expected `--define {item}=True/False`')
             sys.exit(1)
     return defineargs_dict
 
@@ -359,6 +359,7 @@ def gsc_sign_image(args):
     env.globals.update(yaml.safe_load(args.config_file))
     extract_user_from_image_config(unsigned_image.attrs['Config'], env)
     env.globals['args'] = extract_define_args(args)
+    env.tests['trueish'] = test_trueish
     distro = env.globals['Distro']
 
     distro, _ = distro.split(':')
@@ -536,6 +537,16 @@ sub_info = subcommands.add_parser('info-image', help='Retrieve information about
                                   'Docker image')
 sub_info.set_defaults(command=gsc_info_image)
 sub_info.add_argument('image', help='Name of the graminized Docker image.')
+
+def test_trueish(value):
+    value = value.casefold()
+    if not value or value in ('false', 'off', 'no'):
+        return False
+    if value in ('true', 'on', 'yes'):
+        return True
+    if value.isdigit():
+        return bool(int(value))
+    raise ValueError(f'Invalid value for trueish: {value!r}')
 
 def main(args):
     args = argparser.parse_args()
