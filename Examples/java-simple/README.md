@@ -31,7 +31,7 @@ $ (cd ../..; ./gsc build openjdk-11-java-simple \
     -c <PATH-TO-CONFIG-FILE>)
 ```
 
-3. Sign graminized Docker image using:
+3. Sign the graminized Docker image using:
 
 ```bash
 $ (cd ../..; ./gsc sign-image openjdk-11-java-simple \
@@ -39,7 +39,7 @@ $ (cd ../..; ./gsc sign-image openjdk-11-java-simple \
     -c <PATH-TO-CONFIG-FILE>)
 ```
 
-4. Run graminized image: 
+4. Run graminized image:
 
 ```bash
 $ docker run --rm --device=/dev/sgx_enclave \
