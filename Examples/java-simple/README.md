@@ -17,10 +17,10 @@ https://www.oracle.com/pl/java/.
 
 ## Build and run graminized Docker image
 
-1. Build a Docker image:
+1. Build Docker image:
 
 ```bash
-$ docker build -t java-simple .
+$ docker build -t openjdk-11-java-simple .
 ```
 
 2. Navigate to the `gsc/` directory:
@@ -32,14 +32,14 @@ $ cd ../..
 3. Graminize the Docker image (this step can take some time!):
 
 ```bash
-$ ./gsc build java-simple Examples/java-simple/java-simple.manifest \
+$ ./gsc build openjdk-11-java-simple Examples/java-simple/java-simple.manifest \
         -c <PATH-TO-CONFIG-FILE>
 ```
 
 4. Sign graminized Docker image using:
 
 ```bash
-$ ./gsc sign-image java-simple <PATH-TO-KEY-FILE> \
+$ ./gsc sign-image openjdk-11-java-simple <PATH-TO-KEY-FILE> \
         -c <PATH-TO-CONFIG-FILE>
 ```
 
@@ -47,5 +47,5 @@ $ ./gsc sign-image java-simple <PATH-TO-KEY-FILE> \
 
 ```bash
 $ docker run --rm --device=/dev/sgx_enclave \
-        -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket gsc-java-simple
+        -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket gsc-openjdk-11-java-simple
 ```
