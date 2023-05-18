@@ -47,27 +47,23 @@ $ docker build -t openjdk-11-java-spring-boot .
 $ (cd spring-boot-web-service/; gradle clean)
 ```
 
-4. Navigate to the `gsc/` directory:
+4. Graminize the Docker image (this step can take some time!):
 
 ```bash
-$ cd ../..
+$ (cd ../..; ./gsc build openjdk-11-java-spring-boot \
+    Examples/java-spring-boot/java-spring-boot.manifest \
+    -c <PATH-TO-CONFIG-FILE>)
 ```
 
-5. Graminize the Docker image (this step can take some time!):
+5. Sign the graminized Docker image:
 
 ```bash
-$ ./gsc build openjdk-11-java-spring-boot Examples/java-spring-boot/java-spring-boot.manifest \
-        -c <PATH-TO-CONFIG-FILE>
+$ (cd ../..; ./gsc sign-image openjdk-11-java-spring-boot \
+    <PATH-TO-KEY-FILE> \
+    -c <PATH-TO-CONFIG-FILE>)
 ```
 
-6. Sign the graminized Docker image:
-
-```bash
-$ ./gsc sign-image openjdk-11-java-spring-boot <PATH-TO-KEY-FILE> \
-        -c <PATH-TO-CONFIG-FILE>
-```
-
-7. Run graminized image:
+6. Run graminized image:
 
       * To run the image on the default port set to 8080,
    run the command (the application may take a while to load):
@@ -84,10 +80,10 @@ $ ./gsc sign-image openjdk-11-java-spring-boot <PATH-TO-KEY-FILE> \
 
         ```bash
         $ docker run --rm --device=/dev/sgx_enclave \
-                -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-                -e SERVER_PORT=9080 \
-                -p 9080:9080 \
-                -d gsc-openjdk-11-java-spring-boot
+            -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+            -e SERVER_PORT=9080 \
+            -p 9080:9080 \
+            -d gsc-openjdk-11-java-spring-boot
         ```
 
 ## Result

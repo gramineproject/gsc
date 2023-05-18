@@ -23,27 +23,23 @@ https://www.oracle.com/pl/java/.
 $ docker build -t openjdk-11-java-simple .
 ```
 
-2. Navigate to the `gsc/` directory:
+2. Graminize the Docker image (this step can take some time!):
 
 ```bash
-$ cd ../..
+$ (cd ../..; ./gsc build openjdk-11-java-simple \
+    Examples/java-simple/java-simple.manifest \
+    -c <PATH-TO-CONFIG-FILE>)
 ```
 
-3. Graminize the Docker image (this step can take some time!):
+3. Sign graminized Docker image using:
 
 ```bash
-$ ./gsc build openjdk-11-java-simple Examples/java-simple/java-simple.manifest \
-        -c <PATH-TO-CONFIG-FILE>
+$ (cd ../..; ./gsc sign-image openjdk-11-java-simple \
+    <PATH-TO-KEY-FILE> \
+    -c <PATH-TO-CONFIG-FILE>)
 ```
 
-4. Sign graminized Docker image using:
-
-```bash
-$ ./gsc sign-image openjdk-11-java-simple <PATH-TO-KEY-FILE> \
-        -c <PATH-TO-CONFIG-FILE>
-```
-
-5. Run graminized image: 
+4. Run graminized image: 
 
 ```bash
 $ docker run --rm --device=/dev/sgx_enclave \
