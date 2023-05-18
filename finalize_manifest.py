@@ -31,7 +31,7 @@ def extract_files_from_user_manifest(manifest):
     return files
 
 
-def generate_trusted_files(root_dir, already_added_files):
+def generate_trusted_files(root_dir, already_added_files, followlinks):
     excluded_paths_regex = (r'^/('
                                 r'boot/.*'
                                 r'|\.dockerenv'
@@ -55,7 +55,7 @@ def generate_trusted_files(root_dir, already_added_files):
 
     # WARNING: below loop does not remove cycles (which can happen due to symlinks), but we assume
     # that Docker images (excluding paths/files listed in `excluded_paths_regex`) don't have cycles.
-    for dirpath, dirnames, files in os.walk(root_dir.encode('UTF-8'), followlinks=True):
+    for dirpath, dirnames, files in os.walk(root_dir.encode('UTF-8'), followlinks=followlinks):
         scandirs = []
         for dirname in dirnames:
             to_be_walked_dir = os.path.join(dirpath, dirname)
@@ -127,6 +127,10 @@ def generate_library_paths():
 argparser = argparse.ArgumentParser()
 argparser.add_argument('-d', '--dir', default='/',
     help='Search directory tree from this root to generate list of trusted files.')
+argparser.add_argument('-l', '--links', action='store_true',
+    help='Whether to traverse symbolic links, default is True.')
+argparser.add_argument('-nl', '--no-links', dest='links', action='store_false')
+argparser.set_defaults(links=True)
 
 def main(args=None):
     args = argparser.parse_args(args[1:])
@@ -142,7 +146,7 @@ def main(args=None):
     already_added_files = extract_files_from_user_manifest(rendered_manifest_dict)
 
     if 'allow_all_but_log' not in rendered_manifest_dict['sgx'].get('file_check_policy', ''):
-        trusted_files = generate_trusted_files(args.dir, already_added_files)
+        trusted_files = generate_trusted_files(args.dir, already_added_files, args.links)
         rendered_manifest_dict['sgx'].setdefault('trusted_files', []).extend(trusted_files)
     else:
         print(f'\t[from inside Docker container] Skipping trusted files generation. This image must not be used in production.')
