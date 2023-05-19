@@ -9,7 +9,7 @@ plugins {
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
 
-group = 'org.gramine'
+group = 'org.demo'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = '11'
 
