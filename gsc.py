@@ -21,6 +21,16 @@ import tomli   # pylint: disable=import-error
 import tomli_w # pylint: disable=import-error
 import yaml    # pylint: disable=import-error
 
+def test_trueish(value):
+    value = value.casefold()
+    if not value or value in ('false', 'off', 'no'):
+        return False
+    if value in ('true', 'on', 'yes'):
+        return True
+    if value.isdigit():
+        return bool(int(value))
+    raise ValueError(f'Invalid value for trueish: {value!r}')
+
 def gsc_image_name(original_image_name):
     return f'gsc-{original_image_name}'
 
@@ -138,8 +148,7 @@ def extract_define_args(args):
             key, value = item.split('=', maxsplit=1)
             defineargs_dict[key] = value
         else:
-            #user specified --define with key and without value, exiting here.
-            print(f'Invalid value for argument `{item}`, Expected `--define {item}=True/False`')
+            print(f'Invalid value for argument `{item}`, expected `--define {item}=<value>`')
             sys.exit(1)
     return defineargs_dict
 
@@ -529,24 +538,14 @@ sub_sign.add_argument('-D','--define', action='append', default=[],
     help='Set image sign-time variables.')
 sub_sign.add_argument('--remove-gramine-deps', action='append_const', dest='define',
     const='remove_gramine_deps=true', help='Remove Gramine dependencies that are not needed'
-                                           'at runtime.')
+                                           ' at runtime.')
 sub_sign.add_argument('--no-remove-gramine-deps', action='append_const', dest='define',
-    const='remove_gramine_deps=false', help='Retain Gramine dependencies that are not needed' 
-                                            'at runtime.')
+    const='remove_gramine_deps=false', help='Retain Gramine dependencies that are not needed'
+                                            ' at runtime.')
 sub_info = subcommands.add_parser('info-image', help='Retrieve information about a graminized '
                                   'Docker image')
 sub_info.set_defaults(command=gsc_info_image)
 sub_info.add_argument('image', help='Name of the graminized Docker image.')
-
-def test_trueish(value):
-    value = value.casefold()
-    if not value or value in ('false', 'off', 'no'):
-        return False
-    if value in ('true', 'on', 'yes'):
-        return True
-    if value.isdigit():
-        return bool(int(value))
-    raise ValueError(f'Invalid value for trueish: {value!r}')
 
 def main(args):
     args = argparser.parse_args()
