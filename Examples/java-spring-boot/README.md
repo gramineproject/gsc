@@ -64,8 +64,7 @@ $ (cd ../..; ./gsc sign-image openjdk-11-java-spring-boot \
 
 6. Run graminized image:
 
-      * To run the image on the default port set to 8080,
-   run the command (the application may take a while to load):
+      * To run the image on the default port set to 8080 (the application may take a while to load):
 
         ```bash
         $ docker run --rm --device=/dev/sgx_enclave \
@@ -74,8 +73,8 @@ $ (cd ../..; ./gsc sign-image openjdk-11-java-spring-boot \
                 -d gsc-openjdk-11-java-spring-boot
         ```
 
-      * To run the image on a customized port using an environment variable, i.e. 9080,
-      run the following command (the application may take a while to load):
+      * To run the image on a customized port using an environment variable, i.e. 9080
+      (the application may take a while to load):
 
         ```bash
         $ docker run --rm --device=/dev/sgx_enclave \
