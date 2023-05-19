@@ -28,25 +28,25 @@ $ sudo apt-get install openjdk-11-jdk
 
 ## Build and run graminized Docker image
 
-1. Build a project using Gradle:
+3. Build a project using Gradle:
 
 ```bash
 $ (cd spring-boot-web-service/; gradle build)
 ```
 
-1. Build Docker image:
+4. Build Docker image:
 
 ```bash
 $ docker build -t openjdk-11-java-spring-boot .
 ```
 
-3. Clean up files that will be no longer used:
+5. Clean up files that will be no longer used:
 
 ```bash
 $ (cd spring-boot-web-service/; gradle clean)
 ```
 
-4. Graminize the Docker image (this step can take some time!):
+6. Graminize the Docker image (this step can take some time!):
 
 ```bash
 $ (cd ../..; ./gsc build openjdk-11-java-spring-boot \
@@ -54,7 +54,7 @@ $ (cd ../..; ./gsc build openjdk-11-java-spring-boot \
     -c <PATH-TO-CONFIG-FILE>)
 ```
 
-5. Sign the graminized Docker image:
+7. Sign the graminized Docker image:
 
 ```bash
 $ (cd ../..; ./gsc sign-image openjdk-11-java-spring-boot \
@@ -62,7 +62,7 @@ $ (cd ../..; ./gsc sign-image openjdk-11-java-spring-boot \
     -c <PATH-TO-CONFIG-FILE>)
 ```
 
-6. Run graminized image:
+8. Run graminized image:
 
       * To run the image on the default port set to 8080 (the application may take a while to load):
 
