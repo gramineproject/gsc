@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: LGPL-3.0-or-later
 // Copyright (C) 2023 Intel Corporation
-package org.gramine.example;
+package org.demo.example;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class GramineApplicationController {
+public class DemoApplicationController {
 
     @GetMapping("/")
     public String getString() {
