@@ -22,15 +22,14 @@ import tomli_w # pylint: disable=import-error
 import yaml    # pylint: disable=import-error
 
 def test_trueish(value):
-    if bool(value) is True:
-        value = value.casefold()
-        if not value or value in ('false', 'off', 'no'):
-            return False
-        if value in ('true', 'on', 'yes'):
-            return True
-        if value.isdigit():
-            return bool(int(value))
-        raise ValueError(f'Invalid value for trueish: {value!r}')
+    value = value.casefold()
+    if not value or value in ('false', 'off', 'no'):
+        return False
+    if value in ('true', 'on', 'yes'):
+        return True
+    if value.isdigit():
+        return bool(int(value))
+    raise ValueError(f'Invalid value for trueish: {value!r}')
 
 def gsc_image_name(original_image_name):
     return f'gsc-{original_image_name}'
