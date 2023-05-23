@@ -22,7 +22,7 @@ import tomli_w # pylint: disable=import-error
 import yaml    # pylint: disable=import-error
 
 def test_trueish(value):
-    if bool(value) is not False:
+    if bool(value) is True:
         value = value.casefold()
         if not value or value in ('false', 'off', 'no'):
             return False
