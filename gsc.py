@@ -348,27 +348,38 @@ def gsc_sign_image(args):
     distro = env.globals['Distro']
 
     distro, _ = distro.split(':')
-    env.loader = jinja2.FileSystemLoader('templates/')
-    sign_template = env.get_template(f'{distro}/Dockerfile.sign.template')
+    sign_template = None
+    build_args = {}
 
     os.makedirs(tmp_build_path, exist_ok=True)
+
+    # Use default steps if user has not provided a Dockerfile/template for signing
+    if args.template is None:
+        # copy user-provided signing key and signing Bash script to our tmp build dir (to copy them
+        # later inside Docker image)
+        tmp_build_key_path = tmp_build_path / 'gsc-signer-key.pem'
+        tmp_build_sign_path = tmp_build_path / 'sign.sh'
+        shutil.copyfile(os.path.abspath(args.key), tmp_build_key_path)
+        shutil.copy(os.path.abspath('sign.sh'), tmp_build_sign_path)
+        env.loader = jinja2.FileSystemLoader('templates/')
+        sign_template = env.get_template(f'{distro}/Dockerfile.sign.template')
+        build_args = {"passphrase": args.passphrase}
+    else:
+        extract_user_from_image_config(unsigned_image.attrs['Config'], env)
+        env.loader = jinja2.FileSystemLoader(os.path.dirname(args.template))
+        sign_template = env.get_template(os.path.basename(args.template))
+
     with open(tmp_build_path / 'Dockerfile.sign', 'w') as dockerfile:
         dockerfile.write(sign_template.render(image=unsigned_image_name))
-
-    # copy user-provided signing key and signing Bash script to our tmp build dir (to copy them
-    # later inside Docker image)
-    tmp_build_key_path = tmp_build_path / 'gsc-signer-key.pem'
-    tmp_build_sign_path = tmp_build_path / 'sign.sh'
-    shutil.copyfile(os.path.abspath(args.key), tmp_build_key_path)
-    shutil.copy(os.path.abspath('sign.sh'), tmp_build_sign_path)
 
     try:
         # `forcerm` parameter forces removal of intermediate Docker images even after unsuccessful
         # builds, to not leave the signing key lingering in any Docker containers
         build_docker_image(docker_socket.api, tmp_build_path, signed_image_name, 'Dockerfile.sign',
-                           forcerm=True, buildargs={"passphrase": args.passphrase})
+                           forcerm=True, buildargs=build_args)
     finally:
-        os.remove(tmp_build_key_path)
+        if args.template is None:
+            os.remove(tmp_build_key_path)
 
     if get_docker_image(docker_socket, signed_image_name) is None:
         print(f'Failed to build a signed graminized Docker image `{signed_image_name}`.')
@@ -508,7 +519,10 @@ sub_sign.set_defaults(command=gsc_sign_image)
 sub_sign.add_argument('-c', '--config_file', type=argparse.FileType('r', encoding='UTF-8'),
     default='config.yaml', help='Specify configuration file.')
 sub_sign.add_argument('image', help='Name of the application (base) Docker image.')
-sub_sign.add_argument('key', help='Key to sign the Intel SGX enclaves inside the Docker image.')
+sub_sign.add_argument('-k', '--key',
+    help='Key to sign the Intel SGX enclaves inside the Docker image.')
+sub_sign.add_argument('-t', '--template',
+                      help='Custom Dockerfile/template to use for signing, say, with an HSM.')
 sub_sign.add_argument('-p', '--passphrase', help='Passphrase for the signing key.')
 
 sub_info = subcommands.add_parser('info-image', help='Retrieve information about a graminized '
