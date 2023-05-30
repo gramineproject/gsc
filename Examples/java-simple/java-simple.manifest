@@ -1,6 +1,6 @@
 # For better performance
 libos.check_invalid_pointers = false
 
-sgx.enclave_size = "4G"
 sys.stack.size = "2M"
+sgx.enclave_size = "4G"
 sgx.max_threads = 512
