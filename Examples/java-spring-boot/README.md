@@ -1,52 +1,47 @@
 # Java Spring Boot example
 
 Spring Boot is a popular framework for building Java-based web applications. By using the GSC tool,
-you can deploy Spring Boot web applications inside a Gramine SGX enclave graminized containers.
-For more information on Spring Boot, please visit https://spring.io/.
+you can deploy Spring Boot web applications inside a graminized Docker container, such that the app
+runs inside the SGX enclave. For more information on Spring Boot, please visit https://spring.io/.
 
-## Disclaimer
+## Notes
 
 * This generated image is for non-production usage.
 
 * Tested on:
   - Type: Azure Confidential Computing SGX Virtual Machine
-  - OS: Linux (Ubuntu 20.04)
   - Size: Standard DC1s v3 (1 vCPU, 8 GiB memory)
-  - OpenJDK 11
-  - Gradle v7.6
+  - OS: Linux (Ubuntu 20.04)
 
-## Software requirements
+* Install the OpenJDK 11 package so that Gradle can consume the files:
 
-1. It is necessary to install the openjdk-11 package on your machine so that Gradle can
-consume the files. Use the command below to install it:
+    ```bash
+    $ sudo apt-get install openjdk-11-jdk
+    ```
 
-```bash
-$ sudo apt-get install openjdk-11-jdk
-```
-
-2. Follow the installation guide at https://gradle.org/install/ to install Gradle v7.6.
+* Follow the installation guide at https://gradle.org/install/ to install Gradle v7.6.
 
 ## Build and run graminized Docker image
 
-3. Build a project using Gradle:
+1. Build a project using Gradle:
 
 ```bash
 $ (cd spring-boot-web-service/; gradle build)
 ```
 
-4. Build Docker image:
+2. Build Docker image:
 
 ```bash
 $ docker build -t openjdk-11-java-spring-boot .
 ```
 
-5. Clean up files that will be no longer used:
+3. Clean up files that will be no longer used:
 
 ```bash
 $ (cd spring-boot-web-service/; gradle clean)
 ```
 
-6. Graminize the Docker image (this step can take some time!):
+4. Graminize the Docker image (this step can take some time!):
 
 ```bash
 $ (cd ../..; ./gsc build openjdk-11-java-spring-boot \
@@ -54,7 +49,7 @@ $ (cd ../..; ./gsc build openjdk-11-java-spring-boot \
     -c <PATH-TO-CONFIG-FILE>)
 ```
 
-7. Sign the graminized Docker image:
+5. Sign the graminized Docker image:
 
 ```bash
 $ (cd ../..; ./gsc sign-image openjdk-11-java-spring-boot \
@@ -62,9 +57,9 @@ $ (cd ../..; ./gsc sign-image openjdk-11-java-spring-boot \
     -c <PATH-TO-CONFIG-FILE>)
 ```
 
-8. Run graminized image:
+6. Run graminized image (the application may take a while to load):
 
-      * To run the image on the default port set to 8080 (the application may take a while to load):
+      * On the default port set to 8080:
 
         ```bash
         $ docker run --rm --device=/dev/sgx_enclave \
@@ -73,8 +68,7 @@ $ (cd ../..; ./gsc sign-image openjdk-11-java-spring-boot \
                 -d gsc-openjdk-11-java-spring-boot
         ```
 
-      * To run the image on a customized port using an environment variable, i.e. 9080
-      (the application may take a while to load):
+      * On a customized port using an environment variable, i.e. 9080:
 
         ```bash
         $ docker run --rm --device=/dev/sgx_enclave \
@@ -93,4 +87,8 @@ Boot application".
 ```bash
 $ wget -q localhost:<port>
 $ cat index.html
+```
+2. To terminate the graminized container with Spring-Boot application, run the command:
+```sh
+$ docker stop <containerID>
 ```
