@@ -2,6 +2,6 @@
 // Copyright (C) 2023 Intel Corporation
 class JavaExample {
     public static void main(String[] args) {
-        System.out.println("Hello from Gramine!");
+        System.out.println("Hello from Graminized Java application!");
     }
 }

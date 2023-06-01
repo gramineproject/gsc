@@ -43,6 +43,6 @@ $ (cd ../..; ./gsc sign-image openjdk-11-java-simple \
 
 ```bash
 $ docker run --rm --device=/dev/sgx_enclave \
-        -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-        gsc-openjdk-11-java-simple
+    -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+    gsc-openjdk-11-java-simple
 ```

@@ -63,12 +63,12 @@ $ (cd ../..; ./gsc sign-image openjdk-11-java-spring-boot \
 
         ```bash
         $ docker run --rm --device=/dev/sgx_enclave \
-                -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-                -p 8080:8080 \
-                -d gsc-openjdk-11-java-spring-boot
+            -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
+            -p 8080:8080 \
+            -d gsc-openjdk-11-java-spring-boot
         ```
 
-      * On a customized port using an environment variable, i.e. 9080:
+      * On a customized port using an environment variable, e.g. 9080:
 
         ```bash
         $ docker run --rm --device=/dev/sgx_enclave \
@@ -88,7 +88,8 @@ $ wget -q localhost:<port>
 $ cat index.html
 ```
 
-8. To terminate the graminized container with Spring-Boot application, run the command:
+8. To stop the graminized container with Spring-Boot application, run the command:
+
 ```sh
 $ docker stop <containerID>
 ```
