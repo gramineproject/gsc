@@ -31,7 +31,7 @@ $ (cd ../..; ./gsc build openjdk-11-java-simple \
     -c <PATH-TO-CONFIG-FILE>)
 ```
 
-1. Sign the graminized Docker image:
+3. Sign the graminized Docker image:
 
 ```bash
 $ (cd ../..; ./gsc sign-image openjdk-11-java-simple \
