@@ -78,17 +78,17 @@ $ (cd ../..; ./gsc sign-image openjdk-11-java-spring-boot \
             -d gsc-openjdk-11-java-spring-boot
         ```
 
-## Result
 
-Once you have the graminized container up and running, verify its correctness by calling
+7. Once you have the graminized container up and running, verify its correctness by calling
 the following command below. The result should be the following text - "Hello from Graminized Spring
-Boot application".
+Boot application":
 
 ```bash
 $ wget -q localhost:<port>
 $ cat index.html
 ```
-2. To terminate the graminized container with Spring-Boot application, run the command:
+
+8. To terminate the graminized container with Spring-Boot application, run the command:
 ```sh
 $ docker stop <containerID>
 ```
