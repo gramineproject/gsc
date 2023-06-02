@@ -84,12 +84,11 @@ the following command below. The result should be the following text - "Hello fr
 Boot application":
 
 ```bash
-$ wget -q localhost:<port>
-$ cat index.html
+$ wget -qO- localhost:<port>
 ```
 
 8. To stop the graminized container with Spring-Boot application, run the command:
 
-```sh
+```bash
 $ docker stop <containerID>
 ```
