@@ -1,4 +1,4 @@
-From ubuntu:18.04
+From ubuntu:20.04
 
 RUN apt-get update
 

@@ -1,22 +1,32 @@
 {% extends "Dockerfile.common.sign.template" %}
 
 {% block uninstall %}
+{% set distro = Distro.split(':') %}
 RUN \
-       apt-get update -y \
-       && apt-get install -y python3-pip \
-       && pip3 uninstall -y click jinja2 \
-          tomli tomli-w \
-          toml \
-       && apt-get remove -y binutils \
-          expect \
-          libcurl4-openssl-dev \
-          openssl \
-          python3-pip \
-          python3-protobuf \
-          python3-cryptography \
-          python3-pyelftools \
-       && apt-get autoremove -y \
-       && rm -rf /var/lib/apt/lists/*;
+        apt-get remove -y binutils \
+        expect \
+        libcurl4-openssl-dev \
+        openssl \
+        python3-protobuf \
+        python3-cryptography \
+        python3-pyelftools \
+        {% if (distro[0] == "debian" and distro[1] |int  > 11) or
+              (distro[0] == "ubuntu" and distro[1] |int  > 21) -%}
+           python3-tomli \
+           python3-tomli-w \
+           python3-toml \
+           python3-click \
+           python3-jinja2 \
+        {% else -%}
+           && apt-get update -y \
+           && apt-get install -y python3-pip \
+           && pip3 uninstall -y click jinja2 \
+              tomli tomli-w \
+              toml \
+           && apt-get remove -y python3-pip \
+        {% endif -%}
+        && apt-get autoremove -y \
+        && rm -rf /var/lib/apt/lists/*;
 {% endblock %}
 
 {% block path %}export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib -type d -path '*/site-packages')" &&{% endblock %}

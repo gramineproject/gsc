@@ -39,7 +39,7 @@ image.
 Prerequisites
 =============
 
-The installation descriptions of prerequisites are for Ubuntu 18.04 and may
+The installation descriptions of prerequisites are for Ubuntu 20.04 and may
 differ when using a different Ubuntu version or Linux distribution.
 
 Software packages
@@ -290,7 +290,7 @@ follows three main stages and produces an image named ``gsc-<image-name>``.
 
 #. **Building Gramine.** The first stage builds Gramine from sources based on
    the provided configuration (see :file:`config.yaml`) which includes the
-   distribution (e.g., Ubuntu 18.04), Gramine repository, and the Intel SGX
+   distribution (e.g., Ubuntu 20.04), Gramine repository, and the Intel SGX
    driver details. This stage can be skipped if :command:`gsc build` uses a
    pre-built Gramine Docker image.
 
@@ -342,9 +342,9 @@ in :file:`config.yaml.template`.
 
    Defines Linux distribution to be used to build Gramine in. This distro should
    match the distro underlying the application's Docker image; otherwise the
-   results may be unpredictable. Currently supported distros are Ubuntu 18.04,
-   Ubuntu 20.04, Ubuntu 21.04, Debian 10, Debian 11 and CentOS 8. Default value
-   is ``ubuntu:18.04``.
+   results may be unpredictable. Currently supported distros are Ubuntu 20.04,
+   Ubuntu 21.04, Ubuntu 22.04, Debian 10, Debian 11, Debian 12 and CentOS 8.
+   Default value is ``ubuntu:20.04``.
 
 .. describe:: Registry
 

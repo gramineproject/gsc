@@ -1,6 +1,7 @@
 {% extends "Dockerfile.common.compile.template" %}
 
 {% block install %}
+{% set distro = Distro.split(':') %}
 RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
     && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         autoconf \
@@ -22,11 +23,17 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
         python3-cryptography \
         python3-pip \
         python3-protobuf \
-        wget \
-    && /usr/bin/python3 -B -m pip install 'tomli>=1.1.0' 'tomli-w>=0.4.0' 'meson>=0.56'
-
-# For compatibility with Gramine v1.3 or lower
-RUN /usr/bin/python3 -B -m pip install 'toml>=0.10'
+        wget \ 
+        {% if (distro[0] == "debian" and distro[1] |int  > 11) or
+              (distro[0] == "ubuntu" and distro[1] |int  > 21) -%}
+           meson \
+           python3-tomli \
+           python3-tomli-w \
+           python3-toml 
+        {% else -%}
+           && /usr/bin/python3 -B -m pip install 'tomli>=1.1.0' 'tomli-w>=0.4.0' 'meson>=0.56'
+	   RUN /usr/bin/python3 -B -m pip install 'toml>=0.10'
+        {%- endif %}
 
 COPY intel-sgx-deb.key /
 

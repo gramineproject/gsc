@@ -3,10 +3,10 @@
 # application's Docker image; otherwise the results may be unpredictable.
 #
 # Currently supported distros are:
-# - ubuntu:18.04, ubuntu:20.04, ubuntu:21.04
-# - debian:10, debian:11
+# - ubuntu:20.04, ubuntu:21.04, ubuntu:22.04
+# - debian:10, debian:11, debian:12
 # - centos:8
-Distro: "ubuntu:18.04"
+Distro: "ubuntu:20.04"
 
 # If the image has a specific registry, define it here.
 # Empty by default; example value: "registry.access.redhat.com/ubi8".
