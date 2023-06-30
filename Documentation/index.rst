@@ -342,8 +342,8 @@ in :file:`config.yaml.template`.
    Defines Linux distribution to be used to build Gramine in. This distro should
    match the distro underlying the application's Docker image; otherwise the
    results may be unpredictable. Currently supported distros are Ubuntu 20.04,
-   Ubuntu 21.04, Debian 10, Debian 11 and CentOS 8. Default value is
-   ``ubuntu:20.04``.
+   Ubuntu 21.04, Ubuntu 22.04, Ubuntu 23.04, Debian 10, Debian 11, Debian 12 and
+   CentOS 8. Default value is ``ubuntu:20.04``.
 
 .. describe:: Registry
 
