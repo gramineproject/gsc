@@ -32,21 +32,27 @@ def extract_files_from_user_manifest(manifest):
 
 
 def generate_trusted_files(root_dir, already_added_files):
+    # please keep this list in sync with the one in GSC documentation
     excluded_paths_regex = (r'^/('
-                                r'boot/.*'
-                                r'|\.dockerenv'
-                                r'|\.dockerinit'
+                                r'|boot/.*'
                                 r'|dev/.*'
+                                r'|efi/.*'
+                                # below files are security-critical (only root can access them), and
+                                # trying to hash them in non-root Docker images would fail
+                                r'|etc/\.pwd\.lock'
                                 r'|etc/gshadow.*'
                                 r'|etc/mtab'
-                                r'|etc/\.pwd\.lock'
                                 r'|etc/rc(\d|.)\.d/.*'
                                 r'|etc/security/.*'
                                 r'|etc/shadow.*'
-                                r'|gramine/python/.*'
+                                # below file will be removed in final GSC Docker image, so skip it
                                 r'|gramine/app_files/finalize_manifest\.py'
+                                r'|media/.*'
+                                r'|mnt/.*'
                                 r'|proc/.*'
+                                r'|run/.*'
                                 r'|sys/.*'
+                                r'|tmp/.*'
                                 r'|var/.*)$')
     exclude_re = re.compile(excluded_paths_regex)
 
