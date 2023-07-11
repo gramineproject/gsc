@@ -4,7 +4,7 @@ FROM {{Registry}}/{{Distro}} AS gramine
 FROM {{Distro}} AS gramine
 {% endif %}
 
-# Install distro-specific packages to build Gramine (e.g., python3, protobuf, toml, etc.)
+# Install distro-specific packages to build Gramine (e.g., python3, protobuf, tomli, etc.)
 {% block install %}{% endblock %}
 
 RUN git clone {{Gramine.Repository}} /gramine

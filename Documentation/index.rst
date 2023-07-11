@@ -53,7 +53,6 @@ pip. GSC requires Python 3.6 or later.
 
    sudo apt-get install docker.io python3 python3-pip
    pip3 install docker jinja2 tomli tomli-w pyyaml
-   pip3 install toml  # for compatibility with Gramine v1.3 or lower
 
 SGX software stack
 ------------------

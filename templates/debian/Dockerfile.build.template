@@ -18,8 +18,6 @@ RUN apt-get update \
         python3-pyelftools \
     && /usr/bin/python3 -B -m pip install click jinja2 protobuf \
                                           'tomli>=1.1.0' 'tomli-w>=0.4.0' \
-# For compatibility with Gramine v1.3 or lower
-    && /usr/bin/python3 -B -m pip install 'toml>=0.10' \
 # Since all needed pip packages are installed, we can uninstall python3-pip safely
     && apt-get remove -y python3-pip \
     && apt-get autoremove -y \
