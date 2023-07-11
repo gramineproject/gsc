@@ -404,7 +404,7 @@ def gsc_sign_image(args):
           f'`{unsigned_image_name}`.')
 
 
-# Simplified version of read_sigstruct from python/graminelibos/sgx_get_token.py
+# Simplified version of `Sigstruct.from_bytes()` from python/graminelibos/sigstruct.py
 def read_sigstruct(sig):
     # Offsets for fields in SIGSTRUCT (defined by the SGX HW architecture, they never change)
     SGX_ARCH_ENCLAVE_CSS_DATE = 20
@@ -416,7 +416,7 @@ def read_sigstruct(sig):
     SGX_ARCH_ENCLAVE_CSS_MISC_SELECT = 900
     # Field format: (offset, type, value)
     fields = {
-        'date': (SGX_ARCH_ENCLAVE_CSS_DATE, '<HBB', 'year', 'month', 'day'),
+        'date': (SGX_ARCH_ENCLAVE_CSS_DATE, '<BBH', 'day', 'month', 'year'),
         'modulus': (SGX_ARCH_ENCLAVE_CSS_MODULUS, '384s', 'modulus'),
         'enclave_hash': (SGX_ARCH_ENCLAVE_CSS_ENCLAVE_HASH, '32s', 'enclave_hash'),
         'isv_prod_id': (SGX_ARCH_ENCLAVE_CSS_ISV_PROD_ID, '<H', 'isv_prod_id'),
@@ -428,7 +428,17 @@ def read_sigstruct(sig):
     for field in fields.values():
         values = struct.unpack_from(field[1], sig, field[0])
         for i, value in enumerate(values):
-            attr[field[i + 2]] = value
+            key = field[i + 2]
+            if key in ['day', 'month', 'year']:
+                try:
+                    attr[key] = int(f'{value:x}')
+                except ValueError:
+                    print(f'Misencoded date_{key} in SIGSTRUCT! '
+                          f'Please consider generating a new SIGSTRUCT with "gramine-sgx-sign".',
+                          file=sys.stderr)
+                    raise
+                continue
+            attr[key] = value
 
     return attr
 
