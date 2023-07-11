@@ -470,29 +470,30 @@ This example assumes that all prerequisites are installed and configured.
 
       openssl genrsa -3 -out enclave-key.pem 3072
 
-#. Pull public Python image from Dockerhub:
+#. Pull public Python image from Dockerhub (we pin to the Debian Bullseye
+   version):
 
    .. code-block:: sh
 
-      docker pull python
+      docker pull python:bullseye
 
 #. Graminize the Python image using :command:`gsc build`:
 
    .. code-block:: sh
 
-      ./gsc build --insecure-args python test/generic.manifest
+      ./gsc build --insecure-args python:bullseye test/generic.manifest
 
 #. Sign the graminized Docker image using :command:`gsc sign-image`:
 
    .. code-block:: sh
 
-      ./gsc sign-image python enclave-key.pem
+      ./gsc sign-image python:bullseye enclave-key.pem
 
 #. Retrieve SGX-related information from graminized image using :command:`gsc info-image`:
 
    .. code-block:: sh
 
-      ./gsc info-image gsc-python
+      ./gsc info-image gsc-python:bullseye
 
 #. Test the graminized Docker image (change ``--device=/dev/sgx_enclave`` to
    your version of the Intel SGX driver if needed):
@@ -501,7 +502,7 @@ This example assumes that all prerequisites are installed and configured.
 
       docker run --device=/dev/sgx_enclave \
          -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-         gsc-python -c 'print("HelloWorld!")'
+         gsc-python:bullseye -c 'print("HelloWorld!")'
 
 #. You can also start a Bash interactive session in the graminized Docker
    image (useful for debugging):
@@ -510,7 +511,7 @@ This example assumes that all prerequisites are installed and configured.
 
       docker run --device=/dev/sgx_enclave \
          -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-         -it --entrypoint /bin/bash gsc-python
+         -it --entrypoint /bin/bash gsc-python:bullseye
 
 Limitations
 ===========
