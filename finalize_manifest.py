@@ -86,16 +86,6 @@ def generate_trusted_files(root_dir, already_added_files):
             if '\n' in filename:
                 # we use TOML's basic single-line strings, can't have newlines
                 continue
-            if '\\x' in filename:
-                # Python TOML parser has a bug that prevents it from correctly handling `\x`
-                # sequences in strings (see https://github.com/uiri/toml/issues/404). Fortunately,
-                # the only files that exhibit such pattern are systemd helper files which graminized
-                # apps will never access anyway.
-                # FIXME: Now we switched to `tomli`, but GSC can still use Gramine v1.3 or lower
-                #        which uses `toml`. When GSC removes support for v1.3, can remove this.
-                print(f'\t[from inside Docker container] File {filename} contains `\\x` sequence '
-                       'and will be skipped from `sgx.trusted_files`!')
-                continue
 
             if not os.access(filename, os.R_OK):
                 # only accessible files are added as trusted files (note that this check is below
