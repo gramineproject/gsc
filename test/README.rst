@@ -30,11 +30,11 @@ below commands assume that you already created the GSC configuration file
 
    cd ..
 
-   docker build --tag ubuntu18.04-bash --file test/ubuntu18.04-bash.dockerfile .
+   docker build --tag ubuntu20.04-bash --file test/ubuntu20.04-bash.dockerfile .
 
-   ./gsc build --insecure-args ubuntu18.04-bash test/ubuntu18.04-bash.manifest
-   ./gsc sign-image ubuntu18.04-bash enclave-key.pem
-   ./gsc info-image gsc-ubuntu18.04-bash
+   ./gsc build --insecure-args ubuntu20.04-bash test/ubuntu20.04-bash.manifest
+   ./gsc sign-image ubuntu20.04-bash enclave-key.pem
+   ./gsc info-image gsc-ubuntu20.04-bash
 
 Test the graminized Docker image (change ``--device=/dev/sgx_enclave`` to your
 version of the Intel SGX driver if needed):
@@ -43,4 +43,4 @@ version of the Intel SGX driver if needed):
 
    docker run --device=/dev/sgx_enclave \
       -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-      gsc-ubuntu18.04-bash -c ls
+      gsc-ubuntu20.04-bash -c ls
