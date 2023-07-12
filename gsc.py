@@ -416,29 +416,27 @@ def read_sigstruct(sig):
     SGX_ARCH_ENCLAVE_CSS_MISC_SELECT = 900
     # Field format: (offset, type, value)
     fields = {
-        'date': (SGX_ARCH_ENCLAVE_CSS_DATE, '<BBH', 'day', 'month', 'year'),
-        'modulus': (SGX_ARCH_ENCLAVE_CSS_MODULUS, '384s', 'modulus'),
-        'enclave_hash': (SGX_ARCH_ENCLAVE_CSS_ENCLAVE_HASH, '32s', 'enclave_hash'),
-        'isv_prod_id': (SGX_ARCH_ENCLAVE_CSS_ISV_PROD_ID, '<H', 'isv_prod_id'),
-        'isv_svn': (SGX_ARCH_ENCLAVE_CSS_ISV_SVN, '<H', 'isv_svn'),
-        'attributes': (SGX_ARCH_ENCLAVE_CSS_ATTRIBUTES, '8s8s', 'flags', 'xfrms'),
-        'misc_select': (SGX_ARCH_ENCLAVE_CSS_MISC_SELECT, '4s', 'misc_select'),
+        'date_year': (SGX_ARCH_ENCLAVE_CSS_DATE + 2, '<H'),
+        'date_month': (SGX_ARCH_ENCLAVE_CSS_DATE + 1, '<B'),
+        'date_day': (SGX_ARCH_ENCLAVE_CSS_DATE, '<B'),
+        'modulus': (SGX_ARCH_ENCLAVE_CSS_MODULUS, '384s'),
+        'enclave_hash': (SGX_ARCH_ENCLAVE_CSS_ENCLAVE_HASH, '32s'),
+        'isv_prod_id': (SGX_ARCH_ENCLAVE_CSS_ISV_PROD_ID, '<H'),
+        'isv_svn': (SGX_ARCH_ENCLAVE_CSS_ISV_SVN, '<H'),
+        'flags': (SGX_ARCH_ENCLAVE_CSS_ATTRIBUTES, '8s'),
+        'xfrms': (SGX_ARCH_ENCLAVE_CSS_ATTRIBUTES + 8, '8s'),
+        'misc_select': (SGX_ARCH_ENCLAVE_CSS_MISC_SELECT, '4s'),
     }
     attr = {}
-    for field in fields.values():
-        values = struct.unpack_from(field[1], sig, field[0])
-        for i, value in enumerate(values):
-            key = field[i + 2]
-            if key in ['day', 'month', 'year']:
-                try:
-                    attr[key] = int(f'{value:x}')
-                except ValueError:
-                    print(f'Misencoded date_{key} in SIGSTRUCT! '
-                          f'Please consider generating a new SIGSTRUCT with "gramine-sgx-sign".',
-                          file=sys.stderr)
-                    raise
-                continue
-            attr[key] = value
+    for key, (offset, fmt) in fields.items():
+        if key in ['date_year', 'date_month', 'date_day']:
+            try:
+                attr[key] = int(f'{struct.unpack_from(fmt, sig, offset)[0]:x}')
+            except ValueError:
+                print(f'Misencoded {key} in SIGSTRUCT!', file=sys.stderr)
+                raise
+            continue
+        attr[key] = struct.unpack_from(fmt, sig, offset)[0]
 
     return attr
 
@@ -472,7 +470,7 @@ def gsc_info_image(args):
             sigstruct['mr_signer'] = mrsigner.digest().hex()
             sigstruct['isv_prod_id'] = attr['isv_prod_id']
             sigstruct['isv_svn'] = attr['isv_svn']
-            sigstruct['date'] = '%d-%02d-%02d' % (attr['year'], attr['month'], attr['day'])
+            sigstruct['date'] = '%d-%02d-%02d' % (attr['date_year'], attr['date_month'], attr['date_day'])
             sigstruct['flags'] = attr['flags'].hex()
             sigstruct['xfrms'] = attr['xfrms'].hex()
             sigstruct['misc_select'] = attr['misc_select'].hex()
