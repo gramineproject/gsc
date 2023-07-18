@@ -470,7 +470,8 @@ def gsc_info_image(args):
             sigstruct['mr_signer'] = mrsigner.digest().hex()
             sigstruct['isv_prod_id'] = attr['isv_prod_id']
             sigstruct['isv_svn'] = attr['isv_svn']
-            sigstruct['date'] = '%d-%02d-%02d' % (attr['date_year'], attr['date_month'], attr['date_day'])
+            sigstruct['date'] = '%d-%02d-%02d' % (
+                attr['date_year'], attr['date_month'], attr['date_day'])
             sigstruct['flags'] = attr['flags'].hex()
             sigstruct['xfrms'] = attr['xfrms'].hex()
             sigstruct['misc_select'] = attr['misc_select'].hex()
