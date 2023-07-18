@@ -5,6 +5,7 @@ RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-* &&\
     sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-* &&\
     sed -i 's/enabled=0/enabled=1/g' /etc/yum.repos.d/CentOS-Linux-PowerTools.repo
 
+# NOTE: meson v1.2.0 has a bug that leads to Gramine build failure because of not found `libcurl.a`
 RUN dnf update -y \
     &&  dnf install -y \
         autoconf \
@@ -35,6 +36,6 @@ RUN dnf update -y \
         python3-protobuf \
         rpm-build \
         wget \
-    && /usr/bin/python3 -B -m pip install 'tomli>=1.1.0' 'tomli-w>=0.4.0' 'meson>=0.56'
+    && /usr/bin/python3 -B -m pip install 'tomli>=1.1.0' 'tomli-w>=0.4.0' 'meson>=0.56,<1.2.0'
 
 {% endblock %}
