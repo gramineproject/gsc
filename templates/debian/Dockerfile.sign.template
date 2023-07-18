@@ -5,7 +5,6 @@
 RUN \
         apt-get remove -y binutils \
         expect \
-        libcurl4-openssl-dev \
         openssl \
         python3-protobuf \
         python3-cryptography \
@@ -14,16 +13,14 @@ RUN \
               (distro[0] == "ubuntu" and distro[1] |int  > 21) -%}
            python3-tomli \
            python3-tomli-w \
-           python3-toml \
            python3-click \
            python3-jinja2 \
-        {% else -%}
+        {%- else %}
            && apt-get update -y \
            && apt-get install -y python3-pip \
-           && pip3 uninstall -y click jinja2 \
-              tomli tomli-w \
+           && pip3 uninstall -y click jinja2 tomli tomli-w \
            && apt-get remove -y python3-pip \
-        {% endif -%}
+        {%- endif %}
         && apt-get autoremove -y \
         && rm -rf /var/lib/apt/lists/*;
 {% endblock %}
