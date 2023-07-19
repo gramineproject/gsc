@@ -359,7 +359,7 @@ in :file:`config.yaml.template`.
 
 .. describe:: Gramine.Branch
 
-   Use this release/branch of the repository. Default value: ``v1.4``.
+   Use this release/branch of the repository. Default value: ``v1.5``.
 
 .. describe:: Gramine.Image
 
