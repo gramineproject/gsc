@@ -9,6 +9,7 @@ import json
 import hashlib
 import os
 import pathlib
+import re
 import shutil
 import struct
 import sys
@@ -176,6 +177,55 @@ def merge_two_dicts(dict1, dict2, path=[]):
             dict1[key] = dict2[key]
     return dict1
 
+def handle_redhat_repo_configs(distro, tmp_build_path):
+    if distro not in {"redhat/ubi8", "redhat/ubi8-minimal"}:
+        return
+
+    repo_name = "rhel-8-for-x86_64-baseos-rpms"
+    with open('/etc/yum.repos.d/redhat.repo') as redhat_repo:
+        redhat_repo_contents = redhat_repo.read()
+
+        if not re.search(repo_name, redhat_repo_contents):
+            print(f'Cannot find {repo_name} in /etc/yum.repos.d/redhat.repo. '
+                  f'Register and subscribe your RHEL system to the Red Hat Customer '
+                  f'Portal using Red Hat Subscription-Manager.')
+            sys.exit(1)
+
+        shutil.copyfile('/etc/yum.repos.d/redhat.repo', tmp_build_path / 'redhat.repo')
+        pattern_sslclientkey = re.compile(r'(?<!#)sslclientkey\s*=\s*(.*)')
+        pattern_sslcacert = re.compile(r'(?<!#)sslcacert\s*=\s*(.*)')
+
+        match_sslclientkey = pattern_sslclientkey.search(redhat_repo_contents)
+        if match_sslclientkey:
+            sslclientkey_path = match_sslclientkey.group(1)
+            sslclientkey_dir = os.path.dirname(sslclientkey_path)
+        else:
+            print(f'Cannot find SSL client key path in /etc/yum.repos.d/redhat.repo. '
+                  f'Register and subscribe your RHEL system to the Red Hat Customer '
+                  f'Portal using Red Hat Subscription-Manager.')
+            sys.exit(1)
+
+        match_sslcacert = pattern_sslcacert.search(redhat_repo_contents)
+        if match_sslcacert:
+            sslcacert_path = match_sslcacert.group(1)
+        else:
+            print(f'Cannot find SSL CA certificate path in /etc/yum.repos.d/redhat.repo. '
+                  f'Register and subscribe your RHEL system to the Red Hat Customer '
+                  f'Portal using Red Hat Subscription-Manager.')
+            sys.exit(1)
+
+        # The `redhat-uep.pem` file is used to validate the authenticity of Red Hat Update Engine
+        # Proxy (UEP) server during updates and subscription management on the system.
+        shutil.copyfile(sslcacert_path, tmp_build_path / 'redhat-uep.pem')
+
+        if os.path.exists(tmp_build_path / 'pki'):
+            shutil.rmtree(tmp_build_path / 'pki')
+
+        # This directory stores the entitlement certificates for Red Hat subscriptions.
+        # These files are used to authenticate and verify that a system is entitled to receive
+        # software updates and support from Red Hat.
+        shutil.copytree(sslclientkey_dir, tmp_build_path / 'pki/entitlement')
+
 # Command 1: Build unsigned graminized Docker image from original app Docker image.
 def gsc_build(args):
     original_image_name = args.image                           # input original-app image name
@@ -289,6 +339,8 @@ def gsc_build(args):
     # Available at https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key
     shutil.copyfile('keys/intel-sgx-deb.key', tmp_build_path / 'intel-sgx-deb.key')
 
+    handle_redhat_repo_configs(distro, tmp_build_path)
+
     build_docker_image(docker_socket.api, tmp_build_path, unsigned_image_name, 'Dockerfile.build',
                        rm=args.rm, nocache=args.no_cache, buildargs=extract_build_args(args))
 
@@ -346,6 +398,8 @@ def gsc_build_gramine(args):
     # Intel's SGX PGP RSA-1024 key signing the intel-sgx/sgx_repo repository. Expires 2023-05-24.
     # Available at https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key
     shutil.copyfile('keys/intel-sgx-deb.key', tmp_build_path / 'intel-sgx-deb.key')
+
+    handle_redhat_repo_configs(distro, tmp_build_path)
 
     build_docker_image(docker_socket.api, tmp_build_path, gramine_image_name, 'Dockerfile.compile',
                        rm=args.rm, nocache=args.no_cache, buildargs=extract_build_args(args))
