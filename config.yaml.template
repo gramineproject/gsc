@@ -6,6 +6,8 @@
 # - ubuntu:20.04, ubuntu:21.04
 # - debian:10, debian:11
 # - centos:8
+# - redhat/ubi8:8.8
+# - redhat/ubi8-minimal:8.8
 Distro: "ubuntu:20.04"
 
 # If the image has a specific registry, define it here.

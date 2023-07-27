@@ -1,0 +1,75 @@
+{% extends "Dockerfile.common.compile.template" %}
+
+{% block install %}
+COPY RPM-GPG-KEY-CentOS-Official /
+
+{% set distro = Distro.split(':') %}
+{% set pkg_manager = 'dnf' %}
+{% if distro[0] == "redhat/ubi8" %}
+    RUN dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
+        && dnf update -y
+
+    RUN rpm --import /RPM-GPG-KEY-CentOS-Official \
+        && dnf config-manager --add-repo http://vault.centos.org/centos/8/BaseOS/x86_64/os \
+        && dnf config-manager --add-repo http://vault.centos.org/centos/8/AppStream/x86_64/os \
+        && dnf config-manager --add-repo http://vault.centos.org/centos/8/PowerTools/x86_64/os
+{% else %}
+    {% set pkg_manager = 'microdnf' %}
+    RUN  rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+
+    RUN echo "[CentOSBaseOS]" >> /etc/yum.repos.d/ubi.repo \
+        && echo "name=CentOSBaseOS" >> /etc/yum.repos.d/ubi.repo \
+        && echo "baseurl=http://vault.centos.org/centos/8/BaseOS/x86_64/os" >> /etc/yum.repos.d/ubi.repo \
+        && echo "enabled=1" >> /etc/yum.repos.d/ubi.repo \
+        && echo "gpgcheck=1" >> /etc/yum.repos.d/ubi.repo \
+        && echo "gpgkey=file:///RPM-GPG-KEY-CentOS-Official" >> /etc/yum.repos.d/ubi.repo
+
+    RUN echo "[CentOSAppStream]" >> /etc/yum.repos.d/ubi.repo \
+        && echo "name=CentOSAppStream" >> /etc/yum.repos.d/ubi.repo \
+        && echo "baseurl=http://vault.centos.org/centos/8/AppStream/x86_64/os" >> /etc/yum.repos.d/ubi.repo \
+        && echo "enabled=1" >> /etc/yum.repos.d/ubi.repo \
+        && echo "gpgcheck=1" >> /etc/yum.repos.d/ubi.repo \
+        && echo "gpgkey=file:///RPM-GPG-KEY-CentOS-Official" >> /etc/yum.repos.d/ubi.repo
+
+    RUN echo "[CentOSPowerTools]" >> /etc/yum.repos.d/ubi.repo \
+        && echo "name=CentOSPowerTools" >> /etc/yum.repos.d/ubi.repo \
+        && echo "baseurl=http://vault.centos.org/centos/8/PowerTools/x86_64/os" >> /etc/yum.repos.d/ubi.repo \
+        && echo "enabled=1" >> /etc/yum.repos.d/ubi.repo \
+        && echo "gpgcheck=1" >> /etc/yum.repos.d/ubi.repo \
+        && echo "gpgkey=file:///RPM-GPG-KEY-CentOS-Official" >> /etc/yum.repos.d/ubi.repo
+{% endif %}
+
+# NOTE: meson v1.2.* has a bug that leads to Gramine build failure because of not found `libcurl.a`
+RUN {{ pkg_manager }} update -y \
+    &&  {{ pkg_manager }} install -y \
+        autoconf \
+        bison \
+        curl \
+        elfutils-libelf-devel \
+        epel-release \
+        flex \
+        gawk \
+        gcc-c++ \
+        git \
+        httpd \
+        libevent-devel \
+        make \
+        nasm \
+        ncurses-devel \
+        ninja-build \
+        openssl-devel \
+        patch \
+        pkg-config \
+        protobuf-c-compiler \
+        protobuf-c-devel \
+        protobuf-compiler \
+        protobuf-devel \
+        python3 \
+        python3-cryptography \
+        python3-pip \
+        python3-protobuf \
+        rpm-build \
+        wget \
+    && /usr/bin/python3 -B -m pip install 'tomli>=1.1.0' 'tomli-w>=0.4.0' 'meson>=0.56,!=1.2.*'
+
+{% endblock %}
