@@ -218,6 +218,7 @@ def gsc_build(args):
     distro = env.globals['Distro']
 
     distro, _ = distro.split(':')
+    distro = distro.split('/')[0]
     env.globals.update({'compile_template': f'{distro}/Dockerfile.compile.template'})
     env.loader = jinja2.FileSystemLoader('templates/')
 
@@ -279,6 +280,11 @@ def gsc_build(args):
     # Available at https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key
     shutil.copyfile('keys/intel-sgx-deb.key', tmp_build_path / 'intel-sgx-deb.key')
 
+    # Official CentOS GPG public key used to authenticate and validate CentOS software packages.
+    # Available at https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official
+    shutil.copyfile('keys/RPM-GPG-KEY-CentOS-Official',
+                    tmp_build_path / 'RPM-GPG-KEY-CentOS-Official')
+
     build_docker_image(docker_socket.api, tmp_build_path, unsigned_image_name, 'Dockerfile.build',
                        rm=args.rm, nocache=args.no_cache, buildargs=extract_build_args(args))
 
@@ -319,6 +325,7 @@ def gsc_build_gramine(args):
     distro = env.globals['Distro']
 
     distro, _ = distro.split(':')
+    distro = distro.split('/')[0]
     env.loader = jinja2.FileSystemLoader('templates/')
 
     # generate Dockerfile.compile from Jinja-style templates/<distro>/Dockerfile.compile.template
@@ -336,6 +343,11 @@ def gsc_build_gramine(args):
     # Intel's SGX PGP RSA-1024 key signing the intel-sgx/sgx_repo repository. Expires 2023-05-24.
     # Available at https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key
     shutil.copyfile('keys/intel-sgx-deb.key', tmp_build_path / 'intel-sgx-deb.key')
+
+    # Official CentOS GPG public key used to authenticate and validate CentOS software packages.
+    # Available at https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official
+    shutil.copyfile('keys/RPM-GPG-KEY-CentOS-Official',
+                    tmp_build_path / 'RPM-GPG-KEY-CentOS-Official')
 
     build_docker_image(docker_socket.api, tmp_build_path, gramine_image_name, 'Dockerfile.compile',
                        rm=args.rm, nocache=args.no_cache, buildargs=extract_build_args(args))
@@ -374,6 +386,7 @@ def gsc_sign_image(args):
     distro = env.globals['Distro']
 
     distro, _ = distro.split(':')
+    distro = distro.split('/')[0]
     env.loader = jinja2.FileSystemLoader('templates/')
     sign_template = env.get_template(f'{distro}/Dockerfile.sign.template')
 
