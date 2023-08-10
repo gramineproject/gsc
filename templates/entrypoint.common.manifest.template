@@ -18,7 +18,6 @@ sgx.debug = {% if buildtype != "release" %} true {% else %} false {% endif %}
 # !! INSECURE !! Allow passing command-line arguments from the host without validation.
 # Most Docker images rely on runtime arguments and hence, a more general technique is required.
 # The issue is documented at https://github.com/gramineproject/gsc/issues/13.
-loader.argv0_override = "/gramine/app_files/{{binary_basename}}"
 loader.insecure__use_cmdline_argv = true
 {% else %}
 loader.argv_src_file = "file:/gramine/app_files/trusted_argv"

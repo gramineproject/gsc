@@ -21,6 +21,18 @@ import tomli   # pylint: disable=import-error
 import tomli_w # pylint: disable=import-error
 import yaml    # pylint: disable=import-error
 
+def test_trueish(value):
+    if not value:
+        return False
+    value = value.casefold()
+    if value in ('false', 'off', 'no'):
+        return False
+    if value in ('true', 'on', 'yes'):
+        return True
+    if value.isdigit():
+        return bool(int(value))
+    raise ValueError(f'Invalid value for trueish: {value!r}')
+
 def gsc_image_name(original_image_name):
     return f'gsc-{original_image_name}'
 
@@ -130,6 +142,17 @@ def extract_build_args(args):
                 print(f'Could not set build arg `{item}` from environment.')
                 sys.exit(1)
     return buildargs_dict
+
+def extract_define_args(args):
+    defineargs_dict = {}
+    for item in args.define:
+        if '=' in item:
+            key, value = item.split('=', maxsplit=1)
+            defineargs_dict[key] = value
+        else:
+            print(f'Invalid value for argument `{item}`, expected `--define {item}=<value>`')
+            sys.exit(1)
+    return defineargs_dict
 
 def extract_user_from_image_config(config, env):
     user = config['User']
@@ -252,7 +275,7 @@ def gsc_build(args):
     # copy helper script to finalize the manifest from within graminized Docker image
     shutil.copyfile('finalize_manifest.py', tmp_build_path / 'finalize_manifest.py')
 
-    # Intel's SGX PGP RSA-1024 key signing the intel-sgx/sgx_repo repository. Expires 2023-05-24.
+    # Intel's SGX PGP RSA-2048 key signing the intel-sgx/sgx_repo repository. Expires 2027-03-20.
     # Available at https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key
     shutil.copyfile('keys/intel-sgx-deb.key', tmp_build_path / 'intel-sgx-deb.key')
 
@@ -345,6 +368,9 @@ def gsc_sign_image(args):
     # using the user-provided config file with info on OS distro, Gramine version and SGX driver
     env = jinja2.Environment()
     env.globals.update(yaml.safe_load(args.config_file))
+    extract_user_from_image_config(unsigned_image.attrs['Config'], env)
+    env.globals['args'] = extract_define_args(args)
+    env.tests['trueish'] = test_trueish
     distro = env.globals['Distro']
 
     distro, _ = distro.split(':')
@@ -378,7 +404,7 @@ def gsc_sign_image(args):
           f'`{unsigned_image_name}`.')
 
 
-# Simplified version of read_sigstruct from python/graminelibos/sgx_get_token.py
+# Simplified version of `Sigstruct.from_bytes()` from python/graminelibos/sigstruct.py
 def read_sigstruct(sig):
     # Offsets for fields in SIGSTRUCT (defined by the SGX HW architecture, they never change)
     SGX_ARCH_ENCLAVE_CSS_DATE = 20
@@ -390,19 +416,27 @@ def read_sigstruct(sig):
     SGX_ARCH_ENCLAVE_CSS_MISC_SELECT = 900
     # Field format: (offset, type, value)
     fields = {
-        'date': (SGX_ARCH_ENCLAVE_CSS_DATE, '<HBB', 'year', 'month', 'day'),
-        'modulus': (SGX_ARCH_ENCLAVE_CSS_MODULUS, '384s', 'modulus'),
-        'enclave_hash': (SGX_ARCH_ENCLAVE_CSS_ENCLAVE_HASH, '32s', 'enclave_hash'),
-        'isv_prod_id': (SGX_ARCH_ENCLAVE_CSS_ISV_PROD_ID, '<H', 'isv_prod_id'),
-        'isv_svn': (SGX_ARCH_ENCLAVE_CSS_ISV_SVN, '<H', 'isv_svn'),
-        'attributes': (SGX_ARCH_ENCLAVE_CSS_ATTRIBUTES, '8s8s', 'flags', 'xfrms'),
-        'misc_select': (SGX_ARCH_ENCLAVE_CSS_MISC_SELECT, '4s', 'misc_select'),
+        'date_year': (SGX_ARCH_ENCLAVE_CSS_DATE + 2, '<H'),
+        'date_month': (SGX_ARCH_ENCLAVE_CSS_DATE + 1, '<B'),
+        'date_day': (SGX_ARCH_ENCLAVE_CSS_DATE, '<B'),
+        'modulus': (SGX_ARCH_ENCLAVE_CSS_MODULUS, '384s'),
+        'enclave_hash': (SGX_ARCH_ENCLAVE_CSS_ENCLAVE_HASH, '32s'),
+        'isv_prod_id': (SGX_ARCH_ENCLAVE_CSS_ISV_PROD_ID, '<H'),
+        'isv_svn': (SGX_ARCH_ENCLAVE_CSS_ISV_SVN, '<H'),
+        'flags': (SGX_ARCH_ENCLAVE_CSS_ATTRIBUTES, '8s'),
+        'xfrms': (SGX_ARCH_ENCLAVE_CSS_ATTRIBUTES + 8, '8s'),
+        'misc_select': (SGX_ARCH_ENCLAVE_CSS_MISC_SELECT, '4s'),
     }
     attr = {}
-    for field in fields.values():
-        values = struct.unpack_from(field[1], sig, field[0])
-        for i, value in enumerate(values):
-            attr[field[i + 2]] = value
+    for key, (offset, fmt) in fields.items():
+        if key in ['date_year', 'date_month', 'date_day']:
+            try:
+                attr[key] = int(f'{struct.unpack_from(fmt, sig, offset)[0]:x}')
+            except ValueError:
+                print(f'Misencoded {key} in SIGSTRUCT!', file=sys.stderr)
+                raise
+            continue
+        attr[key] = struct.unpack_from(fmt, sig, offset)[0]
 
     return attr
 
@@ -436,7 +470,8 @@ def gsc_info_image(args):
             sigstruct['mr_signer'] = mrsigner.digest().hex()
             sigstruct['isv_prod_id'] = attr['isv_prod_id']
             sigstruct['isv_svn'] = attr['isv_svn']
-            sigstruct['date'] = '%d-%02d-%02d' % (attr['year'], attr['month'], attr['day'])
+            sigstruct['date'] = '%d-%02d-%02d' % (
+                attr['date_year'], attr['date_month'], attr['date_day'])
             sigstruct['flags'] = attr['flags'].hex()
             sigstruct['xfrms'] = attr['xfrms'].hex()
             sigstruct['misc_select'] = attr['misc_select'].hex()
@@ -510,7 +545,14 @@ sub_sign.add_argument('-c', '--config_file', type=argparse.FileType('r', encodin
 sub_sign.add_argument('image', help='Name of the application (base) Docker image.')
 sub_sign.add_argument('key', help='Key to sign the Intel SGX enclaves inside the Docker image.')
 sub_sign.add_argument('-p', '--passphrase', help='Passphrase for the signing key.')
-
+sub_sign.add_argument('-D','--define', action='append', default=[],
+    help='Set image sign-time variables.')
+sub_sign.add_argument('--remove-gramine-deps', action='append_const', dest='define',
+    const='remove_gramine_deps=true', help='Remove Gramine dependencies that are not needed'
+                                           ' at runtime.')
+sub_sign.add_argument('--no-remove-gramine-deps', action='append_const', dest='define',
+    const='remove_gramine_deps=false', help='Retain Gramine dependencies that are not needed'
+                                            ' at runtime.')
 sub_info = subcommands.add_parser('info-image', help='Retrieve information about a graminized '
                                   'Docker image')
 sub_info.set_defaults(command=gsc_info_image)
