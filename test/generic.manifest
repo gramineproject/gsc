@@ -1,12 +1,6 @@
-# Some workloads like Python may generate huge manifest files
-loader.pal_internal_mem_size = "128M"
-
 sgx.enclave_size = "4G"
 sgx.max_threads = 8
 
-# FIXME: `toml` Python lib that was used in Gramine v1.3 and lower hangs/fails on non-homogeneous
-#        TOML arrays, so until we fully deprecate support for Gramine v1.3 in GSC, specify items in
-#        the sgx.trusted_files array only as strings (never as dicts `{ "uri": "file:file1" }`)
 sgx.trusted_files = [
   "file:/gramine/app_files/entrypoint.manifest",  # unused entry, only to test merging of manifests
 ]

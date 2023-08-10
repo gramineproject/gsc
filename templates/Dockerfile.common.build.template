@@ -11,7 +11,7 @@ FROM {{app_image}}
 # Temporarily switch to the root user to install packages
 USER root
 
-# Install distro-specific packages to run Gramine (e.g., python3, protobuf, toml, etc.)
+# Install distro-specific packages to run Gramine (e.g., python3, protobuf, tomli, etc.)
 {% block install %}{% endblock %}
 
 # Create a directory that will store apploader.sh and entrypoint files.
