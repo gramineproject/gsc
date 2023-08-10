@@ -39,7 +39,7 @@ image.
 Prerequisites
 =============
 
-The installation descriptions of prerequisites are for Ubuntu 18.04 and may
+The installation descriptions of prerequisites are for Ubuntu 20.04 and may
 differ when using a different Ubuntu version or Linux distribution.
 
 Software packages
@@ -53,7 +53,6 @@ pip. GSC requires Python 3.6 or later.
 
    sudo apt-get install docker.io python3 python3-pip
    pip3 install docker jinja2 tomli tomli-w pyyaml
-   pip3 install toml  # for compatibility with Gramine v1.3 or lower
 
 SGX software stack
 ------------------
@@ -169,6 +168,16 @@ of the signing key in them.
 
    Provide passphrase for the enclave signing key (if applicable)
 
+.. option:: -D, --define
+
+   Set image sign-time variables during :command:`gsc sign`.
+
+.. option:: --remove-gramine-deps
+
+   Remove Gramine dependencies that are not needed at runtime. This may have
+   a negative side effect of removing even those dependencies that are actually
+   needed by the original application. Use with care!
+
 .. option:: IMAGE-NAME
 
    Name of the application Docker image
@@ -280,7 +289,7 @@ follows three main stages and produces an image named ``gsc-<image-name>``.
 
 #. **Building Gramine.** The first stage builds Gramine from sources based on
    the provided configuration (see :file:`config.yaml`) which includes the
-   distribution (e.g., Ubuntu 18.04), Gramine repository, and the Intel SGX
+   distribution (e.g., Ubuntu 20.04), Gramine repository, and the Intel SGX
    driver details. This stage can be skipped if :command:`gsc build` uses a
    pre-built Gramine Docker image.
 
@@ -332,9 +341,9 @@ in :file:`config.yaml.template`.
 
    Defines Linux distribution to be used to build Gramine in. This distro should
    match the distro underlying the application's Docker image; otherwise the
-   results may be unpredictable. Currently supported distros are Ubuntu 18.04,
-   Ubuntu 20.04, Ubuntu 21.04, Debian 10, Debian 11 and CentOS 8. Default value
-   is ``ubuntu:18.04``.
+   results may be unpredictable. Currently supported distros are Ubuntu 20.04,
+   Ubuntu 21.04, Debian 10, Debian 11 and CentOS 8. Default value is
+   ``ubuntu:20.04``.
 
 .. describe:: Registry
 
@@ -350,7 +359,7 @@ in :file:`config.yaml.template`.
 
 .. describe:: Gramine.Branch
 
-   Use this release/branch of the repository. Default value: ``v1.4``.
+   Use this release/branch of the repository. Default value: ``v1.5``.
 
 .. describe:: Gramine.Image
 
@@ -460,29 +469,30 @@ This example assumes that all prerequisites are installed and configured.
 
       openssl genrsa -3 -out enclave-key.pem 3072
 
-#. Pull public Python image from Dockerhub:
+#. Pull public Python image from Dockerhub (we pin to the Debian Bullseye
+   version):
 
    .. code-block:: sh
 
-      docker pull python
+      docker pull python:bullseye
 
 #. Graminize the Python image using :command:`gsc build`:
 
    .. code-block:: sh
 
-      ./gsc build --insecure-args python test/generic.manifest
+      ./gsc build --insecure-args python:bullseye test/generic.manifest
 
 #. Sign the graminized Docker image using :command:`gsc sign-image`:
 
    .. code-block:: sh
 
-      ./gsc sign-image python enclave-key.pem
+      ./gsc sign-image python:bullseye enclave-key.pem
 
 #. Retrieve SGX-related information from graminized image using :command:`gsc info-image`:
 
    .. code-block:: sh
 
-      ./gsc info-image gsc-python
+      ./gsc info-image gsc-python:bullseye
 
 #. Test the graminized Docker image (change ``--device=/dev/sgx_enclave`` to
    your version of the Intel SGX driver if needed):
@@ -491,7 +501,7 @@ This example assumes that all prerequisites are installed and configured.
 
       docker run --device=/dev/sgx_enclave \
          -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-         gsc-python -c 'print("HelloWorld!")'
+         gsc-python:bullseye -c 'print("HelloWorld!")'
 
 #. You can also start a Bash interactive session in the graminized Docker
    image (useful for debugging):
@@ -500,7 +510,7 @@ This example assumes that all prerequisites are installed and configured.
 
       docker run --device=/dev/sgx_enclave \
          -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-         -it --entrypoint /bin/bash gsc-python
+         -it --entrypoint /bin/bash gsc-python:bullseye
 
 Limitations
 ===========
