@@ -15,9 +15,9 @@ COPY RPM-GPG-KEY-CentOS-Official /
     RUN rpm --import /RPM-GPG-KEY-CentOS-Official \
         && dnf config-manager --add-repo http://vault.centos.org/centos/8/BaseOS/x86_64/os \
         && dnf config-manager --add-repo http://vault.centos.org/centos/8/AppStream/x86_64/os
-{% else %}
+{% elif distro[0] == "redhat/ubi8-minimal" %}
     {% set pkg_manager = 'microdnf' %}
-    RUN  rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+    RUN rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
 
     RUN echo "[CentOSBaseOS]" >> /etc/yum.repos.d/ubi.repo \
         && echo "name=CentOSBaseOS" >> /etc/yum.repos.d/ubi.repo \
