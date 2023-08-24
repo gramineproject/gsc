@@ -16,10 +16,10 @@ RUN apt-get update \
         python3-cryptography \
         python3-protobuf \
         python3-pyelftools \
-# debian-12 and ubuntu-23.04 distros have adopted PEP 668, with this change `pip` will no longer
-# install package outside virtual env, hence using distro specific package manager.
-        {% if (distro[0] == "debian" and distro[1] | int >= 12) or
-              (distro[0] == "ubuntu" and distro[1] | int >= 23) -%}
+# Debian 12 and Ubuntu 23.04 adopted PEP 668, which dictates that `pip` can no longer install
+# packages managed by the distro's general-purpose package manager, hence we use `apt-get`
+        {%- if (distro[0] == "debian" and distro[1] | int >= 12) or
+               (distro[0] == "ubuntu" and distro[1] | int >= 23) %}
            python3-click \
            python3-jinja2 \
            python3-tomli \
