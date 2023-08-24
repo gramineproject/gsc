@@ -23,7 +23,7 @@ import subprocess
 # -- Project information -----------------------------------------------------
 
 project = 'GSC Contributions'
-copyright = '2021, GSC Contributors'
+copyright = '2023, GSC Contributors'
 author = 'GSC Contributors'
 
 # The short X.Y version
