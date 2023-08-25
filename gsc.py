@@ -218,7 +218,6 @@ def gsc_build(args):
     distro = env.globals['Distro']
 
     distro, _ = distro.split(':')
-    distro = distro.split('/')[0]
     env.globals.update({'compile_template': f'{distro}/Dockerfile.compile.template'})
     env.loader = jinja2.FileSystemLoader('templates/')
 
@@ -325,7 +324,6 @@ def gsc_build_gramine(args):
     distro = env.globals['Distro']
 
     distro, _ = distro.split(':')
-    distro = distro.split('/')[0]
     env.loader = jinja2.FileSystemLoader('templates/')
 
     # generate Dockerfile.compile from Jinja-style templates/<distro>/Dockerfile.compile.template
@@ -386,7 +384,6 @@ def gsc_sign_image(args):
     distro = env.globals['Distro']
 
     distro, _ = distro.split(':')
-    distro = distro.split('/')[0]
     env.loader = jinja2.FileSystemLoader('templates/')
     sign_template = env.get_template(f'{distro}/Dockerfile.sign.template')
 

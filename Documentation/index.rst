@@ -342,7 +342,8 @@ in :file:`config.yaml.template`.
    Defines Linux distribution to be used to build Gramine in. This distro should
    match the distro underlying the application's Docker image; otherwise the
    results may be unpredictable. Currently supported distros are Ubuntu 20.04,
-   Ubuntu 21.04, Debian 10, Debian 11 and CentOS 8. Default value is
+   Ubuntu 21.04, Debian 10, Debian 11, CentOS 8, Red Hat Universal Base Image (UBI)
+   8 and Red Hat Universal Base Image (UBI) 8 minimal. Default value is
    ``ubuntu:20.04``.
 
 .. describe:: Registry
@@ -524,9 +525,10 @@ Operating System dependency
 
 GSC relies on Gramine to execute Linux applications inside Intel SGX enclaves and
 the installation of prerequisites depends on package manager and package
-repositories. Docker images based on Ubuntu and CentOS are supported by GSC.
-GSC can simply be extended to support other distributions by
-providing a set of templates for this distribution in :file:`templates/`.
+repositories. Docker images based on Ubuntu, CentOS and Red Hat Universal Base
+Image are supported by GSC. GSC can simply be extended to support other
+distributions by providing a set of templates for this distribution in
+:file:`templates/`.
 
 Trusted data in Docker volumes
 ------------------------------

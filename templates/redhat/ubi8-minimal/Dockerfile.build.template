@@ -1,0 +1,54 @@
+{% extends "Dockerfile.common.build.template" %}
+
+{% block install %}
+# Combine all installation and removal steps in a single RUN command to reduce the final image size.
+# This is because each Dockerfile command creates a new layer which necessarily adds size to the
+# final image. This trick allow
+COPY RPM-GPG-KEY-CentOS-Official /
+
+RUN rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+
+RUN echo "[CentOSBaseOS]" >> /etc/yum.repos.d/ubi.repo \
+    && echo "name=CentOSBaseOS" >> /etc/yum.repos.d/ubi.repo \
+    && echo "baseurl=http://vault.centos.org/centos/8/BaseOS/x86_64/os" >> /etc/yum.repos.d/ubi.repo \
+    && echo "enabled=1" >> /etc/yum.repos.d/ubi.repo \
+    && echo "gpgcheck=1" >> /etc/yum.repos.d/ubi.repo \
+    && echo "gpgkey=file:///RPM-GPG-KEY-CentOS-Official" >> /etc/yum.repos.d/ubi.repo
+
+RUN echo "[CentOSAppStream]" >> /etc/yum.repos.d/ubi.repo \
+    && echo "name=CentOSAppStream" >> /etc/yum.repos.d/ubi.repo \
+    && echo "baseurl=http://vault.centos.org/centos/8/AppStream/x86_64/os" >> /etc/yum.repos.d/ubi.repo \
+    && echo "enabled=1" >> /etc/yum.repos.d/ubi.repo \
+    && echo "gpgcheck=1" >> /etc/yum.repos.d/ubi.repo \
+    && echo "gpgkey=file:///RPM-GPG-KEY-CentOS-Official" >> /etc/yum.repos.d/ubi.repo
+
+RUN microdnf update -y \
+    &&  microdnf install -y \
+        binutils \
+        wget \
+        pkgconfig \
+        expect \
+        openssl \
+        protobuf-c-devel \
+        python3 \
+        python3-cryptography \
+        python3-pip \
+        python3-protobuf \
+        findutils \
+        which \
+    && /usr/bin/python3 -B -m pip install click jinja2 protobuf \
+                                          'tomli>=1.1.0' 'tomli-w>=0.4.0' \
+    && microdnf repolist \
+# Install pyelftools after the installation of epel-release as it is provided by the EPEL repo
+    && microdnf install -y python3-pyelftools \
+    && microdnf -y clean all
+
+{% if buildtype != "release" %}
+RUN microdnf install -y \
+        gdb \
+        less \
+        libunwind \
+        python3-pytest \
+        strace
+{% endif %}
+{% endblock %}
