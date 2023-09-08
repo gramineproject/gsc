@@ -1,1 +1,24 @@
-{% extends "centos/Dockerfile.sign.template" %}
+{% extends "Dockerfile.common.sign.template" %}
+
+{% block uninstall %}
+RUN \
+       pip3 uninstall -y click jinja2 protobuf \
+          tomli tomli-w \
+       && microdnf remove -y binutils \
+          epel-release \
+          expect \
+          findutils \
+          openssl \
+          pkgconfig \
+          protobuf-c-devel \
+          python3 \
+          python3-cryptography \
+          python3-pip \
+          python3-protobuf \
+          python3-pyelftools \
+          which \
+          wget \
+       && microdnf -y clean all;
+{% endblock %}
+
+{% block path %}export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib64 -type d -path '*/site-packages')" &&{% endblock %}
