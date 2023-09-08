@@ -7,7 +7,6 @@ RUN \
        && microdnf remove -y binutils \
           epel-release \
           expect \
-          findutils \
           openssl \
           pkgconfig \
           protobuf-c-devel \
