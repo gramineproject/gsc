@@ -3,7 +3,7 @@
 {% block install %}
 # Combine all installation and removal steps in a single RUN command to reduce the final image size.
 # This is because each Dockerfile command creates a new layer which necessarily adds size to the
-# final image. This trick allow to decrease the image size by hundreds of MBs.
+# final image. This trick allows to decrease the image size by hundreds of MBs.
 COPY RPM-GPG-KEY-CentOS-Official /
 
 RUN rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm

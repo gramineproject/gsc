@@ -8,15 +8,10 @@ RUN \
           epel-release \
           expect \
           openssl \
-          pkgconfig \
-          protobuf-c-devel \
-          python3 \
           python3-cryptography \
           python3-pip \
           python3-protobuf \
           python3-pyelftools \
-          which \
-          wget \
        && microdnf -y clean all;
 {% endblock %}
 
