@@ -2,7 +2,7 @@
 
 {% block uninstall %}
 RUN \
-       pip3 uninstall -y click jinja2 protobuf \
+       pip3 uninstall -y click jinja2 \
           tomli tomli-w \
        && microdnf remove -y binutils \
           epel-release \

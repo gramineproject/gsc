@@ -18,7 +18,6 @@ RUN dnf update -y \
         bison \
         curl \
         elfutils-libelf-devel \
-        epel-release \
         flex \
         gawk \
         gcc-c++ \
