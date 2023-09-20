@@ -284,6 +284,9 @@ def gsc_build(args):
     shutil.copyfile('keys/RPM-GPG-KEY-CentOS-Official',
                     tmp_build_path / 'RPM-GPG-KEY-CentOS-Official')
 
+    # CentOS Linux repositories configuration for BaseOS, AppStream, and PowerTools
+    shutil.copyfile('repos-config/centos8.repo', tmp_build_path / 'centos8.repo')
+
     build_docker_image(docker_socket.api, tmp_build_path, unsigned_image_name, 'Dockerfile.build',
                        rm=args.rm, nocache=args.no_cache, buildargs=extract_build_args(args))
 
@@ -346,6 +349,9 @@ def gsc_build_gramine(args):
     # Available at https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official
     shutil.copyfile('keys/RPM-GPG-KEY-CentOS-Official',
                     tmp_build_path / 'RPM-GPG-KEY-CentOS-Official')
+
+    # CentOS Linux repositories configuration for BaseOS, AppStream, and PowerTools
+    shutil.copyfile('repos-config/centos8.repo', tmp_build_path / 'centos8.repo')
 
     build_docker_image(docker_socket.api, tmp_build_path, gramine_image_name, 'Dockerfile.compile',
                        rm=args.rm, nocache=args.no_cache, buildargs=extract_build_args(args))

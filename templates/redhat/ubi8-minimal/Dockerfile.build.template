@@ -1,29 +1,15 @@
 {% extends "Dockerfile.common.build.template" %}
 
 {% block install %}
+COPY RPM-GPG-KEY-CentOS-Official /
+COPY centos8.repo /etc/yum.repos.d/
+
 # Combine all installation and removal steps in a single RUN command to reduce the final image size.
 # This is because each Dockerfile command creates a new layer which necessarily adds size to the
 # final image. This trick allows to decrease the image size by hundreds of MBs.
-COPY RPM-GPG-KEY-CentOS-Official /
-
-RUN rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
-
-RUN echo -e "[CentOSBaseOS] \n\
-name=CentOSBaseOS \n\
-baseurl=http://vault.centos.org/centos/8/BaseOS/x86_64/os \n\
-enabled=1 \n\
-gpgcheck=1 \n\
-gpgkey=file:///RPM-GPG-KEY-CentOS-Official" >> /etc/yum.repos.d/ubi.repo
-
-RUN echo -e "[CentOSAppStream] \n\
-name=CentOSAppStream \n\
-baseurl=http://vault.centos.org/centos/8/AppStream/x86_64/os \n\
-enabled=1 \n\
-gpgcheck=1 \n\
-gpgkey=file:///RPM-GPG-KEY-CentOS-Official" >> /etc/yum.repos.d/ubi.repo
-
-RUN microdnf update -y \
-    &&  microdnf install -y \
+RUN rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
+    && microdnf update -y \
+    && microdnf install -y \
         binutils \
         expect \
         findutils \
