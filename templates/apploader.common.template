@@ -11,10 +11,10 @@ set -e
 # Default to Linux-SGX if no PAL was specified
 if [ -z "$GSC_PAL" ] || [ "$GSC_PAL" == "Linux-SGX" ]
 then
-    gramine-sgx /gramine/app_files/entrypoint \
+    exec gramine-sgx /gramine/app_files/entrypoint \
         {% if insecure_args %}{{ binary_arguments | map('shlex_quote') | join(' ') }} \
         "${@}"{% endif %}
 else
-    gramine-direct /gramine/app_files/entrypoint \
+    exec gramine-direct /gramine/app_files/entrypoint \
     {{ binary_arguments | map('shlex_quote') | join(' ') }} "${@}"
 fi
