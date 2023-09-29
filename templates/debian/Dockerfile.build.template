@@ -8,7 +8,6 @@
 RUN apt-get update \
     && env DEBIAN_FRONTEND=noninteractive apt-get install -y \
         binutils \
-        expect \
         libprotobuf-c-dev \
         locales \
         openssl \
