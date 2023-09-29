@@ -6,7 +6,6 @@ RUN \
           tomli tomli-w \
        && dnf remove -y binutils \
           epel-release \
-          expect \
           openssl \
           python3-protobuf \
           python3-pyelftools \

@@ -381,12 +381,9 @@ def gsc_sign_image(args):
     with open(tmp_build_path / 'Dockerfile.sign', 'w') as dockerfile:
         dockerfile.write(sign_template.render(image=unsigned_image_name))
 
-    # copy user-provided signing key and signing Bash script to our tmp build dir (to copy them
-    # later inside Docker image)
+    # copy user-provided signing key to our tmp build dir (to copy it later inside Docker image)
     tmp_build_key_path = tmp_build_path / 'gsc-signer-key.pem'
-    tmp_build_sign_path = tmp_build_path / 'sign.sh'
     shutil.copyfile(os.path.abspath(args.key), tmp_build_key_path)
-    shutil.copy(os.path.abspath('sign.sh'), tmp_build_sign_path)
 
     try:
         # `forcerm` parameter forces removal of intermediate Docker images even after unsuccessful

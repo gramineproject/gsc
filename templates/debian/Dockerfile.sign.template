@@ -4,7 +4,6 @@
 {% set distro = Distro.split(':') %}
 RUN \
         apt-get remove -y binutils \
-        expect \
         openssl \
         python3-protobuf \
         python3-cryptography \
