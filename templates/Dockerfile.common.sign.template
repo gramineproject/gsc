@@ -3,13 +3,12 @@ FROM {{image}} as unsigned_image
 COPY gsc-signer-key.pem /gramine/app_files/gsc-signer-key.pem
 
 ARG passphrase
-COPY sign.sh /gramine/app_files/sign.sh
 
-RUN {% block path %}{% endblock %} /gramine/app_files/sign.sh \
-      /gramine/app_files/gsc-signer-key.pem \
-      /gramine/app_files/entrypoint.manifest \
-      /gramine/app_files/entrypoint.manifest.sgx \
-      $passphrase
+RUN {% block path %}{% endblock %} gramine-sgx-sign \
+      --key /gramine/app_files/gsc-signer-key.pem \
+      --manifest /gramine/app_files/entrypoint.manifest \
+      --output /gramine/app_files/entrypoint.manifest.sgx \
+      ${passphrase:+--passphrase "$passphrase"}
 
 # This trick removes all temporary files from the previous commands (including gsc-signer-key.pem
 # and passphrase)

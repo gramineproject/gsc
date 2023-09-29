@@ -12,7 +12,6 @@ RUN dnf update -y \
     &&  dnf install -y \
         binutils \
         epel-release \
-        expect \
         openssl \
         protobuf-c-devel \
         python3 \

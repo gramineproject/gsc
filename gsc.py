@@ -391,12 +391,9 @@ def gsc_sign_image(args):
     with open(tmp_build_path / 'Dockerfile.sign', 'w') as dockerfile:
         dockerfile.write(sign_template.render(image=unsigned_image_name))
 
-    # copy user-provided signing key and signing Bash script to our tmp build dir (to copy them
-    # later inside Docker image)
+    # copy user-provided signing key to our tmp build dir (to copy it later inside Docker image)
     tmp_build_key_path = tmp_build_path / 'gsc-signer-key.pem'
-    tmp_build_sign_path = tmp_build_path / 'sign.sh'
     shutil.copyfile(os.path.abspath(args.key), tmp_build_key_path)
-    shutil.copy(os.path.abspath('sign.sh'), tmp_build_sign_path)
 
     try:
         # `forcerm` parameter forces removal of intermediate Docker images even after unsuccessful
@@ -544,7 +541,7 @@ sub_sign.add_argument('-c', '--config_file', type=argparse.FileType('r', encodin
     default='config.yaml', help='Specify configuration file.')
 sub_sign.add_argument('image', help='Name of the application (base) Docker image.')
 sub_sign.add_argument('key', help='Key to sign the Intel SGX enclaves inside the Docker image.')
-sub_sign.add_argument('-p', '--passphrase', help='Passphrase for the signing key.')
+sub_sign.add_argument('-p', '--passphrase', "--password", help='Passphrase for the signing key.')
 sub_sign.add_argument('-D','--define', action='append', default=[],
     help='Set image sign-time variables.')
 sub_sign.add_argument('--remove-gramine-deps', action='append_const', dest='define',
