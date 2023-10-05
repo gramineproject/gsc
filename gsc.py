@@ -494,11 +494,6 @@ sub_build.set_defaults(command=gsc_build)
 sub_build.add_argument('-b', '--buildtype', choices=['release', 'debug', 'debugoptimized'],
     default='release', help='Compile Gramine in release, debug or debugoptimized mode.')
 
-# TODO: Drop `-d` option with GSC v1.6 release
-sub_build.add_argument('-d', '--debug', action='store_const', dest='buildtype',
-    const='debug', help='Compile Gramine with debug flags and output (deprecated).')
-sub_build.add_argument('-L', '--linux', action='store_true',
-    help='Compile Gramine with Linux PAL in addition to Linux-SGX PAL.')
 sub_build.add_argument('--insecure-args', action='store_true',
     help='Allow to specify untrusted arguments during Docker run. '
          'Otherwise arguments are ignored.')
@@ -519,11 +514,6 @@ sub_build_gramine.set_defaults(command=gsc_build_gramine)
 sub_build_gramine.add_argument('-b', '--buildtype', choices=['release', 'debug', 'debugoptimized'],
     default='release', help='Compile Gramine in release, debug or debugoptimized mode.')
 
-# TODO: Drop `-d` option with GSC v1.6 release
-sub_build_gramine.add_argument('-d', '--debug', action='store_const', dest='buildtype',
-    const='debug', help='Compile Gramine with debug flags and output (deprecated).')
-sub_build_gramine.add_argument('-L', '--linux', action='store_true',
-    help='Compile Gramine with Linux PAL in addition to Linux-SGX PAL.')
 sub_build_gramine.add_argument('-nc', '--no-cache', action='store_true',
     help='Build graminized Docker image without any cached images.')
 sub_build_gramine.add_argument('--rm', action='store_true',
