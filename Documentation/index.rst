@@ -101,16 +101,6 @@ Gramine image.
    Use <buildtype> value ``release``, ``debug`` or ``debugoptimized`` to
    compile Gramine in the corresponding mode. Default: ``release``.
 
-..
-  TODO: Drop `-d` option with GSC v1.6 release
-
-.. option:: -d, --debug
-
-   Compile Gramine with debug flags and debug output.
-
-   .. deprecated:: 1.5
-      Use :option:`--buildtype`.
-
 .. option:: --insecure-args
 
    Allow untrusted arguments to be specified at :command:`docker run`. Otherwise
@@ -196,16 +186,6 @@ parameter `Gramine.Image`.
 
    Use <buildtype> value ``release``, ``debug`` or ``debugoptimized`` to
    compile Gramine in the corresponding mode. Default: ``release``.
-
-..
-  TODO: Drop `-d` option with GSC v1.6 release
-
-.. option:: -d, --debug
-
-   Compile Gramine with debug flags and debug output.
-
-   .. deprecated:: 1.5
-      Use :option:`--buildtype`.
 
 .. option:: --no-cache
 
