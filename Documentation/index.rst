@@ -111,11 +111,6 @@ Gramine image.
    .. deprecated:: 1.5
       Use :option:`--buildtype`.
 
-.. option:: -L
-
-   Compile Gramine with Linux PAL in addition to Linux-SGX PAL. If configured
-   to use a prebuilt Gramine image, the image has to support this option.
-
 .. option:: --insecure-args
 
    Allow untrusted arguments to be specified at :command:`docker run`. Otherwise
@@ -211,12 +206,6 @@ parameter `Gramine.Image`.
 
    .. deprecated:: 1.5
       Use :option:`--buildtype`.
-
-.. option:: -L
-
-   Compile Gramine with Linux PAL in addition to Linux-SGX PAL. Allows
-   :command:`gsc build` commands to include the Linux PAL using :option:`-L
-   <gsc-build -L>`.
 
 .. option:: --no-cache
 
@@ -416,8 +405,7 @@ executable arguments may be supplied to the :command:`docker run` command.
 Execute with Linux PAL instead of Linux-SGX PAL
 -----------------------------------------------
 
-When specifying :option:`-L <gsc-build -L>`  during GSC :command:`gsc build`,
-you may select the Linux PAL at Docker run time instead of the Linux-SGX PAL by
+You may select the Linux PAL at Docker run time instead of the Linux-SGX PAL by
 specifying the environment variable :envvar:`GSC_PAL` as an option to the
 :command:`docker run` command. When using the Linux PAL, it is not necessary to
 sign the image via a :command:`gsc sign-image` command.
