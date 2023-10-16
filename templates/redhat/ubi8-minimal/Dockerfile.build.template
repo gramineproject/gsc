@@ -1,14 +1,18 @@
 {% extends "Dockerfile.common.build.template" %}
 
 {% block install %}
-COPY RPM-GPG-KEY-CentOS-Official /
-COPY centos8.repo /etc/yum.repos.d/
+COPY redhat.repo /etc/yum.repos.d/
+COPY pki/entitlement/ /etc/pki/entitlement/
+COPY redhat-uep.pem /etc/rhsm/ca/
 
 # Combine all installation and removal steps in a single RUN command to reduce the final image size.
 # This is because each Dockerfile command creates a new layer which necessarily adds size to the
 # final image. This trick allows to decrease the image size by hundreds of MBs.
-RUN rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
+RUN rm -rf /etc/rhsm-host \
+    && rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
     && microdnf update -y \
+    && microdnf install -y subscription-manager \
+    && subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms \
     && microdnf install -y \
         binutils \
         expect \

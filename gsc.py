@@ -20,6 +20,7 @@ import shlex
 import tomli   # pylint: disable=import-error
 import tomli_w # pylint: disable=import-error
 import yaml    # pylint: disable=import-error
+import re
 
 def test_trueish(value):
     if not value:
@@ -176,6 +177,40 @@ def merge_two_dicts(dict1, dict2, path=[]):
             dict1[key] = dict2[key]
     return dict1
 
+def handle_redhat_repo_configs(distro, tmp_build_path):
+    if distro in {"redhat/ubi8", "redhat/ubi8-minimal"}:
+        repo_name = "rhel-8-for-x86_64-baseos-rpms"
+        with open('/etc/yum.repos.d/redhat.repo') as redhat_repo:
+                redhat_repo_contents = redhat_repo.read()
+
+                if not re.search(repo_name, redhat_repo_contents):
+                    print(f'Register and subscribe your RHEL system to the Red Hat Customer '
+                          f'Portal using Red Hat Subscription-Manager.')
+                    sys.exit(0)
+
+                # Copy the Red Hat repository configuration file to the temporary build location
+                shutil.copyfile('/etc/yum.repos.d/redhat.repo', tmp_build_path / 'redhat.repo')
+                pattern_sslclientkey = re.compile(r'sslclientkey\s*=\s*(.*)')
+                pattern_sslcacert = re.compile(r'sslcacert\s*=\s*(.*)')
+
+                # Search for and extract the SSL client key path from the repository configuration
+                match_sslclientkey = pattern_sslclientkey.search(redhat_repo_contents)
+                sslclientkey_path = match_sslclientkey.group(1)
+                sslclientkey_dir = os.path.dirname(sslclientkey_path)
+
+                # Search for and extract the SSL CA certificate path from the repository configuration
+                match_sslcacert = pattern_sslcacert.search(redhat_repo_contents)
+                sslcacert_path = match_sslcacert.group(1)
+
+                # Copy the SSL CA certificate to the temporary build location
+                shutil.copyfile(sslcacert_path, tmp_build_path / 'redhat-uep.pem')
+
+                if os.path.exists(tmp_build_path / 'pki'):
+                    shutil.rmtree(tmp_build_path / 'pki')
+
+                # Copy the SSL client key directory to the temporary build location
+                shutil.copytree(sslclientkey_dir, tmp_build_path / 'pki/entitlement')
+
 # Command 1: Build unsigned graminized Docker image from original app Docker image.
 def gsc_build(args):
     original_image_name = args.image                           # input original-app image name
@@ -279,13 +314,7 @@ def gsc_build(args):
     # Available at https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key
     shutil.copyfile('keys/intel-sgx-deb.key', tmp_build_path / 'intel-sgx-deb.key')
 
-    # Official CentOS GPG public key used to authenticate and validate CentOS software packages.
-    # Available at https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official
-    shutil.copyfile('keys/RPM-GPG-KEY-CentOS-Official',
-                    tmp_build_path / 'RPM-GPG-KEY-CentOS-Official')
-
-    # CentOS Linux repositories configuration for BaseOS, AppStream, and PowerTools
-    shutil.copyfile('repos-config/centos8.repo', tmp_build_path / 'centos8.repo')
+    handle_redhat_repo_configs(distro, tmp_build_path)
 
     build_docker_image(docker_socket.api, tmp_build_path, unsigned_image_name, 'Dockerfile.build',
                        rm=args.rm, nocache=args.no_cache, buildargs=extract_build_args(args))
@@ -345,13 +374,7 @@ def gsc_build_gramine(args):
     # Available at https://download.01.org/intel-sgx/sgx_repo/ubuntu/intel-sgx-deb.key
     shutil.copyfile('keys/intel-sgx-deb.key', tmp_build_path / 'intel-sgx-deb.key')
 
-    # Official CentOS GPG public key used to authenticate and validate CentOS software packages.
-    # Available at https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official
-    shutil.copyfile('keys/RPM-GPG-KEY-CentOS-Official',
-                    tmp_build_path / 'RPM-GPG-KEY-CentOS-Official')
-
-    # CentOS Linux repositories configuration for BaseOS, AppStream, and PowerTools
-    shutil.copyfile('repos-config/centos8.repo', tmp_build_path / 'centos8.repo')
+    handle_redhat_repo_configs(distro, tmp_build_path)
 
     build_docker_image(docker_socket.api, tmp_build_path, gramine_image_name, 'Dockerfile.compile',
                        rm=args.rm, nocache=args.no_cache, buildargs=extract_build_args(args))

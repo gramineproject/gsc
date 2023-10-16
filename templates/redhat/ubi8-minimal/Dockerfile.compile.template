@@ -1,12 +1,16 @@
 {% extends "Dockerfile.common.compile.template" %}
 
 {% block install %}
-COPY RPM-GPG-KEY-CentOS-Official /
-COPY centos8.repo /etc/yum.repos.d/
+COPY redhat.repo /etc/yum.repos.d/
+COPY pki/entitlement/ /etc/pki/entitlement/
+COPY redhat-uep.pem /etc/rhsm/ca/
 
 # NOTE: meson v1.2.* has a bug that leads to Gramine build failure because of not found `libcurl.a`
-RUN rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
+RUN rm -rf /etc/rhsm-host \
+    && rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
     && microdnf update -y \
+    && microdnf install -y subscription-manager \
+    && subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms \
     && microdnf install -y \
         autoconf \
         bison \
