@@ -190,17 +190,28 @@ def handle_redhat_repo_configs(distro, tmp_build_path):
 
                 # Copy the Red Hat repository configuration file to the temporary build location
                 shutil.copyfile('/etc/yum.repos.d/redhat.repo', tmp_build_path / 'redhat.repo')
-                pattern_sslclientkey = re.compile(r'sslclientkey\s*=\s*(.*)')
-                pattern_sslcacert = re.compile(r'sslcacert\s*=\s*(.*)')
+                pattern_sslclientkey = re.compile(r'(?<!#)sslclientkey\s*=\s*(.*)')
+                pattern_sslcacert = re.compile(r'(?<!#)sslcacert\s*=\s*(.*)')
 
                 # Search for and extract the SSL client key path from the repository configuration
                 match_sslclientkey = pattern_sslclientkey.search(redhat_repo_contents)
-                sslclientkey_path = match_sslclientkey.group(1)
-                sslclientkey_dir = os.path.dirname(sslclientkey_path)
+                if match_sslclientkey:
+                    sslclientkey_path = match_sslclientkey.group(1)
+                    sslclientkey_dir = os.path.dirname(sslclientkey_path)
+                else:
+                    print(f'Register and subscribe your RHEL system to the Red Hat Customer '
+                          f'Portal using Red Hat Subscription-Manager.')
+                    sys.exit(0)
 
-                # Search for and extract the SSL CA certificate path from the repository configuration
+                # Search for and extract the SSL CA certificate path from the repository
+                # configuration
                 match_sslcacert = pattern_sslcacert.search(redhat_repo_contents)
-                sslcacert_path = match_sslcacert.group(1)
+                if match_sslcacert:
+                    sslcacert_path = match_sslcacert.group(1)
+                else:
+                    print(f'Register and subscribe your RHEL system to the Red Hat Customer '
+                          f'Portal using Red Hat Subscription-Manager.')
+                    sys.exit(0)
 
                 # Copy the SSL CA certificate to the temporary build location
                 shutil.copyfile(sslcacert_path, tmp_build_path / 'redhat-uep.pem')
