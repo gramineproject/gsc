@@ -541,7 +541,7 @@ sub_sign.add_argument('-c', '--config_file', type=argparse.FileType('r', encodin
     default='config.yaml', help='Specify configuration file.')
 sub_sign.add_argument('image', help='Name of the application (base) Docker image.')
 sub_sign.add_argument('key', help='Key to sign the Intel SGX enclaves inside the Docker image.')
-sub_sign.add_argument('-p', '--passphrase', help='Passphrase for the signing key.')
+sub_sign.add_argument('-p', '--passphrase', "--password", help='Passphrase for the signing key.')
 sub_sign.add_argument('-D','--define', action='append', default=[],
     help='Set image sign-time variables.')
 sub_sign.add_argument('--remove-gramine-deps', action='append_const', dest='define',
