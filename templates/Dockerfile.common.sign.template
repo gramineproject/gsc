@@ -1,5 +1,8 @@
 # Sign image in a separate stage to ensure that signing key is never part of the final image
 FROM {{image}} as unsigned_image
+ARG BUILD_ID
+LABEL build_id=$BUILD_ID
+
 COPY gsc-signer-key.pem /gramine/app_files/gsc-signer-key.pem
 
 ARG passphrase
