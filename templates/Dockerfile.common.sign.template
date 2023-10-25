@@ -1,5 +1,11 @@
 # Sign image in a separate stage to ensure that signing key is never part of the final image
 FROM {{image}} as unsigned_image
+
+# BUILD_ID is a random UUID provided by `gsc sign-image` command, to be able to remove
+# the temporary intermediate-stage image later in `gsc sign-image`, to free disk space
+ARG BUILD_ID
+LABEL build_id=$BUILD_ID
+
 COPY gsc-signer-key.pem /gramine/app_files/gsc-signer-key.pem
 
 ARG passphrase
