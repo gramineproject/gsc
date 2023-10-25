@@ -13,6 +13,7 @@ import shutil
 import struct
 import sys
 import tempfile
+import uuid
 
 import docker  # pylint: disable=import-error
 import jinja2
@@ -388,13 +389,16 @@ def gsc_sign_image(args):
     shutil.copyfile(os.path.abspath(args.key), tmp_build_key_path)
     shutil.copy(os.path.abspath('sign.sh'), tmp_build_sign_path)
 
+    build_id = uuid.uuid4().hex
     try:
         # `forcerm` parameter forces removal of intermediate Docker images even after unsuccessful
         # builds, to not leave the signing key lingering in any Docker containers
         build_docker_image(docker_socket.api, tmp_build_path, signed_image_name, 'Dockerfile.sign',
-                           forcerm=True, buildargs={"passphrase": args.passphrase})
+                           forcerm=True, buildargs={"passphrase": args.passphrase,
+                           "BUILD_ID": build_id})
     finally:
         os.remove(tmp_build_key_path)
+        docker_socket.api.prune_images(filters={"label": "build_id="+build_id})
 
     if get_docker_image(docker_socket, signed_image_name) is None:
         print(f'Failed to build a signed graminized Docker image `{signed_image_name}`.')
