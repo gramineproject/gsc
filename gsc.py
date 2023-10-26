@@ -248,7 +248,7 @@ def gsc_build(args):
 
     user_manifest_contents = ''
     if not os.path.exists(args.manifest):
-        print(f'Manifest file {args.manifest} does not exist')
+        print(f'Manifest file {args.manifest} does not exist.')
         sys.exit(1)
     with open(args.manifest, 'r') as user_manifest_file:
         user_manifest_contents = user_manifest_file.read()
