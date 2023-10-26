@@ -342,12 +342,14 @@ in :file:`config.yaml.template`.
    Defines Linux distribution to be used to build Gramine in. This distro should
    match the distro underlying the application's Docker image; otherwise the
    results may be unpredictable. Currently supported distros are Ubuntu 20.04,
-   Ubuntu 21.04, Debian 10, Debian 11, CentOS 8, Red Hat Universal Base Image (UBI)
-   8 and Red Hat Universal Base Image (UBI) 8 minimal. Default value is ``ubuntu:20.04``.
+   Ubuntu 21.04, Debian 10, Debian 11, CentOS 8, Red Hat Universal Base Image
+   (UBI) 8 and Red Hat Universal Base Image (UBI) 8 minimal. Default value is
+   ``ubuntu:20.04``.
 
    .. warning::
-      Please register and subscribe your host RHEL system to the Red Hat Customer Portal to use
-      Red Hat Universal Base Image (UBI) 8 and UBI8-minimal distros.
+      Please register and subscribe your host RHEL system to the Red Hat
+      Customer Portal to use Red Hat Universal Base Image (UBI) 8 and
+      UBI8-minimal distros.
 
 .. describe:: Registry
 
