@@ -240,7 +240,8 @@ def gsc_build(args):
     try:
         entrypoint_manifest_dict = tomli.loads(entrypoint_manifest_render)
     except Exception as e:
-        print(f'Failed to parse the "{distro}/entrypoint.manifest.template" file. Error:', e, file=sys.stderr)
+        print(f'Failed to parse the "{distro}/entrypoint.manifest.template" file. Error:', e,
+              file=sys.stderr)
         sys.exit(1)
 
     base_image_environment = extract_environment_from_image_config(original_image.attrs['Config'])
