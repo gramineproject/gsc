@@ -237,18 +237,31 @@ def gsc_build(args):
     #   - base Docker image's environment variables
     #   - additional, user-provided manifest options
     entrypoint_manifest_render = env.get_template(f'{distro}/entrypoint.manifest.template').render()
-    entrypoint_manifest_dict = tomli.loads(entrypoint_manifest_render)
+    try:
+        entrypoint_manifest_dict = tomli.loads(entrypoint_manifest_render)
+    except Exception as e:
+        print(f'Failed to parse the \"{distro}/entrypoint.manifest.template\" file. Error:', e)
+        sys.exit(1)
 
     base_image_environment = extract_environment_from_image_config(original_image.attrs['Config'])
-    base_image_dict = tomli.loads(base_image_environment)
+    try:
+        base_image_dict = tomli.loads(base_image_environment)
+    except Exception as e:
+        print(f'Failed to parse the image \"{original_image_name}\" environments. Error:', e)
+        sys.exit(1)
 
     user_manifest_contents = ''
     if not os.path.exists(args.manifest):
-        raise FileNotFoundError(f'Manifest file {args.manifest} does not exist')
+        print(f'Manifest file {args.manifest} does not exist')
+        sys.exit(1)
     with open(args.manifest, 'r') as user_manifest_file:
         user_manifest_contents = user_manifest_file.read()
 
-    user_manifest_dict = tomli.loads(user_manifest_contents)
+        try:
+            user_manifest_dict = tomli.loads(user_manifest_contents)
+        except Exception as e:
+            print(f'Failed to parse the \"{args.manifest}\" file. Error:', e)
+            sys.exit(1)
 
     # Support deprecated syntax: replace old-style TOML-dict (`sgx.trusted_files.key = "file:foo"`)
     # with new-style TOML-array (`sgx.trusted_files = ["file:foo"]`) in the user manifest
