@@ -240,7 +240,7 @@ def gsc_build(args):
     try:
         entrypoint_manifest_dict = tomli.loads(entrypoint_manifest_render)
     except Exception as e:
-        print(f'Failed to parse the "{distro}/entrypoint.manifest.template" file. Error:', e)
+        print(f'Failed to parse the "{distro}/entrypoint.manifest.template" file. Error:', e, file=sys.stderr)
         sys.exit(1)
 
     base_image_environment = extract_environment_from_image_config(original_image.attrs['Config'])
@@ -248,7 +248,7 @@ def gsc_build(args):
 
     user_manifest_contents = ''
     if not os.path.exists(args.manifest):
-        print(f'Manifest file {args.manifest} does not exist.')
+        print(f'Manifest file "{args.manifest}" does not exist.', file=sys.stderr)
         sys.exit(1)
     with open(args.manifest, 'r') as user_manifest_file:
         user_manifest_contents = user_manifest_file.read()
@@ -256,7 +256,7 @@ def gsc_build(args):
         try:
             user_manifest_dict = tomli.loads(user_manifest_contents)
         except Exception as e:
-            print(f'Failed to parse the "{args.manifest}" file. Error:', e)
+            print(f'Failed to parse the "{args.manifest}" file. Error:', e, file=sys.stderr)
             sys.exit(1)
 
     # Support deprecated syntax: replace old-style TOML-dict (`sgx.trusted_files.key = "file:foo"`)
