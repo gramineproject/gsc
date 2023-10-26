@@ -394,11 +394,11 @@ def gsc_sign_image(args):
         # `forcerm` parameter forces removal of intermediate Docker images even after unsuccessful
         # builds, to not leave the signing key lingering in any Docker containers
         build_docker_image(docker_socket.api, tmp_build_path, signed_image_name, 'Dockerfile.sign',
-                           forcerm=True, buildargs={"passphrase": args.passphrase,
-                           "BUILD_ID": build_id})
+                           forcerm=True, buildargs={'passphrase': args.passphrase,
+                           'BUILD_ID': build_id})
     finally:
         os.remove(tmp_build_key_path)
-        docker_socket.api.prune_images(filters={"label": "build_id="+build_id})
+        docker_socket.api.prune_images(filters={'label': 'build_id=' + build_id})
 
     if get_docker_image(docker_socket, signed_image_name) is None:
         print(f'Failed to build a signed graminized Docker image `{signed_image_name}`.')
