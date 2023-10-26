@@ -9,6 +9,7 @@ import json
 import hashlib
 import os
 import pathlib
+import re
 import shutil
 import struct
 import sys
@@ -20,7 +21,6 @@ import shlex
 import tomli   # pylint: disable=import-error
 import tomli_w # pylint: disable=import-error
 import yaml    # pylint: disable=import-error
-import re
 
 def test_trueish(value):
     if not value:
@@ -178,49 +178,53 @@ def merge_two_dicts(dict1, dict2, path=[]):
     return dict1
 
 def handle_redhat_repo_configs(distro, tmp_build_path):
-    if distro in {"redhat/ubi8", "redhat/ubi8-minimal"}:
-        repo_name = "rhel-8-for-x86_64-baseos-rpms"
-        with open('/etc/yum.repos.d/redhat.repo') as redhat_repo:
-                redhat_repo_contents = redhat_repo.read()
+    if distro not in {"redhat/ubi8", "redhat/ubi8-minimal"}:
+        return
 
-                if not re.search(repo_name, redhat_repo_contents):
-                    print(f'Register and subscribe your RHEL system to the Red Hat Customer '
-                          f'Portal using Red Hat Subscription-Manager.')
-                    sys.exit(0)
+    repo_name = "rhel-8-for-x86_64-baseos-rpms"
+    with open('/etc/yum.repos.d/redhat.repo') as redhat_repo:
+        redhat_repo_contents = redhat_repo.read()
 
-                # Copy the Red Hat repository configuration file to the temporary build location
-                shutil.copyfile('/etc/yum.repos.d/redhat.repo', tmp_build_path / 'redhat.repo')
-                pattern_sslclientkey = re.compile(r'(?<!#)sslclientkey\s*=\s*(.*)')
-                pattern_sslcacert = re.compile(r'(?<!#)sslcacert\s*=\s*(.*)')
+        if not re.search(repo_name, redhat_repo_contents):
+            print(f'Cannot find {repo_name} in /etc/yum.repos.d/redhat.repo. '
+                  f'Register and subscribe your RHEL system to the Red Hat Customer '
+                  f'Portal using Red Hat Subscription-Manager.')
+            sys.exit(1)
 
-                # Search for and extract the SSL client key path from the repository configuration
-                match_sslclientkey = pattern_sslclientkey.search(redhat_repo_contents)
-                if match_sslclientkey:
-                    sslclientkey_path = match_sslclientkey.group(1)
-                    sslclientkey_dir = os.path.dirname(sslclientkey_path)
-                else:
-                    print(f'Register and subscribe your RHEL system to the Red Hat Customer '
-                          f'Portal using Red Hat Subscription-Manager.')
-                    sys.exit(0)
+        shutil.copyfile('/etc/yum.repos.d/redhat.repo', tmp_build_path / 'redhat.repo')
+        pattern_sslclientkey = re.compile(r'(?<!#)sslclientkey\s*=\s*(.*)')
+        pattern_sslcacert = re.compile(r'(?<!#)sslcacert\s*=\s*(.*)')
 
-                # Search for and extract the SSL CA certificate path from the repository
-                # configuration
-                match_sslcacert = pattern_sslcacert.search(redhat_repo_contents)
-                if match_sslcacert:
-                    sslcacert_path = match_sslcacert.group(1)
-                else:
-                    print(f'Register and subscribe your RHEL system to the Red Hat Customer '
-                          f'Portal using Red Hat Subscription-Manager.')
-                    sys.exit(0)
+        match_sslclientkey = pattern_sslclientkey.search(redhat_repo_contents)
+        if match_sslclientkey:
+            sslclientkey_path = match_sslclientkey.group(1)
+            sslclientkey_dir = os.path.dirname(sslclientkey_path)
+        else:
+            print(f'Cannot find SSL client key path in /etc/yum.repos.d/redhat.repo. '
+                  f'Register and subscribe your RHEL system to the Red Hat Customer '
+                  f'Portal using Red Hat Subscription-Manager.')
+            sys.exit(1)
 
-                # Copy the SSL CA certificate to the temporary build location
-                shutil.copyfile(sslcacert_path, tmp_build_path / 'redhat-uep.pem')
+        match_sslcacert = pattern_sslcacert.search(redhat_repo_contents)
+        if match_sslcacert:
+            sslcacert_path = match_sslcacert.group(1)
+        else:
+            print(f'Cannot find SSL CA certificate path in /etc/yum.repos.d/redhat.repo. '
+                  f'Register and subscribe your RHEL system to the Red Hat Customer '
+                  f'Portal using Red Hat Subscription-Manager.')
+            sys.exit(1)
 
-                if os.path.exists(tmp_build_path / 'pki'):
-                    shutil.rmtree(tmp_build_path / 'pki')
+        # The `redhat-uep.pem` file is used to validate the authenticity of Red Hat Update Engine
+        # Proxy (UEP) server during updates and subscription management on the system.
+        shutil.copyfile(sslcacert_path, tmp_build_path / 'redhat-uep.pem')
 
-                # Copy the SSL client key directory to the temporary build location
-                shutil.copytree(sslclientkey_dir, tmp_build_path / 'pki/entitlement')
+        if os.path.exists(tmp_build_path / 'pki'):
+            shutil.rmtree(tmp_build_path / 'pki')
+
+        # This directory stores the entitlement certificates for Red Hat subscriptions.
+        # These files are used to authenticate and verify that a system is entitled to receive
+        # software updates and support from Red Hat.
+        shutil.copytree(sslclientkey_dir, tmp_build_path / 'pki/entitlement')
 
 # Command 1: Build unsigned graminized Docker image from original app Docker image.
 def gsc_build(args):

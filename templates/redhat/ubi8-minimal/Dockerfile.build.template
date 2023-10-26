@@ -30,7 +30,8 @@ RUN rm -rf /etc/rhsm-host \
     && /usr/bin/python3 -B -m pip install click jinja2 \
                                           'tomli>=1.1.0' 'tomli-w>=0.4.0' \
     && microdnf repolist \
-    && microdnf -y clean all
+    && microdnf -y clean all \
+    && rm -rf /etc/yum.repos.d/redhat.repo /etc/pki/entitlement/* /etc/rhsm/ca/redhat-uep.pem
 
 {% if buildtype != "release" %}
 RUN microdnf install -y \
