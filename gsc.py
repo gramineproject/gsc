@@ -9,6 +9,7 @@ import json
 import hashlib
 import os
 import pathlib
+import re
 import shutil
 import struct
 import sys
@@ -176,6 +177,37 @@ def merge_two_dicts(dict1, dict2, path=[]):
             dict1[key] = dict2[key]
     return dict1
 
+def get_image_distro(docker_socket, image_name):
+    output = docker_socket.containers.run(image_name, entrypoint='cat /etc/os-release', remove=True)
+    output = output.decode('UTF-8')
+
+    pattern_id = re.compile('^ID=(.*)', flags=re.MULTILINE)
+    match = pattern_id.search(output)
+    if match is None:
+        raise ValueError(f'Error: Could not find distro ID')
+
+    distro_id = match.group(1)
+
+    pattern_version_id = re.compile('^VERSION_ID=\"(.*)\"', flags=re.MULTILINE)
+    match = pattern_version_id.search(output)
+    if match is None:
+        raise ValueError(f'Error: Could not find distro VERSION_ID')
+
+    distro_version_id = match.group(1)
+    return distro_id + ':' + distro_version_id
+
+def fetch_and_validate_distro_support(docker_socket, image_name, env):
+    distro = env.globals['Distro']
+    if distro == 'auto':
+        distro = get_image_distro(docker_socket, image_name)
+        env.globals['Distro'] = distro
+
+    distro, _ = distro.split(':')
+    if not os.path.exists(f'templates/{distro}'):
+        raise FileNotFoundError(f'{distro} distro is not supported by GSC.')
+
+    return distro
+
 # Command 1: Build unsigned graminized Docker image from original app Docker image.
 def gsc_build(args):
     original_image_name = args.image                           # input original-app image name
@@ -215,9 +247,12 @@ def gsc_build(args):
 
     os.makedirs(tmp_build_path, exist_ok=True)
 
-    distro = env.globals['Distro']
+    try:
+        distro = fetch_and_validate_distro_support(docker_socket, original_image_name, env)
+    except Exception as e:
+        print(e, file=sys.stderr)
+        sys.exit(1)
 
-    distro, _ = distro.split(':')
     env.globals.update({'compile_template': f'{distro}/Dockerfile.compile.template'})
     env.loader = jinja2.FileSystemLoader('templates/')
 
@@ -326,9 +361,12 @@ def gsc_build_gramine(args):
 
     os.makedirs(tmp_build_path, exist_ok=True)
 
-    distro = env.globals['Distro']
+    try:
+        distro = fetch_and_validate_distro_support(docker_socket, args.image, env)
+    except Exception as e:
+        print(e, file=sys.stderr)
+        sys.exit(1)
 
-    distro, _ = distro.split(':')
     env.loader = jinja2.FileSystemLoader('templates/')
 
     # generate Dockerfile.compile from Jinja-style templates/<distro>/Dockerfile.compile.template
@@ -381,9 +419,13 @@ def gsc_sign_image(args):
     extract_user_from_image_config(unsigned_image.attrs['Config'], env)
     env.globals['args'] = extract_define_args(args)
     env.tests['trueish'] = test_trueish
-    distro = env.globals['Distro']
 
-    distro, _ = distro.split(':')
+    try:
+        distro = fetch_and_validate_distro_support(docker_socket, args.image, env)
+    except Exception as e:
+        print(e, file=sys.stderr)
+        sys.exit(1)
+
     env.loader = jinja2.FileSystemLoader('templates/')
     sign_template = env.get_template(f'{distro}/Dockerfile.sign.template')
 
