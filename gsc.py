@@ -5,7 +5,6 @@
 #                         Dmitrii Kuvaiskii <dmitrii.kuvaiskii@intel.com>
 
 import argparse
-import json
 import hashlib
 import os
 import pathlib
@@ -22,6 +21,12 @@ import shlex
 import tomli   # pylint: disable=import-error
 import tomli_w # pylint: disable=import-error
 import yaml    # pylint: disable=import-error
+
+class DistroRetrievalError(Exception):
+    def __init__(self, *args):
+        super().__init__(('Could not automatically detect the OS distro of the supplied Docker '
+                         'image. Please specify OS distro manually in the configuration file.'),
+                         *args)
 
 def test_trueish(value):
     if not value:
@@ -227,6 +232,42 @@ def handle_redhat_repo_configs(distro, tmp_build_path):
         # software updates and support from Red Hat.
         shutil.copytree(sslclientkey_dir, tmp_build_path / 'pki/entitlement')
 
+def get_image_distro(docker_socket, image_name):
+    out = docker_socket.containers.run(image_name, entrypoint='cat /etc/os-release', remove=True)
+    out = out.decode('UTF-8')
+
+    os_release = dict(shlex.split(line)[0].split('=') for line in out.splitlines() if line.strip())
+
+    # Some OS distros (e.g. Alpine) have very precise versions (e.g. 3.17.3), and to support these
+    # OS distros, we need to truncate at the 2nd dot.
+    try:
+        version_id = '.'.join(os_release['VERSION_ID'].split(".", 2)[:2])
+        distro = os_release['ID'] + ':' + version_id
+    except KeyError:
+        raise DistroRetrievalError
+
+    # RedHat specific logic to distinguish between UBI8 and UBI8-minimal
+    if (os_release['ID'] == 'rhel'):
+        try:
+            docker_socket.containers.run(image_name, entrypoint='ls /usr/bin/microdnf', remove=True)
+            distro = 'redhat/ubi8-minimal:' + version_id
+        except docker.errors.ContainerError:
+            distro = 'redhat/ubi8:' + version_id
+
+    return distro
+
+def fetch_and_validate_distro_support(docker_socket, image_name, env):
+    distro = env.globals['Distro']
+    if distro == 'auto':
+        distro = get_image_distro(docker_socket, image_name)
+        env.globals['Distro'] = distro
+
+    distro = distro.split(':')[0]
+    if not os.path.exists(f'templates/{distro}'):
+        raise FileNotFoundError(f'`{distro}` distro is not supported by GSC.')
+
+    return distro
+
 # Command 1: Build unsigned graminized Docker image from original app Docker image.
 def gsc_build(args):
     original_image_name = args.image                           # input original-app image name
@@ -266,9 +307,12 @@ def gsc_build(args):
 
     os.makedirs(tmp_build_path, exist_ok=True)
 
-    distro = env.globals['Distro']
+    try:
+        distro = fetch_and_validate_distro_support(docker_socket, original_image_name, env)
+    except Exception as e:
+        print(e, file=sys.stderr)
+        sys.exit(1)
 
-    distro, _ = distro.split(':')
     env.globals.update({'compile_template': f'{distro}/Dockerfile.compile.template'})
     env.loader = jinja2.FileSystemLoader('templates/')
 
@@ -380,8 +424,16 @@ def gsc_build_gramine(args):
     os.makedirs(tmp_build_path, exist_ok=True)
 
     distro = env.globals['Distro']
+    if distro == 'auto':
+        print('`gsc build-gramine` does not allow `Distro` set to `auto` in the configuration '
+              'file.')
+        sys.exit(1)
 
     distro, _ = distro.split(':')
+    if not os.path.exists(f'templates/{distro}'):
+        print(f'{distro} distro is not supported by GSC.')
+        sys.exit(1)
+
     env.loader = jinja2.FileSystemLoader('templates/')
 
     # generate Dockerfile.compile from Jinja-style templates/<distro>/Dockerfile.compile.template
@@ -436,9 +488,13 @@ def gsc_sign_image(args):
     extract_user_from_image_config(unsigned_image.attrs['Config'], env)
     env.globals['args'] = extract_define_args(args)
     env.tests['trueish'] = test_trueish
-    distro = env.globals['Distro']
 
-    distro, _ = distro.split(':')
+    try:
+        distro = fetch_and_validate_distro_support(docker_socket, args.image, env)
+    except Exception as e:
+        print(e, file=sys.stderr)
+        sys.exit(1)
+
     env.loader = jinja2.FileSystemLoader('templates/')
     sign_template = env.get_template(f'{distro}/Dockerfile.sign.template')
 
