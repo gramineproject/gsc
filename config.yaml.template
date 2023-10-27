@@ -8,7 +8,10 @@
 # - centos:8
 # - redhat/ubi8:8.8
 # - redhat/ubi8-minimal:8.8
-Distro: "ubuntu:20.04"
+
+# GSC detects the distro automatically of the supplied image if ditro is set to `auto`.
+# User also have the option to provide one of the supported distros mentioned above.
+Distro: "auto"
 
 # If the image has a specific registry, define it here.
 # Empty by default; example value: "registry.access.redhat.com/ubi8".

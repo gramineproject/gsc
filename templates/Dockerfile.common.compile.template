@@ -1,7 +1,7 @@
 {% if Registry|length %}
 FROM {{Registry}}/{{Distro}} AS gramine
 {% else %}
-FROM {{Distro}} AS gramine
+FROM {{image}} AS gramine
 {% endif %}
 
 # Install distro-specific packages to build Gramine (e.g., python3, protobuf, tomli, etc.)
