@@ -258,8 +258,8 @@ follows three main stages and produces an image named ``gsc-<image-name>``.
 
 #. **Building Gramine.** The first stage builds Gramine from sources based on
    the provided configuration (see :file:`config.yaml`) which includes the
-   distribution (e.g., Ubuntu 20.04), Gramine repository, and the Intel SGX
-   driver details. This stage can be skipped if :command:`gsc build` uses a
+   distribution, Gramine repository, and the Intel SGX driver details.
+   This stage can be skipped if :command:`gsc build` uses a
    pre-built Gramine Docker image.
 
 #. **Graminizing the application image.** The second stage copies the important
@@ -309,10 +309,12 @@ in :file:`config.yaml.template`.
 .. describe:: Distro
 
    Defines Linux distribution to be used to build Gramine in. This distro should
-   match the distro underlying the application's Docker image; otherwise the
-   results may be unpredictable. Currently supported distros are Ubuntu 20.04,
-   Ubuntu 21.04, Ubuntu 22.04, Ubuntu 23.04, Debian 10, Debian 11, Debian 12 and
-   CentOS 8. Default value is ``ubuntu:20.04``.
+   match the distro of the supplied Docker image; otherwise the results may be
+   unpredictable. Currently supported distros are Ubuntu 20.04, Ubuntu 21.04,
+   Ubuntu 22.04, Ubuntu 23.04, Debian 10, Debian 11, Debian 12 and CentOS 8.
+   Default value is ``auto`` which means GSC automatically detects the distro
+   of the supplied Docker image. User also have the option to provide one of the
+   supported distros mentioned above.
 
 .. describe:: Registry
 

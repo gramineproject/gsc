@@ -6,7 +6,10 @@
 # - ubuntu:20.04, ubuntu:21.04, ubuntu:22.04, ubuntu:23.04
 # - debian:10, debian:11, debian:12
 # - centos:8
-Distro: "ubuntu:20.04"
+
+# GSC detects the distro automatically of the supplied image if ditro is set to `auto`.
+# User also have the option to provide one of the supported distros mentioned above.
+Distro: "auto"
 
 # If the image has a specific registry, define it here.
 # Empty by default; example value: "registry.access.redhat.com/ubi8".
