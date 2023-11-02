@@ -398,6 +398,8 @@ def gsc_sign_image(args):
                            'BUILD_ID': build_id})
     finally:
         os.remove(tmp_build_key_path)
+        # Remove the image created during multistage docker build to save disk space. Removing
+        # the image doesn't assure security.
         docker_socket.api.prune_images(filters={'label': 'build_id=' + build_id})
 
     if get_docker_image(docker_socket, signed_image_name) is None:
