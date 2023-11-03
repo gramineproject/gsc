@@ -1,14 +1,15 @@
 # Specify the OS distro that is used to build Gramine, i.e., the distro from where the Gramine build
 # gets all tools and dependencies from. This distro should match the distro underlying the
-# application's Docker image; otherwise the results may be unpredictable.
+# application's Docker image; otherwise the results may be unpredictable (if you specify `"auto"`,
+# which is recommended, you don't need to worry about the mismatch).
 #
 # Currently supported distros are:
 # - ubuntu:20.04, ubuntu:21.04, ubuntu:22.04, ubuntu:23.04
 # - debian:10, debian:11, debian:12
 # - centos:8
 
-# GSC detects the distro automatically of the supplied image if ditro is set to `auto`.
-# User also have the option to provide one of the supported distros mentioned above.
+# If Distro is set to "auto", GSC detects the distro automatically by examining the supplied
+# Docker image. Alternatively, Distro can be set to one of the supported distros mentioned above.
 Distro: "auto"
 
 # If the image has a specific registry, define it here.

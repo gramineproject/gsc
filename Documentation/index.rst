@@ -313,8 +313,8 @@ in :file:`config.yaml.template`.
    unpredictable. Currently supported distros are Ubuntu 20.04, Ubuntu 21.04,
    Ubuntu 22.04, Ubuntu 23.04, Debian 10, Debian 11, Debian 12 and CentOS 8.
    Default value is ``auto`` which means GSC automatically detects the distro
-   of the supplied Docker image. User also have the option to provide one of the
-   supported distros mentioned above.
+   of the supplied Docker image. Users also have the option to provide one of
+   the supported distros mentioned above.
 
 .. describe:: Registry
 
