@@ -23,8 +23,9 @@ import tomli_w # pylint: disable=import-error
 import yaml    # pylint: disable=import-error
 
 # declare constants
-DISTRO_RETRIVAL_ERROR = (f'Could not detect the OS distro of the supplied docker image. Please add '
-                         f'OS distro manually in configuration file (Default: config.yaml).')
+DISTRO_RETRIVAL_ERROR = ('Could not automatically detect the OS distro of the supplied Docker '
+                         'image. Please specify OS distro manually in the configuration file.')
+
 def test_trueish(value):
     if not value:
         return False
@@ -417,7 +418,7 @@ def gsc_build_gramine(args):
 
     distro = env.globals['Distro']
     if distro == 'auto':
-        print('Please specify the Distro in configuration file (Default: config.yaml).')
+        print('Please specify the Distro in the configuration file.')
         sys.exit(1)
 
     distro, _ = distro.split(':')

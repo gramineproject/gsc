@@ -316,8 +316,8 @@ in :file:`config.yaml.template`.
    8 minimal.
 
    Default value is ``auto`` which means GSC automatically detects the distro
-   of the supplied Docker image. User also have the option to provide one of the
-   supported distros mentioned above.
+   of the supplied Docker image. Users also have the option to provide one of
+   the supported distros mentioned above.
 
    .. warning::
       Please register and subscribe your host RHEL system to the Red Hat
