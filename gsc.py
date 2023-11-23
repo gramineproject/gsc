@@ -23,8 +23,8 @@ import tomli_w # pylint: disable=import-error
 import yaml    # pylint: disable=import-error
 
 # declare constants
-DISTRO_RETRIVAL_ERROR = (f'Could not detect the OS distro of the supplied docker image.'
-                         f' Please add OS distro manually in config.yaml file.')
+DISTRO_RETRIVAL_ERROR = (f'Could not detect the OS distro of the supplied docker image. Please add '
+                         f'OS distro manually in configuration file (Default: config.yaml).')
 def test_trueish(value):
     if not value:
         return False
@@ -239,9 +239,9 @@ def get_image_distro(docker_socket, image_name):
     if (os_release['ID'] == 'rhel'):
         try:
             docker_socket.containers.run(image_name, entrypoint='ls /usr/bin/microdnf', remove=True)
-            distro = 'redhat/ubi8-minimal'
+            distro = 'redhat/ubi8-minimal:' + os_release['VERSION_ID']
         except:
-            distro = 'redhat/ubi8'
+            distro = 'redhat/ubi8:' + os_release['VERSION_ID']
 
     return distro
 
@@ -252,7 +252,6 @@ def fetch_and_validate_distro_support(docker_socket, image_name, env):
         env.globals['Distro'] = distro
 
     distro = distro.split(':')[0] if ':' in distro else distro
-
     if not os.path.exists(f'templates/{distro}'):
         raise FileNotFoundError(f'{distro} distro is not supported by GSC.')
 
@@ -416,13 +415,14 @@ def gsc_build_gramine(args):
 
     os.makedirs(tmp_build_path, exist_ok=True)
 
-    try:
-        distro = fetch_and_validate_distro_support(docker_socket, args.image, env)
-    except KeyError as e:
-        print(DISTRO_RETRIVAL_ERROR, file=sys.stderr)
+    distro = env.globals['Distro']
+    if distro == 'auto':
+        print('Please specify the Distro in configuration file (Default: config.yaml).')
         sys.exit(1)
-    except Exception as e:
-        print(e, file=sys.stderr)
+
+    distro, _ = distro.split(':')
+    if not os.path.exists(f'templates/{distro}'):
+        print(f'{distro} distro is not supported by GSC.')
         sys.exit(1)
 
     env.loader = jinja2.FileSystemLoader('templates/')
