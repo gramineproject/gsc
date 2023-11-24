@@ -23,6 +23,10 @@ import tomli   # pylint: disable=import-error
 import tomli_w # pylint: disable=import-error
 import yaml    # pylint: disable=import-error
 
+# declare constants
+YELLOW = '\033[93m' # Print text in yellow color
+ENDC = '\033[0m'
+
 def test_trueish(value):
     if not value:
         return False
@@ -162,18 +166,30 @@ def extract_user_from_image_config(config, env):
         user = 'root'
     env.globals.update({'app_user': user})
 
-def merge_two_dicts(dict1, dict2, path=[]):
+def merge_two_dicts(dict1, dict1_source, dict2, dict2_source, path=[]):
     for key in dict2:
         if key in dict1:
             if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
-                merge_two_dicts(dict1[key], dict2[key], path + [str(key)])
+                merge_two_dicts(dict1[key], dict1_source,
+                                dict2[key], dict2_source, path + [str(key)])
             elif isinstance(dict1[key], list) and isinstance(dict2[key], list):
                 dict1[key].extend(dict2[key])
             elif dict1[key] == dict2[key]:
                 pass
+            # Key exists in both the dictionaties but with different values
             else:
-                raise Exception(f'''Duplicate key with different values found: `{".".join(path +
-                                   [str(key)])}`''')
+                if key in ['LD_LIBRARY_PATH', 'PATH', 'LD_PRELOAD']:
+                    # Concatenate the key values 
+                    dict1[key] = f'{dict1[key]}:{dict2[key]}'
+                    print(f'{YELLOW} Duplicate key: `{".".join(path + [str(key)])}` '
+                                  f'from `{dict2_source}` already exists in the '
+                                  f'`{dict1_source}`. Key value from `{dict2_source}` will be '
+                                  f'appended to the value in `{dict1_source}`.{ENDC}')
+                else:
+                    print(f'{YELLOW} Duplicate key: `{".".join(path + [str(key)])}` '
+                                  f'from `{dict2_source}` already exists in the '
+                                  f'`{dict1_source}`, hence ignoring the key value from '
+                                  f'`{dict2_source}`. {ENDC}')
         else:
             dict1[key] = dict2[key]
     return dict1
@@ -287,7 +303,8 @@ def gsc_build(args):
     #   - Jinja-style templates/entrypoint.manifest.template
     #   - base Docker image's environment variables
     #   - additional, user-provided manifest options
-    entrypoint_manifest_render = env.get_template(f'{distro}/entrypoint.manifest.template').render()
+    entrypoint_manifest = f'{distro}/entrypoint.manifest.template'
+    entrypoint_manifest_render = env.get_template(entrypoint_manifest).render()
     try:
         entrypoint_manifest_dict = tomli.loads(entrypoint_manifest_render)
     except Exception as e:
@@ -297,11 +314,14 @@ def gsc_build(args):
 
     base_image_environment = extract_environment_from_image_config(original_image.attrs['Config'])
     base_image_dict = tomli.loads(base_image_environment)
+    base_image_dict_source = f'"{original_image}" image environments'
 
     user_manifest_contents = ''
     if not os.path.exists(args.manifest):
         print(f'Manifest file "{args.manifest}" does not exist.', file=sys.stderr)
         sys.exit(1)
+
+    user_manifest = args.manifest
     with open(args.manifest, 'r') as user_manifest_file:
         user_manifest_contents = user_manifest_file.read()
 
@@ -327,8 +347,11 @@ def gsc_build(args):
                 pf_list = list(user_manifest_dict['sgx']['protected_files'].values())
                 user_manifest_dict['sgx']['protected_files'] = pf_list
 
-    merged_manifest_dict = merge_two_dicts(user_manifest_dict, entrypoint_manifest_dict)
-    merged_manifest_dict = merge_two_dicts(merged_manifest_dict, base_image_dict)
+    merged_manifest_dict = merge_two_dicts(user_manifest_dict, user_manifest,
+                                           entrypoint_manifest_dict, entrypoint_manifest)
+    merged_manifest_dict_source = f'{user_manifest}, {entrypoint_manifest}'
+    merged_manifest_dict = merge_two_dicts(merged_manifest_dict, merged_manifest_dict_source,
+                                           base_image_dict, base_image_dict_source)
 
     with open(tmp_build_path / 'entrypoint.manifest', 'wb') as entrypoint_manifest:
         tomli_w.dump(merged_manifest_dict, entrypoint_manifest)
