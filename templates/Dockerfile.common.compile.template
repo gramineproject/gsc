@@ -1,7 +1,5 @@
 {% if Registry|length %}
 FROM {{Registry}}/{{Distro}} AS gramine
-{% elif app_image %}
-FROM {{app_image}} AS gramine
 {% else %}
 FROM {{Distro}} AS gramine
 {% endif %}

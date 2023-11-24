@@ -235,14 +235,19 @@ def get_image_distro(docker_socket, image_name):
     out = out.decode('UTF-8')
 
     os_release = dict(shlex.split(line)[0].split('=') for line in out.splitlines() if line.strip())
-    distro = os_release['ID'] + ':' + os_release['VERSION_ID']
 
+    # Some OS distros (e.g. Alpine) have very precise versions (e.g. 3.17.3), and to support these
+    # OS distros, we need to truncate at the 2nd dot.
+    version_id = '.'.join(os_release['VERSION_ID'].split(".", 2)[:2])
+    distro = os_release['ID'] + ':' + version_id
+
+    # RedHat specific logic to distinguish between UBI8 and UBI8-minimal
     if (os_release['ID'] == 'rhel'):
         try:
             docker_socket.containers.run(image_name, entrypoint='ls /usr/bin/microdnf', remove=True)
-            distro = 'redhat/ubi8-minimal:' + os_release['VERSION_ID']
+            distro = 'redhat/ubi8-minimal:' + version_id
         except:
-            distro = 'redhat/ubi8:' + os_release['VERSION_ID']
+            distro = 'redhat/ubi8:' + version_id
 
     return distro
 
@@ -252,9 +257,9 @@ def fetch_and_validate_distro_support(docker_socket, image_name, env):
         distro = get_image_distro(docker_socket, image_name)
         env.globals['Distro'] = distro
 
-    distro = distro.split(':')[0] if ':' in distro else distro
+    distro = distro.split(':')[0]
     if not os.path.exists(f'templates/{distro}'):
-        raise FileNotFoundError(f'{distro} distro is not supported by GSC.')
+        raise FileNotFoundError(f'`{distro}` distro is not supported by GSC.')
 
     return distro
 
@@ -418,7 +423,8 @@ def gsc_build_gramine(args):
 
     distro = env.globals['Distro']
     if distro == 'auto':
-        print('Please specify the Distro in the configuration file.')
+        print('`gsc build-gramine` does not allow `Distro` set to `auto` in the configuration '
+              'file.')
         sys.exit(1)
 
     distro, _ = distro.split(':')
