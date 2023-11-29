@@ -22,9 +22,11 @@ import tomli   # pylint: disable=import-error
 import tomli_w # pylint: disable=import-error
 import yaml    # pylint: disable=import-error
 
-# declare constants
-DISTRO_RETRIVAL_ERROR = ('Could not automatically detect the OS distro of the supplied Docker '
-                         'image. Please specify OS distro manually in the configuration file.')
+class DistroRetrievalError(Exception):
+    def __init__(self, *args):
+        super().__init__(('Could not automatically detect the OS distro of the supplied Docker '
+                         'image. Please specify OS distro manually in the configuration file.'),
+                         *args)
 
 def test_trueish(value):
     if not value:
@@ -238,15 +240,18 @@ def get_image_distro(docker_socket, image_name):
 
     # Some OS distros (e.g. Alpine) have very precise versions (e.g. 3.17.3), and to support these
     # OS distros, we need to truncate at the 2nd dot.
-    version_id = '.'.join(os_release['VERSION_ID'].split(".", 2)[:2])
-    distro = os_release['ID'] + ':' + version_id
+    try:
+        version_id = '.'.join(os_release['VERSION_ID'].split(".", 2)[:2])
+        distro = os_release['ID'] + ':' + version_id
+    except KeyError:
+        raise DistroRetrievalError
 
     # RedHat specific logic to distinguish between UBI8 and UBI8-minimal
     if (os_release['ID'] == 'rhel'):
         try:
             docker_socket.containers.run(image_name, entrypoint='ls /usr/bin/microdnf', remove=True)
             distro = 'redhat/ubi8-minimal:' + version_id
-        except:
+        except docker.errors.ContainerError:
             distro = 'redhat/ubi8:' + version_id
 
     return distro
@@ -304,9 +309,6 @@ def gsc_build(args):
 
     try:
         distro = fetch_and_validate_distro_support(docker_socket, original_image_name, env)
-    except KeyError as e:
-        print(DISTRO_RETRIVAL_ERROR, file=sys.stderr)
-        sys.exit(1)
     except Exception as e:
         print(e, file=sys.stderr)
         sys.exit(1)
@@ -489,9 +491,6 @@ def gsc_sign_image(args):
 
     try:
         distro = fetch_and_validate_distro_support(docker_socket, args.image, env)
-    except KeyError as e:
-        print(DISTRO_RETRIVAL_ERROR, file=sys.stderr)
-        sys.exit(1)
     except Exception as e:
         print(e, file=sys.stderr)
         sys.exit(1)
