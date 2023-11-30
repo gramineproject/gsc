@@ -388,13 +388,14 @@ executable arguments may be supplied to the :command:`docker run` command.
    :command:`gsc build`.
 
 
-Execute with Linux PAL instead of Linux-SGX PAL
------------------------------------------------
+Execute with Linux PAL (gramine-direct) instead of Linux-SGX PAL (gramine-sgx)
+------------------------------------------------------------------------------
 
-You may select the Linux PAL at Docker run time instead of the Linux-SGX PAL by
-specifying the environment variable :envvar:`GSC_PAL` as an option to the
-:command:`docker run` command. When using the Linux PAL, it is not necessary to
-sign the image via a :command:`gsc sign-image` command.
+You may select the Linux PAL (gramine-direct) at Docker run time instead of
+the Linux-SGX PAL (gramine-sgx) by specifying the environment variable
+:envvar:`GSC_PAL` as an option to the :command:`docker run` command. When using
+the Linux PAL, it is not necessary to sign the image via a
+:command:`gsc sign-image` command.
 
 .. envvar:: GSC_PAL
 
