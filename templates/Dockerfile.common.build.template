@@ -1,6 +1,6 @@
 # Include previously-prepared Docker image with Gramine (if any) or compile Gramine from sources
 {% if Gramine.Image %}
-FROM gsc-{{Gramine.Image}} AS gramine
+FROM {{Gramine.Image}} AS gramine
 {% else %}
 {% include compile_template %}
 {% endif %}
