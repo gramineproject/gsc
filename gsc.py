@@ -23,6 +23,10 @@ import tomli   # pylint: disable=import-error
 import tomli_w # pylint: disable=import-error
 import yaml    # pylint: disable=import-error
 
+# declare constants
+YELLOW = '\033[93m' # Print text in yellow color
+ENDC = '\033[0m'
+
 def test_trueish(value):
     if not value:
         return False
@@ -247,10 +251,20 @@ def gsc_build(args):
 
     config = yaml.safe_load(args.config_file)
     if 'Image' in config['Gramine']:
-        gramine_image_name = gsc_image_name(config['Gramine']['Image'])
+        gramine_image_name = config['Gramine']['Image']
         if get_docker_image(docker_socket, gramine_image_name) is None:
-            print(f'Cannot find base-Gramine Docker image `{gramine_image_name}`.')
-            sys.exit(1)
+            # TODO: Drop below if-else block with GSC v1.7 release
+            if get_docker_image(docker_socket, f'gsc-{gramine_image_name}') is None:
+                print(f'Cannot find base-Gramine Docker image `{gramine_image_name}`.')
+                sys.exit(1)
+            else:
+                 config['Gramine']['Image'] = f'gsc-{gramine_image_name}'
+                 print(f'{YELLOW}Warning: Please re-build base-Gramine Docker image '
+                               f'`{gramine_image_name}`. It may cause error in future.{ENDC}')
+
+            # TODO: Uncomment below lines with GSC v1.7 release
+            # print(f'Cannot find base-Gramine Docker image `{gramine_image_name}`.')
+            # sys.exit(1)
 
     print(f'Building unsigned graminized Docker image `{unsigned_image_name}` from original '
           f'application image `{original_image_name}`...')
@@ -356,7 +370,7 @@ def gsc_build(args):
 
 # Command 2: Build a "base Gramine" Docker image with the compiled runtime of Gramine.
 def gsc_build_gramine(args):
-    gramine_image_name = gsc_image_name(args.image)  # output base-Gramine image name
+    gramine_image_name = args.image  # output base-Gramine image name
     tmp_build_path = gsc_tmp_build_path(args.image)  # pathlib obj with build artifacts
 
     docker_socket = docker.from_env()
