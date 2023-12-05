@@ -253,10 +253,10 @@ def gsc_build(args):
             if get_docker_image(docker_socket, gsc_image_name(gramine_image_name)) is None:
                 print(f'Cannot find `base-gramine` Docker image `{gramine_image_name}`.')
                 sys.exit(1)
-            else:
-                 config['Gramine']['Image'] = gsc_image_name(gramine_image_name)
-                 print('Warning: Please re-build `base-gramine` Docker image '
-                       f'`{gramine_image_name}`. It will be error in future.')
+
+            config['Gramine']['Image'] = gsc_image_name(gramine_image_name)
+            print('Warning: Please re-build `base-gramine` Docker image '
+                  f'`{gramine_image_name}`. This will become an error in future.')
 
     print(f'Building unsigned graminized Docker image `{unsigned_image_name}` from original '
           f'application image `{original_image_name}`...')
