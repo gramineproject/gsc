@@ -23,10 +23,6 @@ import tomli   # pylint: disable=import-error
 import tomli_w # pylint: disable=import-error
 import yaml    # pylint: disable=import-error
 
-# declare constants
-YELLOW = '\033[93m' # Print text in yellow color
-ENDC = '\033[0m'
-
 def test_trueish(value):
     if not value:
         return False
@@ -126,10 +122,6 @@ def extract_environment_from_image_config(config):
             continue
         escaped_env_var = env_var.translate(str.maketrans({'\\': r'\\', '"': r'\"'}))
         env_var_name = escaped_env_var.split('=', maxsplit=1)[0]
-        if env_var_name in ('PATH', 'LD_LIBRARY_PATH'):
-            # PATH and LD_LIBRARY_PATH are already part of entrypoint.manifest.template.
-            # Their values are provided in finalize_manifest.py, hence skipping here.
-            continue
         env_var_value = escaped_env_var.split('=', maxsplit=1)[1]
         base_image_environment += f'loader.env.{env_var_name} = "{env_var_value}"\n'
     return base_image_environment
@@ -166,30 +158,25 @@ def extract_user_from_image_config(config, env):
         user = 'root'
     env.globals.update({'app_user': user})
 
-def merge_two_dicts(dict1, dict1_source, dict2, dict2_source, path=[]):
+def merge_two_dicts_in_order(dict1, dict1_src, dict2, dict2_src, path=[]):
     for key in dict2:
         if key in dict1:
             if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
-                merge_two_dicts(dict1[key], dict1_source,
-                                dict2[key], dict2_source, path + [str(key)])
+                merge_two_dicts_in_order(dict1[key], dict1_src, dict2[key], dict2_src,
+                                         path + [str(key)])
             elif isinstance(dict1[key], list) and isinstance(dict2[key], list):
                 dict1[key].extend(dict2[key])
             elif dict1[key] == dict2[key]:
                 pass
-            # Key exists in both the dictionaties but with different values
             else:
+            # the key exists in both dicts but with different values, must concatenate or choose one
                 if key in ['LD_LIBRARY_PATH', 'PATH', 'LD_PRELOAD']:
-                    # Concatenate the key values 
                     dict1[key] = f'{dict1[key]}:{dict2[key]}'
-                    print(f'{YELLOW} Duplicate key: `{".".join(path + [str(key)])}` '
-                                  f'from `{dict2_source}` already exists in the '
-                                  f'`{dict1_source}`. Key value from `{dict2_source}` will be '
-                                  f'appended to the value in `{dict1_source}`.{ENDC}')
+                    print(f'Duplicate key: `{".".join(path + [str(key)])}`. Values from'
+                          f' `{dict1_src}` and `{dict2_src}` are concatenated.')
                 else:
-                    print(f'{YELLOW} Duplicate key: `{".".join(path + [str(key)])}` '
-                                  f'from `{dict2_source}` already exists in the '
-                                  f'`{dict1_source}`, hence ignoring the key value from '
-                                  f'`{dict2_source}`. {ENDC}')
+                    print(f'Duplicate key: `{".".join(path + [str(key)])}`. Value from'
+                          f' `{dict1_src}` overrides the value from `{dict2_src}`.')
         else:
             dict1[key] = dict2[key]
     return dict1
@@ -303,8 +290,8 @@ def gsc_build(args):
     #   - Jinja-style templates/entrypoint.manifest.template
     #   - base Docker image's environment variables
     #   - additional, user-provided manifest options
-    entrypoint_manifest = f'{distro}/entrypoint.manifest.template'
-    entrypoint_manifest_render = env.get_template(entrypoint_manifest).render()
+    entrypoint_manifest_dict_src = f'{distro}/entrypoint.manifest.template'
+    entrypoint_manifest_render = env.get_template(entrypoint_manifest_dict_src).render()
     try:
         entrypoint_manifest_dict = tomli.loads(entrypoint_manifest_render)
     except Exception as e:
@@ -314,14 +301,14 @@ def gsc_build(args):
 
     base_image_environment = extract_environment_from_image_config(original_image.attrs['Config'])
     base_image_dict = tomli.loads(base_image_environment)
-    base_image_dict_source = f'"{original_image}" image environments'
+    base_image_dict_src = f'<{original_image} image env>'
 
     user_manifest_contents = ''
     if not os.path.exists(args.manifest):
         print(f'Manifest file "{args.manifest}" does not exist.', file=sys.stderr)
         sys.exit(1)
 
-    user_manifest = args.manifest
+    user_manifest_dict_src = args.manifest
     with open(args.manifest, 'r') as user_manifest_file:
         user_manifest_contents = user_manifest_file.read()
 
@@ -347,11 +334,13 @@ def gsc_build(args):
                 pf_list = list(user_manifest_dict['sgx']['protected_files'].values())
                 user_manifest_dict['sgx']['protected_files'] = pf_list
 
-    merged_manifest_dict = merge_two_dicts(user_manifest_dict, user_manifest,
-                                           entrypoint_manifest_dict, entrypoint_manifest)
-    merged_manifest_dict_source = f'{user_manifest}, {entrypoint_manifest}'
-    merged_manifest_dict = merge_two_dicts(merged_manifest_dict, merged_manifest_dict_source,
-                                           base_image_dict, base_image_dict_source)
+    merged_manifest_dict = merge_two_dicts_in_order(user_manifest_dict, user_manifest_dict_src,
+                                                    entrypoint_manifest_dict,
+                                                    entrypoint_manifest_dict_src)
+    merged_manifest_dict_src = (f'<merged {user_manifest_dict_src}, {entrypoint_manifest_dict_src}'
+                                ' env>')
+    merged_manifest_dict = merge_two_dicts_in_order(merged_manifest_dict, merged_manifest_dict_src,
+                                                    base_image_dict, base_image_dict_src)
 
     with open(tmp_build_path / 'entrypoint.manifest', 'wb') as entrypoint_manifest:
         tomli_w.dump(merged_manifest_dict, entrypoint_manifest)
