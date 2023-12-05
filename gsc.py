@@ -169,7 +169,7 @@ def merge_two_dicts_in_order(dict1, dict1_src, dict2, dict2_src, path=[]):
             elif dict1[key] == dict2[key]:
                 pass
             else:
-            # the key exists in both dicts but with different values, must concatenate or choose one
+                # key exists in both dicts but with different values, must concatenate or choose one
                 if key in ['LD_LIBRARY_PATH', 'PATH', 'LD_PRELOAD']:
                     dict1[key] = f'{dict1[key]}:{dict2[key]}'
                     print(f'Duplicate key: `{".".join(path + [str(key)])}`. Values from'

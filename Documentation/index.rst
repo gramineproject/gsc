@@ -270,9 +270,9 @@ follows three main stages and produces an image named ``gsc-<image-name>``.
    image to generate a list of trusted files. All envvars are overridden (if
    duplicates found) in the following order: first user-provided manifest, if
    not then GSC-internal manifest, if not then from original Docker image env.
-   The only exceptions are: LD_LIBRARY_PATH, PATH, LD_PRELOAD. They are
-   concatenated instead of overridden. Concatenation order is same as above.
-   GSC excludes files and paths starting with
+   The only exceptions are: ``LD_LIBRARY_PATH``, ``PATH``, ``LD_PRELOAD``;
+   they are concatenated instead of overridden (concatenation order is same as
+   above). GSC excludes files and paths starting with
    :file:`/boot`, :file:`/dev`, :file:`.dockerenv`, :file:`.dockerinit`,
    :file:`/etc/mtab`, :file:`/etc/rc`, :file:`/proc`, :file:`/sys`, and
    :file:`/var`, since checksums are required which either don't exist or may
