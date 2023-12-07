@@ -249,14 +249,15 @@ def gsc_build(args):
     if 'Image' in config['Gramine']:
         gramine_image_name = config['Gramine']['Image']
         if get_docker_image(docker_socket, gramine_image_name) is None:
-            # TODO: Drop below if-else block with GSC v1.7 release
+            # TODO: Drop support for old style `base-Gramine` Docker image name with GSC v1.7
+            # release
             if get_docker_image(docker_socket, gsc_image_name(gramine_image_name)) is None:
-                print(f'Cannot find `base-gramine` Docker image `{gramine_image_name}`.')
+                print(f'Cannot find `base-Gramine` Docker image `{gramine_image_name}`.')
                 sys.exit(1)
 
             config['Gramine']['Image'] = gsc_image_name(gramine_image_name)
-            print('Warning: Please re-build `base-gramine` Docker image '
-                  f'`{gramine_image_name}`. This will become an error in future.')
+            print(f'Warning: Please re-build `base-Gramine` Docker image `{gramine_image_name}` '
+                  'using current workspace. This will become an error in future.')
 
     print(f'Building unsigned graminized Docker image `{unsigned_image_name}` from original '
           f'application image `{original_image_name}`...')
