@@ -311,22 +311,6 @@ def gsc_build(args):
             print(f'Failed to parse the "{args.manifest}" file. Error:', e, file=sys.stderr)
             sys.exit(1)
 
-    # Support deprecated syntax: replace old-style TOML-dict (`sgx.trusted_files.key = "file:foo"`)
-    # with new-style TOML-array (`sgx.trusted_files = ["file:foo"]`) in the user manifest
-    if 'sgx' in user_manifest_dict:
-        if 'trusted_files' in user_manifest_dict['sgx']:
-            if isinstance(user_manifest_dict['sgx']['trusted_files'], dict):
-                tf_list = list(user_manifest_dict['sgx']['trusted_files'].values())
-                user_manifest_dict['sgx']['trusted_files'] = tf_list
-        if 'allowed_files' in user_manifest_dict['sgx']:
-            if isinstance(user_manifest_dict['sgx']['allowed_files'], dict):
-                af_list = list(user_manifest_dict['sgx']['allowed_files'].values())
-                user_manifest_dict['sgx']['allowed_files'] = af_list
-        if 'protected_files' in user_manifest_dict['sgx']:
-            if isinstance(user_manifest_dict['sgx']['protected_files'], dict):
-                pf_list = list(user_manifest_dict['sgx']['protected_files'].values())
-                user_manifest_dict['sgx']['protected_files'] = pf_list
-
     merged_manifest_dict = merge_two_dicts(user_manifest_dict, entrypoint_manifest_dict)
     merged_manifest_dict = merge_two_dicts(merged_manifest_dict, base_image_dict)
 
