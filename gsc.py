@@ -301,7 +301,7 @@ def gsc_build(args):
 
     base_image_environment = extract_environment_from_image_config(original_image.attrs['Config'])
     base_image_dict = tomli.loads(base_image_environment)
-    base_image_dict_src = f'<{original_image} image env>'
+    base_image_dict_src = f'<{original_image_name} image env>'
 
     user_manifest_contents = ''
     if not os.path.exists(args.manifest):
