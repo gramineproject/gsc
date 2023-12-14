@@ -158,11 +158,11 @@ def extract_user_from_image_config(config, env):
         user = 'root'
     env.globals.update({'app_user': user})
 
-def merge_two_dicts_in_order(dict1, dict1_src, dict2, dict2_src, path=[]):
+def merge_envvars(dict1, dict1_src, dict2, dict2_src, path=[]):
     for key in dict2:
         if key in dict1:
             if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
-                merge_two_dicts_in_order(dict1[key], dict1_src, dict2[key], dict2_src,
+                merge_envvars(dict1[key], dict1_src, dict2[key], dict2_src,
                                          path + [str(key)])
             elif isinstance(dict1[key], list) and isinstance(dict2[key], list):
                 dict1[key].extend(dict2[key])
@@ -172,10 +172,10 @@ def merge_two_dicts_in_order(dict1, dict1_src, dict2, dict2_src, path=[]):
                 # key exists in both dicts but with different values, must concatenate or choose one
                 if key in ['LD_LIBRARY_PATH', 'PATH', 'LD_PRELOAD']:
                     dict1[key] = f'{dict1[key]}:{dict2[key]}'
-                    print(f'Duplicate key: `{".".join(path + [str(key)])}`. Values from'
+                    print(f'Warning: Duplicate key `{".".join(path + [str(key)])}`. Values from'
                           f' `{dict1_src}` and `{dict2_src}` are concatenated.')
                 else:
-                    print(f'Duplicate key: `{".".join(path + [str(key)])}`. Value from'
+                    print(f'Warning: Duplicate key `{".".join(path + [str(key)])}`. Value from'
                           f' `{dict1_src}` overrides the value from `{dict2_src}`.')
         else:
             dict1[key] = dict2[key]
@@ -334,12 +334,12 @@ def gsc_build(args):
                 pf_list = list(user_manifest_dict['sgx']['protected_files'].values())
                 user_manifest_dict['sgx']['protected_files'] = pf_list
 
-    merged_manifest_dict = merge_two_dicts_in_order(user_manifest_dict, user_manifest_dict_src,
+    merged_manifest_dict = merge_envvars(user_manifest_dict, user_manifest_dict_src,
                                                     entrypoint_manifest_dict,
                                                     entrypoint_manifest_dict_src)
     merged_manifest_dict_src = (f'<merged {user_manifest_dict_src}, {entrypoint_manifest_dict_src}'
                                 ' env>')
-    merged_manifest_dict = merge_two_dicts_in_order(merged_manifest_dict, merged_manifest_dict_src,
+    merged_manifest_dict = merge_envvars(merged_manifest_dict, merged_manifest_dict_src,
                                                     base_image_dict, base_image_dict_src)
 
     with open(tmp_build_path / 'entrypoint.manifest', 'wb') as entrypoint_manifest:

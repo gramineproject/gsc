@@ -265,14 +265,14 @@ follows three main stages and produces an image named ``gsc-<image-name>``.
 #. **Graminizing the application image.** The second stage copies the important
    Gramine artifacts (e.g., the runtime and signer tool) from the first stage
    (or if the first stage was skipped, it pulls a prebuilt Docker image defined
-   via the configuration file).  It then prepares image-specific variables such
-   as the executable path, the library path and envvars, and scans the entire
-   image to generate a list of trusted files. All envvars are overridden (if
-   duplicates found) in the following order: first user-provided manifest, if
-   not then GSC-internal manifest, if not then from original Docker image env.
-   The only exceptions are: ``LD_LIBRARY_PATH``, ``PATH``, ``LD_PRELOAD``;
-   they are concatenated instead of overridden (concatenation order is same as
-   above). GSC excludes files and paths starting with
+   via the configuration file). It then prepares image-specific variables such
+   as the executable path, and envvars, and scans the entire image to generate
+   a list of trusted files. All envvars are overridden (if duplicates found) in
+   the following order: first user-provided manifest, if not then GSC-internal
+   manifest, if not then from original Docker image env. The only exceptions
+   are: ``LD_LIBRARY_PATH``, ``PATH``, ``LD_PRELOAD``; they are concatenated
+   instead of overridden (concatenation order is same as above). GSC excludes
+   files and paths starting with
    :file:`/boot`, :file:`/dev`, :file:`.dockerenv`, :file:`.dockerinit`,
    :file:`/etc/mtab`, :file:`/etc/rc`, :file:`/proc`, :file:`/sys`, and
    :file:`/var`, since checksums are required which either don't exist or may
