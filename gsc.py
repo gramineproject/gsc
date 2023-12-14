@@ -158,28 +158,31 @@ def extract_user_from_image_config(config, env):
         user = 'root'
     env.globals.update({'app_user': user})
 
-def merge_envvars(dict1, dict1_src, dict2, dict2_src, path=[]):
-    for key in dict2:
-        if key in dict1:
-            if isinstance(dict1[key], dict) and isinstance(dict2[key], dict):
-                merge_envvars(dict1[key], dict1_src, dict2[key], dict2_src,
-                                         path + [str(key)])
-            elif isinstance(dict1[key], list) and isinstance(dict2[key], list):
-                dict1[key].extend(dict2[key])
-            elif dict1[key] == dict2[key]:
+def merge_manifests_in_order(manifest1, manifest2, manifest1_name, manifest2_name, path=[]):
+    for key in manifest2:
+        if key in manifest1:
+            if isinstance(manifest1[key], dict) and isinstance(manifest2[key], dict):
+                merge_manifests_in_order(manifest1[key], manifest2[key], manifest1_name,
+                                         manifest2_name, path + [str(key)])
+            elif isinstance(manifest1[key], list) and isinstance(manifest2[key], list):
+                manifest1[key].extend(manifest2[key])
+            elif manifest1[key] == manifest2[key]:
                 pass
             else:
-                # key exists in both dicts but with different values, must concatenate or choose one
-                if key in ['LD_LIBRARY_PATH', 'PATH', 'LD_PRELOAD']:
-                    dict1[key] = f'{dict1[key]}:{dict2[key]}'
+                # key exists in both manifests but with different values:
+                # - for a special case of three below envvars must concatenate the values,
+                # - in all other cases choose the value from the first manifest
+                if ('.'.join(path) == 'loader.env' and
+                        key in ['LD_LIBRARY_PATH', 'PATH', 'LD_PRELOAD']):
+                    manifest1[key] = f'{manifest1[key]}:{manifest2[key]}'
                     print(f'Warning: Duplicate key `{".".join(path + [str(key)])}`. Values from'
-                          f' `{dict1_src}` and `{dict2_src}` are concatenated.')
+                          f' `{manifest1_name}` and `{manifest2_name}` are concatenated.')
                 else:
                     print(f'Warning: Duplicate key `{".".join(path + [str(key)])}`. Value from'
-                          f' `{dict1_src}` overrides the value from `{dict2_src}`.')
+                          f' `{manifest1_name}` overrides the value from `{manifest2_name}`.')
         else:
-            dict1[key] = dict2[key]
-    return dict1
+            manifest1[key] = manifest2[key]
+    return manifest1
 
 def handle_redhat_repo_configs(distro, tmp_build_path):
     if distro not in {"redhat/ubi8", "redhat/ubi8-minimal"}:
@@ -290,8 +293,8 @@ def gsc_build(args):
     #   - Jinja-style templates/entrypoint.manifest.template
     #   - base Docker image's environment variables
     #   - additional, user-provided manifest options
-    entrypoint_manifest_dict_src = f'{distro}/entrypoint.manifest.template'
-    entrypoint_manifest_render = env.get_template(entrypoint_manifest_dict_src).render()
+    entrypoint_manifest_name = f'{distro}/entrypoint.manifest.template'
+    entrypoint_manifest_render = env.get_template(entrypoint_manifest_name).render()
     try:
         entrypoint_manifest_dict = tomli.loads(entrypoint_manifest_render)
     except Exception as e:
@@ -300,22 +303,22 @@ def gsc_build(args):
         sys.exit(1)
 
     base_image_environment = extract_environment_from_image_config(original_image.attrs['Config'])
-    base_image_dict = tomli.loads(base_image_environment)
-    base_image_dict_src = f'<{original_image_name} image env>'
+    base_image_env_dict = tomli.loads(base_image_environment)
+    base_image_env_name = f'<{original_image_name} image env>'
 
+    user_manifest_name = args.manifest
     user_manifest_contents = ''
-    if not os.path.exists(args.manifest):
-        print(f'Manifest file "{args.manifest}" does not exist.', file=sys.stderr)
+    if not os.path.exists(user_manifest_name):
+        print(f'Manifest file "{user_manifest_name}" does not exist.', file=sys.stderr)
         sys.exit(1)
 
-    user_manifest_dict_src = args.manifest
-    with open(args.manifest, 'r') as user_manifest_file:
+    with open(user_manifest_name, 'r') as user_manifest_file:
         user_manifest_contents = user_manifest_file.read()
 
         try:
             user_manifest_dict = tomli.loads(user_manifest_contents)
         except Exception as e:
-            print(f'Failed to parse the "{args.manifest}" file. Error:', e, file=sys.stderr)
+            print(f'Failed to parse the "{user_manifest_name}" file. Error:', e, file=sys.stderr)
             sys.exit(1)
 
     # Support deprecated syntax: replace old-style TOML-dict (`sgx.trusted_files.key = "file:foo"`)
@@ -334,13 +337,11 @@ def gsc_build(args):
                 pf_list = list(user_manifest_dict['sgx']['protected_files'].values())
                 user_manifest_dict['sgx']['protected_files'] = pf_list
 
-    merged_manifest_dict = merge_envvars(user_manifest_dict, user_manifest_dict_src,
-                                                    entrypoint_manifest_dict,
-                                                    entrypoint_manifest_dict_src)
-    merged_manifest_dict_src = (f'<merged {user_manifest_dict_src}, {entrypoint_manifest_dict_src}'
-                                ' env>')
-    merged_manifest_dict = merge_envvars(merged_manifest_dict, merged_manifest_dict_src,
-                                                    base_image_dict, base_image_dict_src)
+    merged_manifest_dict = merge_manifests_in_order(user_manifest_dict, entrypoint_manifest_dict,
+                                                    user_manifest_name, entrypoint_manifest_name)
+    merged_manifest_name = (f'<merged {user_manifest_name}, {entrypoint_manifest_name} env>')
+    merged_manifest_dict = merge_manifests_in_order(merged_manifest_dict, base_image_env_dict,
+                                                    merged_manifest_name, base_image_env_name)
 
     with open(tmp_build_path / 'entrypoint.manifest', 'wb') as entrypoint_manifest:
         tomli_w.dump(merged_manifest_dict, entrypoint_manifest)
