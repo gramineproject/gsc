@@ -249,7 +249,7 @@ def gsc_build(args):
     if 'Image' in config['Gramine']:
         gramine_image_name = config['Gramine']['Image']
         if get_docker_image(docker_socket, gramine_image_name) is None:
-            # TODO: Drop support for old style base-Gramine Docker image name with GSC v1.7 release
+            # TODO: Drop support for old style base-Gramine Docker image name with GSC v1.8 release
             if get_docker_image(docker_socket, gsc_image_name(gramine_image_name)) is None:
                 print(f'Cannot find base-Gramine Docker image `{gramine_image_name}`.')
                 sys.exit(1)
