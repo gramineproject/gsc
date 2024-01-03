@@ -10,7 +10,6 @@ COPY redhat-uep.pem /etc/rhsm/ca/
 # final image. This trick allows to decrease the image size by hundreds of MBs.
 RUN rm -rf /etc/rhsm-host \
     && rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
-    && microdnf update -y \
     && microdnf install -y subscription-manager \
     && subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms \
     && microdnf install -y \
