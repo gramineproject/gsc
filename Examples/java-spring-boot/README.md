@@ -26,7 +26,7 @@ runs inside the SGX enclave. For more information on Spring Boot, please visit h
 1. Build a project using Gradle:
 
 ```bash
-$ (cd spring-boot-web-service/; gradle build)
+$ (cd spring-boot-web-service/ && gradle build)
 ```
 
 2. Build Docker image:
@@ -38,13 +38,13 @@ $ docker build -t openjdk-11-java-spring-boot .
 3. Clean up files that will be no longer used:
 
 ```bash
-$ (cd spring-boot-web-service/; gradle clean)
+$ (cd spring-boot-web-service/ && gradle clean)
 ```
 
 4. Graminize the Docker image (this step can take some time!):
 
 ```bash
-$ (cd ../..; ./gsc build openjdk-11-java-spring-boot \
+$ (cd ../.. && ./gsc build openjdk-11-java-spring-boot \
     Examples/java-spring-boot/java-spring-boot.manifest \
     -c <PATH-TO-CONFIG-FILE>)
 ```
@@ -52,7 +52,7 @@ $ (cd ../..; ./gsc build openjdk-11-java-spring-boot \
 5. Sign the graminized Docker image:
 
 ```bash
-$ (cd ../..; ./gsc sign-image openjdk-11-java-spring-boot \
+$ (cd ../.. && ./gsc sign-image openjdk-11-java-spring-boot \
     <PATH-TO-KEY-FILE> \
     -c <PATH-TO-CONFIG-FILE>)
 ```
