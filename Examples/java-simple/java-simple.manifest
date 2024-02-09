@@ -1,5 +1,8 @@
-# For better performance
+# For better performance.
 libos.check_invalid_pointers = false
+
+# This option is needed because Java uses memory-fault exception handlers.
+sgx.use_exinfo = true
 
 sys.stack.size = "2M"
 sgx.enclave_size = "4G"

@@ -26,7 +26,7 @@ $ docker build -t openjdk-11-java-simple .
 2. Graminize the Docker image (this step can take some time!):
 
 ```bash
-$ (cd ../..; ./gsc build openjdk-11-java-simple \
+$ (cd ../.. && ./gsc build openjdk-11-java-simple \
     Examples/java-simple/java-simple.manifest \
     -c <PATH-TO-CONFIG-FILE>)
 ```
@@ -34,7 +34,7 @@ $ (cd ../..; ./gsc build openjdk-11-java-simple \
 3. Sign the graminized Docker image:
 
 ```bash
-$ (cd ../..; ./gsc sign-image openjdk-11-java-simple \
+$ (cd ../.. && ./gsc sign-image openjdk-11-java-simple \
     <PATH-TO-KEY-FILE> \
     -c <PATH-TO-CONFIG-FILE>)
 ```
