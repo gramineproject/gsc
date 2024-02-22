@@ -29,7 +29,7 @@ Registry: ""
 # branch is guaranteed to work with current Gramine `master` branch).
 Gramine:
     Repository: "https://github.com/gramineproject/gramine.git"
-    Branch:     "v1.6.1"
+    Branch:     "master"
 
 # Specify the Intel SGX driver installed on your machine (more specifically, on the machine where
 # the graminized Docker container will run); there are several variants of the SGX driver:
