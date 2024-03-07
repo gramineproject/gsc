@@ -6,8 +6,6 @@ runs inside the SGX enclave. For more information on Spring Boot, please visit h
 
 ## Notes
 
-* This generated image is for non-production usage.
-
 * Tested on:
   - Type: Azure Confidential Computing SGX Virtual Machine
   - Size: Standard DC1s v3 (1 vCPU, 8 GiB memory)
