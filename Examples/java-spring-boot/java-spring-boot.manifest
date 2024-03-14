@@ -1,0 +1,13 @@
+# For better performance.
+libos.check_invalid_pointers = false
+
+# This option is needed because Java uses memory-fault exception handlers.
+sgx.use_exinfo = true
+
+sys.stack.size = "2M"
+sgx.enclave_size = "8G"
+sgx.max_threads = 128
+
+# SERVER_PORT is an equivalent environment variable to server.port in Spring Boot
+# that specifies the port number on which the application runs.
+loader.env.SERVER_PORT = { passthrough = true }
