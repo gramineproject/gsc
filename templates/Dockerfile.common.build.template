@@ -11,6 +11,10 @@ FROM {{app_image}}
 # Temporarily switch to the root user to install packages
 USER root
 
+# Reset the correct permissions of /tmp dir (original app image may have changed it, and correct
+# permissions are required for installation of packages)
+RUN chmod 1777 /tmp
+
 # Install distro-specific packages to run Gramine (e.g., python3, protobuf, tomli, etc.)
 {% block install %}{% endblock %}
 
