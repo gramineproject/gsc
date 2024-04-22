@@ -11,8 +11,6 @@ Gramine Shielded Containers (GSC)
 .. |nbsp| unicode:: 0xa0
    :trim:
 
-.. highlight:: sh
-
 Docker containers are widely used to deploy applications in the cloud. Using
 Gramine Shielded Containers (GSC) we provide the infrastructure to deploy Docker
 containers protected by Intel SGX enclaves using the Gramine Library OS.
