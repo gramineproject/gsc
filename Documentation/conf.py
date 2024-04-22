@@ -47,13 +47,13 @@ extensions = [
     'sphinx_rtd_theme',
 ]
 
-# Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
-
 # The suffix(es) of source filenames.
 source_suffix = {
     '.rst': 'restructuredtext',
 }
+
+# Add any paths that contain templates here, relative to this directory.
+templates_path = ['_templates']
 
 # The master toctree document.
 master_doc = 'index'
@@ -63,7 +63,7 @@ master_doc = 'index'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -85,6 +85,8 @@ def setup(app):
     app.add_stylesheet('css/gramine.css')
 
 todo_include_todos = True
+
+myst_heading_anchors = 4
 
 nitpicky = True
 
