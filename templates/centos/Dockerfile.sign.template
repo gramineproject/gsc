@@ -7,9 +7,10 @@ RUN \
        && dnf remove -y binutils \
           epel-release \
           openssl \
+          python3-cryptography \
           python3-protobuf \
           python3-pyelftools \
-          python3-cryptography \
+          python3-voluptuous \
           tcl \
        && dnf -y clean all;
 {% endblock %}

@@ -12,6 +12,7 @@ RUN \
           python3-cryptography \
           python3-protobuf \
           python3-pyelftools \
+          python3-voluptuous \
        && microdnf -y clean all;
 {% endblock %}
 
