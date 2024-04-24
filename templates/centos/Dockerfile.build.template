@@ -21,8 +21,11 @@ RUN dnf update -y \
     && /usr/bin/python3 -B -m pip install click jinja2 protobuf \
                                           'tomli>=1.1.0' 'tomli-w>=0.4.0' \
     && dnf repolist \
-# Install pyelftools after the installation of epel-release as it is provided by the EPEL repo
-    && dnf install -y python3-pyelftools \
+# Install pyelftools and voluptuous after the installation of epel-release as it is provided by the
+# EPEL repo
+    && dnf install -y \
+        python3-pyelftools \
+        python3-voluptuous \
     && dnf -y clean all
 
 {% if buildtype != "release" %}
