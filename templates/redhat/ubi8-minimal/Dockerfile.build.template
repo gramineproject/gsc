@@ -23,6 +23,7 @@ RUN rm -rf /etc/rhsm-host \
         python3-pip \
         python3-protobuf \
         python3-pyelftools \
+        python3-voluptuous \
         wget \
         which \
     && /usr/bin/python3 -B -m pip install click jinja2 \

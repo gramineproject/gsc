@@ -18,6 +18,7 @@ RUN dnf update -y \
         python3-cryptography \
         python3-pip \
         python3-protobuf \
+        python3-voluptuous \
     && /usr/bin/python3 -B -m pip install click jinja2 protobuf \
                                           'tomli>=1.1.0' 'tomli-w>=0.4.0' \
     && dnf repolist \
