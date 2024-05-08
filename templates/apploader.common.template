@@ -14,6 +14,11 @@ then
     exec gramine-sgx /gramine/app_files/entrypoint \
         {% if insecure_args %}{{ binary_arguments | map('shlex_quote') | join(' ') }} \
         "${@}"{% endif %}
+elif [ "$GSC_PAL" == "VM" ]
+then
+    exec gramine-vm /gramine/app_files/entrypoint \
+        {% if insecure_args %}{{ binary_arguments | map('shlex_quote') | join(' ') }} \
+        "${@}"{% endif %}
 else
     exec gramine-direct /gramine/app_files/entrypoint \
     {{ binary_arguments | map('shlex_quote') | join(' ') }} "${@}"
