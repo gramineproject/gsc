@@ -8,13 +8,38 @@ set -e
 # Export distro-specific paths (typically `PYTHONPATH` and `PKG_CONFIG_PATH`)
 {% block path %}{% endblock %}
 
-# Default to Linux-SGX if no PAL was specified
-if [ -z "$GSC_PAL" ] || [ "$GSC_PAL" == "Linux-SGX" ]
-then
-    exec gramine-sgx /gramine/app_files/entrypoint \
-        {% if insecure_args %}{{ binary_arguments | map('shlex_quote') | join(' ') }} \
-        "${@}"{% endif %}
-else
-    exec gramine-direct /gramine/app_files/entrypoint \
-    {{ binary_arguments | map('shlex_quote') | join(' ') }} "${@}"
+# Note: default to SGX if Gramine mode (`direct`, `sgx`) wasn't specified
+GRAMINE_EXEC=gramine-sgx
+
+# TODO: remove GSC_PAL in GSC v1.9
+if [ -n "$GSC_PAL" ] && [ -n "$GRAMINE_MODE" ]; then
+    echo "ERROR: GSC_PAL and GRAMINE_MODE environment variables cannot be set together."
+    exit 1
 fi
+
+if [ -n "$GSC_PAL" ]; then
+    echo "WARNING: GSC_PAL environment variable is deprecated in v1.8 and will be removed in v1.9."
+    echo "         Instead, use GRAMINE_MODE={direct|sgx}."
+
+    # legacy logic was peculiar: if GSC_PAL != Linux-SGX then we set Gramine to `gramine-direct`
+    if [ "$GSC_PAL" == "Linux-SGX" ]; then
+        GRAMINE_EXEC=gramine-sgx
+    else
+        GRAMINE_EXEC=gramine-direct
+    fi
+fi
+
+if [ -n "$GRAMINE_MODE" ]; then
+    if [ "$GRAMINE_MODE" == "sgx" ]; then
+        GRAMINE_EXEC=gramine-sgx
+    elif [ "$GRAMINE_MODE" == "direct" ]; then
+        GRAMINE_EXEC=gramine-direct
+    else
+        echo "ERROR: unrecognized GRAMINE_MODE; can only be 'direct' or 'sgx'."
+        exit 1
+    fi
+fi
+
+exec ${GRAMINE_EXEC} /gramine/app_files/entrypoint \
+    {% if insecure_args %}{{ binary_arguments | map('shlex_quote') | join(' ') }} \
+    "${@}"{% endif %}
