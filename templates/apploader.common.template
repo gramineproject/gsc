@@ -8,13 +8,7 @@ set -e
 # Export distro-specific paths (typically `PYTHONPATH` and `PKG_CONFIG_PATH`)
 {% block path %}{% endblock %}
 
-# Default to Linux-SGX if no PAL was specified
-if [ -z "$GSC_PAL" ] || [ "$GSC_PAL" == "Linux-SGX" ]
-then
-    exec gramine-sgx /gramine/app_files/entrypoint \
-        {% if insecure_args %}{{ binary_arguments | map('shlex_quote') | join(' ') }} \
-        "${@}"{% endif %}
-else
-    exec gramine-direct /gramine/app_files/entrypoint \
-    {{ binary_arguments | map('shlex_quote') | join(' ') }} "${@}"
-fi
+# Note: default to SGX if Gramine binary wasn't specified
+exec ${GRAMINE_BINARY:-gramine-sgx} /gramine/app_files/entrypoint \
+    {% if insecure_args %}{{ binary_arguments | map('shlex_quote') | join(' ') }} \
+    "${@}"{% endif %}
