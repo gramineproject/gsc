@@ -396,26 +396,28 @@ executable arguments may be supplied to the :command:`docker run` command.
    :command:`gsc build`.
 
 
-Execute with Linux PAL (:program:`gramine-direct`)
---------------------------------------------------
+Execute with :program:`gramine-direct`
+--------------------------------------
 
-You may select the Linux PAL (:program:`gramine-direct`) at Docker run time
-instead of the Linux-SGX PAL (:program:`gramine-sgx`) by specifying the
-environment variable :envvar:`GSC_PAL` as an option to the
-:command:`docker run` command. When using the Linux PAL, it is not necessary
-to sign the image via a :command:`gsc sign-image` command.
+By default, the Docker container starts :program:`gramine-sgx`.
 
-.. envvar:: GSC_PAL
+You may choose to start :program:`gramine-direct` in the Docker container by
+specifying the environment variable :envvar:`GSC_GRAMINE_BINARY` as a
+command-line option to :command:`docker run`.
 
-   This environment variable specifies the pal loader.
+.. envvar:: GSC_GRAMINE_BINARY
 
-GSC requires a custom seccomp profile while running with Linux PAL, which has to be
-specified at Docker run time. There are two options:
+   This environment variable specifies the Gramine binary to run. Currently
+   supported values are ``gramine-direct`` and ``gramine-sgx``. Default is
+   ``gramine-sgx``.
+
+GSC requires a custom seccomp profile for :program:`gramine-direct`. There are
+two options:
 
 #. Pass `unconfined` to run the container without the default seccomp profile.
    This option is generally considered insecure, since this results in containers
    running with unrestricted system calls (all system calls are allowed which
-   increases the attack surface of the Linux Kernel).
+   increases the attack surface of the Linux kernel).
 
 #. Pass the custom seccomp profile
    https://github.com/gramineproject/gramine/blob/master/scripts/docker_seccomp.json.
@@ -426,7 +428,13 @@ specified at Docker run time. There are two options:
 
 .. code-block:: sh
 
-   docker run ... --env GSC_PAL=Linux --security-opt seccomp=<profile> gsc-<image-name> ...
+   docker run ... --env GSC_GRAMINE_BINARY=gramine-direct \
+       --security-opt seccomp=<profile> \
+       gsc-<image-name> ...
+
+.. note::
+    Previously, to run :program:`gramine-direct`, one specified ``--env
+    GSC_PAL=Linux``. This is deprecated in GSC v1.8 and will be removed in v1.9.
 
 Example
 =======
