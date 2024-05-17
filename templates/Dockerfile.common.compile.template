@@ -29,7 +29,7 @@ RUN mkdir -p /gramine/driver/asm \
 RUN cd /gramine \
     && meson setup build/ --prefix="/gramine/meson_build_output" \
        --buildtype={{buildtype}} \
-       -Ddirect=enabled -Dsgx=enabled \
+       -Ddirect=enabled -Dsgx=enabled -Dvm=enabled \
        {% if Distro.startswith('ubuntu') %}-Ddcap=enabled{% endif %} \
        {% if "linux-sgx-driver" in SGXDriver.Repository %} \
        -Dsgx_driver=oot -Dsgx_driver_include_path=/gramine/driver \
