@@ -1,0 +1,88 @@
+{% extends "Dockerfile.common.compile.template" %}
+
+{% block install %}
+
+RUN dnf distro-sync -y && dnf install 'dnf-command(config-manager)' -y
+
+RUN dnf config-manager --set-enabled -y crb && \
+    dnf install -y yum-utils && \
+    dnf install -y epel-release && \
+        dnf install -y \
+        autoconf  \
+        automake \
+        bc \
+        binutils \
+        bison \
+        cargo \
+        elfutils-libelf-devel \
+        epel-release \
+        flex \
+        gawk \
+        gcc-c++ \
+        gdb \
+        git \
+        glibc-static \
+        glibc.i686 \
+        golang \
+        httpd \
+        info \
+        java-11-openjdk \
+        java-11-openjdk-devel \
+        jq \
+        less \
+        libcurl-devel \
+        libjpeg-turbo-devel \
+        libmemcached \
+        libunwind \
+        libX11-devel \
+        libXfixes \
+        libXrender \
+        libXtst \
+        libXxf86vm \
+        lsof \
+        make \
+        nasm \
+        nc \
+        ncurses-devel \
+        ncurses-libs \
+        net-tools \
+        ninja-build \
+        nodejs \
+        nss-mdns \
+        nss-myhostname \
+        openssl-devel \
+        patch \
+        pkg-config \
+        protobuf-c-compiler \
+        protobuf-c-devel \
+        protobuf-compiler \
+        protobuf-devel \
+        python3 \
+        python3-click \
+        python3-cryptography \
+        python3-devel \
+        python3-jinja2 \
+        python3-lxml \
+        python3-numpy \
+        python3-pkg-resources \
+        python3-pip \
+        python3-protobuf \
+        python3-pyelftools \
+        python3-pytest \
+        python3-scipy \
+        python3-voluptuous \
+        R-core \
+        rpm-build \
+        sqlite \
+        strace \
+        stress-ng \
+        sudo \
+        texinfo \
+        unzip \
+        vim \
+        wget \
+        zip \
+        zlib-devel \
+    && /usr/bin/python3 -B -m pip install 'tomli>=1.1.0' 'tomli-w>=0.4.0' 'meson>=0.56,!=1.2.*'
+
+{% endblock %}
