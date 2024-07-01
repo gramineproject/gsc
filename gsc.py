@@ -245,10 +245,14 @@ def handle_redhat_repo_configs(distro, tmp_build_path):
         shutil.copytree(sslclientkey_dir, tmp_build_path / 'pki/entitlement')
 
 def template_path(distro):
+    if distro.startswith("quay.io/centos/centos"):
+        return "centos/stream"
+
     if distro.startswith('redhat/ubi'):
         if 'minimal' in distro:
             return 'redhat/ubi-minimal'
         return 'redhat/ubi'
+
     return distro
 
 def assert_not_none(value, error_message):
@@ -284,6 +288,8 @@ def get_image_distro(docker_socket, image_name):
         # and to support these OS distros, we need to truncate at the 2nd dot.
         distro = os_release['ID'] + ':' + '.'.join(version[:2])
 
+    if os_release['NAME'] == 'CentOS Stream':
+        distro = f'quay.io/centos/centos:stream{version[0]}'
     return distro
 
 def fetch_and_validate_distro_support(docker_socket, image_name, env):

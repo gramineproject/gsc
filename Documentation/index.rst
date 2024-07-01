@@ -315,9 +315,9 @@ in :file:`config.yaml.template`.
    Defines Linux distribution to be used to build Gramine in. This distro should
    match the distro of the supplied Docker image; otherwise the results may be
    unpredictable. Currently supported distros are Ubuntu 20.04, Ubuntu 21.04,
-   Ubuntu 22.04, Ubuntu 23.04, Debian 10, Debian 11, Debian 12, CentOS 8,
-   Red Hat Universal Base Image (UBI) 8, Red Hat Universal Base Image (UBI) 9,
-   Red Hat Universal Base Image (UBI) 8 minimal and Red Hat Universal Base Image
+   Ubuntu 22.04, Ubuntu 23.04, Debian 10, Debian 11, Debian 12, CentOS 8, CentOS
+   Stream 9, Red Hat Universal Base Image (UBI) 8, Red Hat Universal Base Image
+   (UBI) 9, Red Hat Universal Base Image (UBI) 8 minimal and Red Hat Universal Base Image
    9 minimal.
 
    Default value is ``auto`` which means GSC automatically detects the distro
