@@ -1,0 +1,41 @@
+{% extends "Dockerfile.common.build.template" %}
+
+{% block install %}
+
+# Combine all installation and removal steps in a single RUN command to reduce the final image size.
+# This is because each Dockerfile command creates a new layer which necessarily adds size to the
+# final image. This trick allows to decrease the image size by hundreds of MBs.
+
+RUN dnf distro-sync -y \
+    && dnf install 'dnf-command(config-manager)' -y \
+    && dnf config-manager --set-enabled -y crb \
+    && dnf install -y \
+        binutils \
+        epel-release \
+        openssl \
+        protobuf-c-compiler \
+        python3 \
+        python3-cryptography \
+        python3-pip \
+        python3-protobuf \
+        which \
+    && /usr/bin/python3 -B -m pip install click jinja2 protobuf \
+                                          'tomli>=1.1.0' 'tomli-w>=0.4.0' \
+    && dnf repolist \
+# Install pyelftools and voluptuous after the installation of epel-release as it is provided by the
+# EPEL repo
+    && dnf install -y \
+        python3-pyelftools \
+        python3-voluptuous \
+    && dnf -y clean all
+
+{% if buildtype != "release" %}
+RUN dnf install -y \
+        gdb \
+        less \
+        libunwind \
+        python3-pytest \
+        strace \
+        vim
+{% endif %}
+{% endblock %}
