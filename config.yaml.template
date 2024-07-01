@@ -6,7 +6,7 @@
 # Currently supported distros are:
 # - ubuntu:20.04, ubuntu:21.04, ubuntu:22.04, ubuntu:23.04
 # - debian:10, debian:11, debian:12
-# - centos:8
+# - centos:8, quay.io/centos/centos:stream9
 # - redhat/ubi8:8.8
 # - redhat/ubi8-minimal:8.8
 

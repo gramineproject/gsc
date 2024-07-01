@@ -260,6 +260,9 @@ def get_image_distro(docker_socket, image_name):
         except docker.errors.ContainerError:
             distro = 'redhat/ubi8:' + version_id
 
+    if (os_release['ID'] == 'centos' and version_id=='9'):
+        distro = 'quay.io/centos/centos:stream' + version_id
+
     return distro
 
 def fetch_and_validate_distro_support(docker_socket, image_name, env):
