@@ -2,42 +2,26 @@
 
 {% block install %}
 
+# NOTE: meson v1.2.* has a bug that leads to Gramine build failure because of not found `libcurl.a`
+
 RUN dnf distro-sync -y && dnf install 'dnf-command(config-manager)' -y
 
 RUN dnf config-manager --set-enabled -y crb && \
-    dnf install -y yum-utils && \
-    dnf install -y epel-release && \
         dnf install -y \
         autoconf  \
-        bc \
         binutils \
         bison \
-        elfutils-libelf-devel \
         epel-release \
         flex \
         gawk \
         gcc-c++ \
-        gdb \
         git \
-        glibc-static \
-        glibc.i686 \
         httpd \
         libcurl-devel \
-        libjpeg-turbo-devel \
-        libmemcached \
-        libunwind \
-        libX11-devel \
-        libXfixes \
-        libXrender \
-        libXtst \
-        lsof \
         make \
         nasm \
         ncurses-devel \
-        ncurses-libs \
         ninja-build \
-        nss-mdns \
-        nss-myhostname \
         openssl-devel \
         patch \
         pkg-config \
@@ -46,13 +30,13 @@ RUN dnf config-manager --set-enabled -y crb && \
         protobuf-compiler \
         protobuf-devel \
         python3 \
-        python3-click \
         python3-cryptography \
         python3-devel \
         python3-pip \
         python3-protobuf \
         rpm-build \
         wget \
+        yum-utils \
     && /usr/bin/python3 -B -m pip install 'tomli>=1.1.0' 'tomli-w>=0.4.0' 'meson>=0.56,!=1.2.*'
 
 {% endblock %}
