@@ -190,10 +190,15 @@ def merge_manifests_in_order(manifest1, manifest2, manifest1_name, manifest2_nam
     return manifest1
 
 def handle_redhat_repo_configs(distro, tmp_build_path):
-    if distro not in {"redhat/ubi8", "redhat/ubi8-minimal"}:
+    if distro in {"redhat/ubi8", "redhat/ubi8-minimal"}:
+        version_id = 8
+    elif distro in {"redhat/ubi9", "redhat/ubi9-minimal"}:
+        version_id = 9
+    else:
         return
 
-    repo_name = "rhel-8-for-x86_64-baseos-rpms"
+    repo_name = f"rhel-{version_id}-for-x86_64-baseos-rpms"
+
     with open('/etc/yum.repos.d/redhat.repo') as redhat_repo:
         redhat_repo_contents = redhat_repo.read()
 
@@ -254,11 +259,12 @@ def get_image_distro(docker_socket, image_name):
 
     # RedHat specific logic to distinguish between UBI8 and UBI8-minimal
     if (os_release['ID'] == 'rhel'):
+        version_id = os_release['VERSION_ID'].split('.')[0]
         try:
             docker_socket.containers.run(image_name, entrypoint='ls /usr/bin/microdnf', remove=True)
-            distro = 'redhat/ubi8-minimal:' + version_id
+            distro = f'redhat/ubi{version_id}-minimal'
         except docker.errors.ContainerError:
-            distro = 'redhat/ubi8:' + version_id
+            distro = f'redhat/ubi{version_id}'
 
     return distro
 
