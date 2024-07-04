@@ -243,6 +243,14 @@ def handle_redhat_repo_configs(distro, tmp_build_path):
         # software updates and support from Red Hat.
         shutil.copytree(sslclientkey_dir, tmp_build_path / 'pki/entitlement')
 
+def get_formatted_redhat_repo(distro):
+    if distro in {"redhat/ubi8", "redhat/ubi9"}:
+        return "redhat/ubi"
+    if distro in {"redhat/ubi8-minimal", "redhat/ubi9-minimal"}:
+        return "redhat/ubi-minimal"
+    else:
+        return distro
+
 def get_image_distro(docker_socket, image_name):
     out = docker_socket.containers.run(image_name, entrypoint='cat /etc/os-release', remove=True)
     out = out.decode('UTF-8')
@@ -275,11 +283,8 @@ def fetch_and_validate_distro_support(docker_socket, image_name, env):
 
     distro = distro.split(':')[0]
 
-    if distro in {"redhat/ubi8", "redhat/ubi9"}:
-        if not os.path.exists('templates/redhat/ubi'):
-            raise FileNotFoundError(f'`{distro}` distro is not supported by GSC.')
-    elif distro in {"redhat/ubi8-minimal", "redhat/ubi9-minimal"}:
-        if not os.path.exists('templates/redhat/ubi-minimal'):
+    if distro.startswith('redhat/ubi'):
+        if not os.path.exists(f'templates/{get_formatted_redhat_repo(distro)}'):
             raise FileNotFoundError(f'`{distro}` distro is not supported by GSC.')
     else:
         if not os.path.exists(f'templates/{distro}'):
@@ -340,10 +345,8 @@ def gsc_build(args):
         sys.exit(1)
 
     env.loader = jinja2.FileSystemLoader('templates/')
-    if distro in {"redhat/ubi8", "redhat/ubi9"}:
-        compile_template = env.get_template(f'redhat/ubi/Dockerfile.compile.template')
-    elif distro in {"redhat/ubi8-minimal", "redhat/ubi9-minimal"}:
-        compile_template = env.get_template(f'redhat/ubi-minimal/Dockerfile.compile.template')
+    if distro.startswith('redhat/ubi'):
+        compile_template = env.get_template(f'{get_formatted_redhat_repo(distro)}/Dockerfile.compile.template')
     else:
         compile_template = env.get_template(f'{distro}/Dockerfile.compile.template')
     env.globals.update({'compile_template': compile_template})
@@ -351,10 +354,8 @@ def gsc_build(args):
     # generate Dockerfile.build from Jinja-style templates/<distro>/Dockerfile.build.template
     # using the user-provided config file with info on OS distro, Gramine version and SGX driver
     # and other env configurations generated above
-    if distro in {"redhat/ubi8", "redhat/ubi9"}:
-        build_template = env.get_template(f'redhat/ubi/Dockerfile.build.template')
-    elif distro in {"redhat/ubi8-minimal", "redhat/ubi9-minimal"}:
-        build_template = env.get_template(f'redhat/ubi-minimal/Dockerfile.build.template')
+    if distro.startswith('redhat/ubi'):
+        build_template = env.get_template(f'{get_formatted_redhat_repo(distro)}/Dockerfile.build.template')
     else:
         build_template = env.get_template(f'{distro}/Dockerfile.build.template')
 
@@ -362,10 +363,8 @@ def gsc_build(args):
         dockerfile.write(build_template.render())
 
     # generate apploader.sh from Jinja-style templates/apploader.template
-    if distro in {"redhat/ubi8", "redhat/ubi9"}:
-        apploader_template = env.get_template(f'redhat/ubi/apploader.template')
-    elif distro in {"redhat/ubi8-minimal", "redhat/ubi9-minimal"}:
-        apploader_template = env.get_template(f'redhat/ubi-minimal/apploader.template')
+    if distro.startswith('redhat/ubi'):
+        apploader_template = env.get_template(f'{get_formatted_redhat_repo(distro)}/apploader.template')
     else:
         apploader_template = env.get_template(f'{distro}/apploader.template')
     with open(tmp_build_path / 'apploader.sh', 'w') as apploader:
@@ -376,10 +375,8 @@ def gsc_build(args):
     #   - base Docker image's environment variables
     #   - additional, user-provided manifest options
 
-    if distro in {"redhat/ubi8", "redhat/ubi9"}:
-        entrypoint_manifest_name = f'redhat/ubi/entrypoint.manifest.template'
-    elif distro in {"redhat/ubi8-minimal", "redhat/ubi9-minimal"}:
-        entrypoint_manifest_name = f'redhat/ubi-minimal/entrypoint.manifest.template'
+    if distro.startswith('redhat/ubi'):
+        entrypoint_manifest_name = f'{get_formatted_redhat_repo(distro)}/entrypoint.manifest.template'
     else:
         entrypoint_manifest_name = f'{distro}/entrypoint.manifest.template'
 
@@ -539,10 +536,8 @@ def gsc_sign_image(args):
 
     env.loader = jinja2.FileSystemLoader('templates/')
 
-    if distro in {"redhat/ubi8", "redhat/ubi9"}:
-        sign_template = env.get_template(f'redhat/ubi/Dockerfile.sign.template')
-    elif distro in {"redhat/ubi8-minimal", "redhat/ubi9-minimal"}:
-        sign_template = env.get_template(f'redhat/ubi-minimal/Dockerfile.sign.template')
+    if distro.startswith('redhat/ubi'):
+        sign_template = env.get_template(f'{get_formatted_redhat_repo(distro)}/Dockerfile.sign.template')
     else:
         sign_template = env.get_template(f'{distro}/Dockerfile.sign.template')
 
