@@ -1,1 +1,0 @@
-{% extends "centos/entrypoint.manifest.template" %}

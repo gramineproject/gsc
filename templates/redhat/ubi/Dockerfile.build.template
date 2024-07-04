@@ -1,6 +1,7 @@
 {% extends "Dockerfile.common.build.template" %}
 
 {% block install %}
+{% set distro = Distro.split(':') %}
 COPY redhat.repo /etc/yum.repos.d/
 COPY pki/entitlement/ /etc/pki/entitlement/
 COPY redhat-uep.pem /etc/rhsm/ca/
@@ -9,8 +10,14 @@ COPY redhat-uep.pem /etc/rhsm/ca/
 # This is because each Dockerfile command creates a new layer which necessarily adds size to the
 # final image. This trick allows to decrease the image size by hundreds of MBs.
 RUN rm -rf /etc/rhsm-host \
+    {%- if distro[0] == "redhat/ubi9" %}
     && subscription-manager repos --enable codeready-builder-for-rhel-9-x86_64-rpms \
     && dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm \
+    {%- endif %}
+    {%- if distro[0] == "redhat/ubi8" %}
+    && subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms \
+    && dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
+    {%- endif %}
     && dnf update -y \
     && dnf install -y \
         binutils \

@@ -1,19 +1,25 @@
 {% extends "Dockerfile.common.compile.template" %}
 
 {% block install %}
+{% set distro = Distro.split(':') %}
 COPY redhat.repo /etc/yum.repos.d/
 COPY pki/entitlement/ /etc/pki/entitlement/
 COPY redhat-uep.pem /etc/rhsm/ca/
 
 # NOTE: meson v1.2.* has a bug that leads to Gramine build failure because of not found `libcurl.a`
 RUN rm -rf /etc/rhsm-host \
-    && rpm -ivh https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm \
-    && microdnf install -y subscription-manager \
+    {%- if distro[0] == "redhat/ubi9" %}
     && subscription-manager repos --enable codeready-builder-for-rhel-9-x86_64-rpms \
-    && microdnf install -y \
+    && dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm \
+    {%- endif %}
+    {%- if distro[0] == "redhat/ubi8" %}
+    && subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms \
+    && dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
+    {%- endif %}
+    && dnf update -y \
+    && dnf install -y \
         autoconf \
         bison \
-        curl \
         elfutils-libelf-devel \
         flex \
         gawk \
@@ -36,6 +42,7 @@ RUN rm -rf /etc/rhsm-host \
         python3-cryptography \
         python3-pip \
         python3-protobuf \
+        python3-voluptuous \
         rpm-build \
         wget \
     && /usr/bin/python3 -B -m pip install 'tomli>=1.1.0' 'tomli-w>=0.4.0' 'meson>=0.56,!=1.2.*'

@@ -7,8 +7,8 @@
 # - ubuntu:20.04, ubuntu:21.04, ubuntu:22.04, ubuntu:23.04
 # - debian:10, debian:11, debian:12
 # - centos:8
-# - redhat/ubi8:8.8, redhat/ubi9
-# - redhat/ubi8-minimal:8.8, redhat/ubi9-minimal
+# - redhat/ubi8:8.8, redhat/ubi9:9.4
+# - redhat/ubi8-minimal:8.8, redhat/ubi9-minimal:9.4
 
 # If Distro is set to "auto", GSC detects the distro automatically by examining the supplied
 # Docker image. Alternatively, Distro can be set to one of the supported distros mentioned above.
