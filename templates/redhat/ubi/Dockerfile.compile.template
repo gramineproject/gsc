@@ -1,19 +1,23 @@
 {% extends "Dockerfile.common.compile.template" %}
 
 {% block install %}
+
+{% set ver = get_ubi_version(Distro) | assert_not_none(
+    'ERROR: Unsupported Red Hat distribution - ' + Distro)
+%}
+
 COPY redhat.repo /etc/yum.repos.d/
 COPY pki/entitlement/ /etc/pki/entitlement/
 COPY redhat-uep.pem /etc/rhsm/ca/
 
 # NOTE: meson v1.2.* has a bug that leads to Gramine build failure because of not found `libcurl.a`
 RUN rm -rf /etc/rhsm-host \
-    && subscription-manager repos --enable codeready-builder-for-rhel-8-x86_64-rpms \
-    && dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
+    && subscription-manager repos --enable codeready-builder-for-rhel-{{ver}}-x86_64-rpms \
+    && dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-{{ver}}.noarch.rpm \
     && dnf update -y \
     && dnf install -y \
         autoconf \
         bison \
-        curl \
         elfutils-libelf-devel \
         flex \
         gawk \
@@ -36,6 +40,7 @@ RUN rm -rf /etc/rhsm-host \
         python3-cryptography \
         python3-pip \
         python3-protobuf \
+        python3-voluptuous \
         rpm-build \
         wget \
     && /usr/bin/python3 -B -m pip install 'tomli>=1.1.0' 'tomli-w>=0.4.0' 'meson>=0.56,!=1.2.*'

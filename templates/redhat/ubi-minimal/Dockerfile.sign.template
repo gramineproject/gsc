@@ -1,0 +1,19 @@
+{% extends "Dockerfile.common.sign.template" %}
+
+# Ideally, we would want to remove `openssl` and all its dependencies, but because of the slight
+# differences between different `openssl` package versions, it is hard to do in a uniform way (as
+# `openssl` installation may install additional packages).
+{% block uninstall %}
+RUN \
+       pip3 uninstall -y click jinja2 \
+          tomli tomli-w \
+       && microdnf remove -y \
+          epel-release \
+          python3-cryptography \
+          python3-protobuf \
+          python3-pyelftools \
+          python3-voluptuous \
+       && microdnf -y clean all;
+{% endblock %}
+
+{% block path %}export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib64 -type d -path '*/site-packages')" &&{% endblock %}

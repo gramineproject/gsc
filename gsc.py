@@ -190,10 +190,16 @@ def merge_manifests_in_order(manifest1, manifest2, manifest1_name, manifest2_nam
     return manifest1
 
 def handle_redhat_repo_configs(distro, tmp_build_path):
-    if distro not in {"redhat/ubi8", "redhat/ubi8-minimal"}:
+    if not distro.startswith('redhat/'):
         return
 
-    repo_name = "rhel-8-for-x86_64-baseos-rpms"
+    version_id_match = re.search(r'^redhat/ubi(\d+)(-minimal)?$', distro)
+    if version_id_match:
+        version_id = version_id_match.group(1)
+        repo_name = f'rhel-{version_id}-for-x86_64-baseos-rpms'
+    else:
+        raise ValueError(f'Invalid Red Hat distro format: {distro}')
+
     with open('/etc/yum.repos.d/redhat.repo') as redhat_repo:
         redhat_repo_contents = redhat_repo.read()
 
@@ -238,27 +244,45 @@ def handle_redhat_repo_configs(distro, tmp_build_path):
         # software updates and support from Red Hat.
         shutil.copytree(sslclientkey_dir, tmp_build_path / 'pki/entitlement')
 
+def template_path(distro):
+    if distro.startswith('redhat/ubi'):
+        if 'minimal' in distro:
+            return 'redhat/ubi-minimal'
+        return 'redhat/ubi'
+    return distro
+
+def assert_not_none(value, error_message):
+    if value is None:
+        raise jinja2.TemplateError(error_message)
+    return value
+
+def get_ubi_version(distro):
+    match_ = re.match(r'^redhat/ubi(\d+)(-minimal)?:(\d+).(\d+)$', distro)
+    return match_.group(1) if match_ else None
+
 def get_image_distro(docker_socket, image_name):
     out = docker_socket.containers.run(image_name, entrypoint='cat /etc/os-release', remove=True)
     out = out.decode('UTF-8')
 
     os_release = dict(shlex.split(line)[0].split('=') for line in out.splitlines() if line.strip())
 
-    # Some OS distros (e.g. Alpine) have very precise versions (e.g. 3.17.3), and to support these
-    # OS distros, we need to truncate at the 2nd dot.
-    try:
-        version_id = '.'.join(os_release['VERSION_ID'].split(".", 2)[:2])
-        distro = os_release['ID'] + ':' + version_id
-    except KeyError:
+    if 'ID' not in os_release or 'VERSION_ID' not in os_release:
         raise DistroRetrievalError
 
-    # RedHat specific logic to distinguish between UBI8 and UBI8-minimal
-    if (os_release['ID'] == 'rhel'):
+    version_str = os_release['VERSION_ID']
+    version = version_str.split('.')
+    if os_release['ID'] == 'rhel':
+        # RedHat specific logic to distinguish between UBI and UBI-minimal
         try:
             docker_socket.containers.run(image_name, entrypoint='ls /usr/bin/microdnf', remove=True)
-            distro = 'redhat/ubi8-minimal:' + version_id
         except docker.errors.ContainerError:
-            distro = 'redhat/ubi8:' + version_id
+            distro = f'redhat/ubi{version[0]}:{version_str}'
+        else:
+            distro = f'redhat/ubi{version[0]}-minimal:{version_str}'
+    else:
+        # Some OS distros (e.g. Alpine) have very precise versions (e.g. 3.17.3),
+        # and to support these OS distros, we need to truncate at the 2nd dot.
+        distro = os_release['ID'] + ':' + '.'.join(version[:2])
 
     return distro
 
@@ -269,7 +293,8 @@ def fetch_and_validate_distro_support(docker_socket, image_name, env):
         env.globals['Distro'] = distro
 
     distro = distro.split(':')[0]
-    if not os.path.exists(f'templates/{distro}'):
+
+    if not os.path.exists(f'templates/{template_path(distro)}'):
         raise FileNotFoundError(f'`{distro}` distro is not supported by GSC.')
 
     return distro
@@ -312,6 +337,8 @@ def gsc_build(args):
     # initialize Jinja env with configurations extracted from the original Docker image
     env = jinja2.Environment()
     env.filters['shlex_quote'] = shlex.quote
+    env.filters['assert_not_none'] = assert_not_none
+    env.globals['get_ubi_version'] = get_ubi_version
     env.globals.update(config)
     env.globals.update(vars(args))
     env.globals.update({'app_image': original_image_name})
@@ -326,25 +353,29 @@ def gsc_build(args):
         print(e, file=sys.stderr)
         sys.exit(1)
 
-    env.globals.update({'compile_template': f'{distro}/Dockerfile.compile.template'})
     env.loader = jinja2.FileSystemLoader('templates/')
+    compile_template = env.get_template(f'{template_path(distro)}/Dockerfile.compile.template')
+    env.globals.update({'compile_template': compile_template})
 
     # generate Dockerfile.build from Jinja-style templates/<distro>/Dockerfile.build.template
     # using the user-provided config file with info on OS distro, Gramine version and SGX driver
     # and other env configurations generated above
-    build_template = env.get_template(f'{distro}/Dockerfile.build.template')
+    build_template = env.get_template(f'{template_path(distro)}/Dockerfile.build.template')
+
     with open(tmp_build_path / 'Dockerfile.build', 'w') as dockerfile:
         dockerfile.write(build_template.render())
 
     # generate apploader.sh from Jinja-style templates/apploader.template
+    apploader_template = env.get_template(f'{template_path(distro)}/apploader.template')
     with open(tmp_build_path / 'apploader.sh', 'w') as apploader:
-        apploader.write(env.get_template(f'{distro}/apploader.template').render())
+        apploader.write(apploader_template.render())
 
     # generate entrypoint.manifest from three parts:
     #   - Jinja-style templates/entrypoint.manifest.template
     #   - base Docker image's environment variables
     #   - additional, user-provided manifest options
-    entrypoint_manifest_name = f'{distro}/entrypoint.manifest.template'
+
+    entrypoint_manifest_name = f'{template_path(distro)}/entrypoint.manifest.template'
     entrypoint_manifest_render = env.get_template(entrypoint_manifest_name).render()
     try:
         entrypoint_manifest_dict = tomli.loads(entrypoint_manifest_render)
@@ -422,6 +453,8 @@ def gsc_build_gramine(args):
 
     # initialize Jinja env with user-provided configurations
     env = jinja2.Environment()
+    env.filters['assert_not_none'] = assert_not_none
+    env.globals['get_ubi_version'] = get_ubi_version
     env.globals.update(config)
     env.globals.update(vars(args))
 
@@ -434,7 +467,7 @@ def gsc_build_gramine(args):
         sys.exit(1)
 
     distro, _ = distro.split(':')
-    if not os.path.exists(f'templates/{distro}'):
+    if not os.path.exists(f'templates/{template_path(distro)}'):
         print(f'{distro} distro is not supported by GSC.')
         sys.exit(1)
 
@@ -443,7 +476,7 @@ def gsc_build_gramine(args):
     # generate Dockerfile.compile from Jinja-style templates/<distro>/Dockerfile.compile.template
     # using the user-provided config file with info on OS distro, Gramine version and SGX driver
     # and other user-provided args (see argparser::gsc_build_gramine below)
-    compile_template = env.get_template(f'{distro}/Dockerfile.compile.template')
+    compile_template = env.get_template(f'{template_path(distro)}/Dockerfile.compile.template')
     with open(tmp_build_path / 'Dockerfile.compile', 'w') as dockerfile:
         dockerfile.write(compile_template.render())
 
@@ -500,8 +533,8 @@ def gsc_sign_image(args):
         sys.exit(1)
 
     env.loader = jinja2.FileSystemLoader('templates/')
-    sign_template = env.get_template(f'{distro}/Dockerfile.sign.template')
 
+    sign_template = env.get_template(f'{template_path(distro)}/Dockerfile.sign.template')
     os.makedirs(tmp_build_path, exist_ok=True)
     with open(tmp_build_path / 'Dockerfile.sign', 'w') as dockerfile:
         dockerfile.write(sign_template.render(image=unsigned_image_name))
