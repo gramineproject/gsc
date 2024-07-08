@@ -6,92 +6,26 @@
 # This is because each Dockerfile command creates a new layer which necessarily adds size to the
 # final image. This trick allows to decrease the image size by hundreds of MBs.
 RUN dnf update -y \
-    &&  dnf install -y \
+    && dnf distro-sync -y && dnf install 'dnf-command(config-manager)' -y \
+    && dnf config-manager --set-enabled -y crb \
+    && dnf install -y \
         binutils \
         epel-release \
+        java-11-openjdk \
+        java-11-openjdk-devel \
         openssl \
+        protobuf-c-compiler \
         python3 \
         python3-cryptography \
         python3-pip \
         python3-protobuf \
     && /usr/bin/python3 -B -m pip install click jinja2 protobuf \
-                                          'tomli>=1.1.0' 'tomli-w>=0.4.0' \
+                                          'tomli>=1.1.0' 'tomli-w>=0.4.0' 'meson>=0.56,!=1.2.*' \
     && dnf repolist \
     && dnf install -y \
         python3-pyelftools \
         python3-voluptuous \
     && dnf -y clean all
-
-RUN dnf distro-sync -y && dnf install 'dnf-command(config-manager)' -y
-
-RUN dnf config-manager --set-enabled -y crb && \
-    dnf install -y yum-utils && \
-    dnf install -y epel-release && \
-    dnf install -y \
-        autoconf \
-        automake \
-        bc \
-        binutils \
-        bison \
-        elfutils-libelf-devel \
-        openssl-devel \
-        rpm-build \
-        flex \
-        gawk \
-        gcc-c++ \
-        gdb \
-        git \
-        httpd \
-        info \
-        java-11-openjdk \
-        java-11-openjdk-devel \
-        jq \
-        less \
-        libcurl-devel \
-        libevent-devel \
-        libX11-devel \
-        libXxf86vm \
-        libXtst \
-        libXfixes \
-        libXrender \
-        libunwind \
-        lsof \
-        make \
-        nasm \
-        nc \
-        ncurses-devel \
-        ncurses-libs \
-        net-tools \
-        ninja-build \
-        nodejs \
-        openssl-devel \
-        protobuf-devel \
-        protobuf-c-devel \
-        patch \
-        pkg-config \
-        protobuf-c-compiler \
-        python3 \
-        python3-click \
-        python3-cryptography \
-        python3-devel \
-        python3-jinja2 \
-        python3-lxml \
-        python3-numpy \
-        python3-pkg-resources \
-        python3-pip \
-        python3-protobuf \
-        python3-pyelftools \
-        python3-pytest \
-        python3-voluptuous \
-        strace \
-        stress-ng \
-        texinfo \
-        wget \
-        unzip \
-        zip \
-        zlib-devel \
-    && python3 -m pip install -U 'tomli>=1.1.0' 'tomli-w>=0.4.0' 'meson>=0.56,!=1.2.*'
-
 {% if buildtype != "release" %}
 RUN dnf install -y \
         gdb \
