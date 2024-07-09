@@ -190,13 +190,10 @@ def merge_manifests_in_order(manifest1, manifest2, manifest1_name, manifest2_nam
     return manifest1
 
 def handle_redhat_repo_configs(distro, tmp_build_path):
-    if distro in {"redhat/ubi8", "redhat/ubi8-minimal"}:
-        version_id = 8
-    elif distro in {"redhat/ubi9", "redhat/ubi9-minimal"}:
-        version_id = 9
-    else:
+    if not distro.startswith("redhat/ubi"):
         return
 
+    version_id = re.search(r'\d+', distro).group()
     repo_name = f"rhel-{version_id}-for-x86_64-baseos-rpms"
 
     with open('/etc/yum.repos.d/redhat.repo') as redhat_repo:
@@ -244,10 +241,10 @@ def handle_redhat_repo_configs(distro, tmp_build_path):
         shutil.copytree(sslclientkey_dir, tmp_build_path / 'pki/entitlement')
 
 def template_path(distro):
-    if distro in {"redhat/ubi8", "redhat/ubi9"}:
+    if distro.startswith("redhat/ubi"):
+        if "minimal" in distro:
+            return "redhat/ubi-minimal"
         return "redhat/ubi"
-    if distro in {"redhat/ubi8-minimal", "redhat/ubi9-minimal"}:
-        return "redhat/ubi-minimal"
     return distro
 
 def get_image_distro(docker_socket, image_name):
