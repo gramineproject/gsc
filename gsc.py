@@ -190,10 +190,15 @@ def merge_manifests_in_order(manifest1, manifest2, manifest1_name, manifest2_nam
     return manifest1
 
 def handle_redhat_repo_configs(distro, tmp_build_path):
-    if distro not in {"redhat/ubi8", "redhat/ubi8-minimal"}:
+    if distro in {"redhat/ubi8", "redhat/ubi8-minimal"}:
+        version_id = 8
+    elif distro in {"redhat/ubi9", "redhat/ubi9-minimal"}:
+        version_id = 9
+    else:
         return
 
-    repo_name = "rhel-8-for-x86_64-baseos-rpms"
+    repo_name = f"rhel-{version_id}-for-x86_64-baseos-rpms"
+
     with open('/etc/yum.repos.d/redhat.repo') as redhat_repo:
         redhat_repo_contents = redhat_repo.read()
 
@@ -238,6 +243,15 @@ def handle_redhat_repo_configs(distro, tmp_build_path):
         # software updates and support from Red Hat.
         shutil.copytree(sslclientkey_dir, tmp_build_path / 'pki/entitlement')
 
+def template_path(distro):
+    if distro in {"redhat/ubi8", "redhat/ubi9"}:
+        return "redhat/ubi"
+    if distro in {"redhat/ubi8-minimal", "redhat/ubi9-minimal"}:
+        return "redhat/ubi-minimal"
+    if distro in {"quay.io/centos/centos"}:
+        return "centos/stream"
+    return distro
+
 def get_image_distro(docker_socket, image_name):
     out = docker_socket.containers.run(image_name, entrypoint='cat /etc/os-release', remove=True)
     out = out.decode('UTF-8')
@@ -256,13 +270,12 @@ def get_image_distro(docker_socket, image_name):
     if (os_release['ID'] == 'rhel'):
         try:
             docker_socket.containers.run(image_name, entrypoint='ls /usr/bin/microdnf', remove=True)
-            distro = 'redhat/ubi8-minimal:' + version_id
+            distro = f'redhat/ubi{version_id.split(".")[0]}-minimal:{version_id}'
         except docker.errors.ContainerError:
-            distro = 'redhat/ubi8:' + version_id
+            distro = f'redhat/ubi{version_id.split(".")[0]}:{version_id}'
 
-    if (os_release['ID'] == 'centos' and version_id == '9'):
-        distro = 'quay.io/centos/centos:stream' + version_id
-
+    if (os_release['NAME'] == "CentOS Stream"):
+        distro = f'quay.io/centos/centos:stream{version_id}'
     return distro
 
 def fetch_and_validate_distro_support(docker_socket, image_name, env):
@@ -272,7 +285,8 @@ def fetch_and_validate_distro_support(docker_socket, image_name, env):
         env.globals['Distro'] = distro
 
     distro = distro.split(':')[0]
-    if not os.path.exists(f'templates/{distro}'):
+
+    if not os.path.exists(f'templates/{template_path(distro)}'):
         raise FileNotFoundError(f'`{distro}` distro is not supported by GSC.')
 
     return distro
@@ -329,25 +343,29 @@ def gsc_build(args):
         print(e, file=sys.stderr)
         sys.exit(1)
 
-    env.globals.update({'compile_template': f'{distro}/Dockerfile.compile.template'})
     env.loader = jinja2.FileSystemLoader('templates/')
+    compile_template = env.get_template(f'{template_path(distro)}/Dockerfile.compile.template')
+    env.globals.update({'compile_template': compile_template})
 
     # generate Dockerfile.build from Jinja-style templates/<distro>/Dockerfile.build.template
     # using the user-provided config file with info on OS distro, Gramine version and SGX driver
     # and other env configurations generated above
-    build_template = env.get_template(f'{distro}/Dockerfile.build.template')
+    build_template = env.get_template(f'{template_path(distro)}/Dockerfile.build.template')
+
     with open(tmp_build_path / 'Dockerfile.build', 'w') as dockerfile:
         dockerfile.write(build_template.render())
 
     # generate apploader.sh from Jinja-style templates/apploader.template
+    apploader_template = env.get_template(f'{template_path(distro)}/apploader.template')
     with open(tmp_build_path / 'apploader.sh', 'w') as apploader:
-        apploader.write(env.get_template(f'{distro}/apploader.template').render())
+        apploader.write(apploader_template.render())
 
     # generate entrypoint.manifest from three parts:
     #   - Jinja-style templates/entrypoint.manifest.template
     #   - base Docker image's environment variables
     #   - additional, user-provided manifest options
-    entrypoint_manifest_name = f'{distro}/entrypoint.manifest.template'
+
+    entrypoint_manifest_name = f'{template_path(distro)}/entrypoint.manifest.template'
     entrypoint_manifest_render = env.get_template(entrypoint_manifest_name).render()
     try:
         entrypoint_manifest_dict = tomli.loads(entrypoint_manifest_render)
@@ -503,8 +521,8 @@ def gsc_sign_image(args):
         sys.exit(1)
 
     env.loader = jinja2.FileSystemLoader('templates/')
-    sign_template = env.get_template(f'{distro}/Dockerfile.sign.template')
 
+    sign_template = env.get_template(f'{template_path(distro)}/Dockerfile.sign.template')
     os.makedirs(tmp_build_path, exist_ok=True)
     with open(tmp_build_path / 'Dockerfile.sign', 'w') as dockerfile:
         dockerfile.write(sign_template.render(image=unsigned_image_name))
