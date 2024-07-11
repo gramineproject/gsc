@@ -6,10 +6,10 @@
 # This is because each Dockerfile command creates a new layer which necessarily adds size to the
 # final image. This trick allows to decrease the image size by hundreds of MBs.
 
-RUN dnf distro-sync -y && dnf install 'dnf-command(config-manager)' -y
-
-RUN dnf config-manager --set-enabled -y crb && \
-    dnf install -y \
+RUN dnf distro-sync -y \
+    && dnf install 'dnf-command(config-manager)' -y \
+    && dnf config-manager --set-enabled -y crb \
+    && dnf install -y \
         binutils \
         epel-release \
         openssl \
