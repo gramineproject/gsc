@@ -1,1 +1,16 @@
 {% extends "centos/Dockerfile.sign.template" %}
+
+{% block uninstall %}
+RUN \
+       pip3 uninstall -y click jinja2 \
+          tomli tomli-w \
+       && dnf remove -y \
+          binutils \
+          epel-release \
+          python3-cryptography \
+          python3-protobuf \
+          python3-pyelftools \
+          python3-voluptuous \
+          tcl \
+       && dnf -y clean all;
+{% endblock %}
