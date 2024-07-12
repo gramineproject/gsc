@@ -1,5 +1,8 @@
 {% extends "centos/Dockerfile.sign.template" %}
 
+# Ideally, we would want to remove `openssl` and all its dependencies, but because of the slight
+# differences between different `openssl` package versions, it is hard to do in a uniform way (as
+# `openssl` installation may install additional packages).
 {% block uninstall %}
 RUN \
        pip3 uninstall -y click jinja2 \
