@@ -6,6 +6,7 @@
 
 import argparse
 import hashlib
+import multiprocessing
 import os
 import pathlib
 import re
@@ -521,7 +522,9 @@ def gsc_sign_image(args):
         os.remove(tmp_build_key_path)
         # Remove a temporary image created during multistage docker build to save disk space.
         # Please note that removing the image doesn't assure security.
-        docker_socket.api.prune_images(filters={'label': 'build_id=' + build_id})
+        lock = multiprocessing.Lock()
+        with lock:
+            docker_socket.api.prune_images(filters={'label': 'build_id=' + build_id})
 
     if get_docker_image(docker_socket, signed_image_name) is None:
         print(f'Failed to build a signed graminized Docker image `{signed_image_name}`.')
