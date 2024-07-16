@@ -448,7 +448,7 @@ def gsc_build_gramine(args):
         sys.exit(1)
 
     distro, _ = distro.split(':')
-    if not os.path.exists(f'templates/{distro}'):
+    if not os.path.exists(f'templates/{template_path(distro)}'):
         print(f'{distro} distro is not supported by GSC.')
         sys.exit(1)
 
@@ -457,7 +457,7 @@ def gsc_build_gramine(args):
     # generate Dockerfile.compile from Jinja-style templates/<distro>/Dockerfile.compile.template
     # using the user-provided config file with info on OS distro, Gramine version and SGX driver
     # and other user-provided args (see argparser::gsc_build_gramine below)
-    compile_template = env.get_template(f'{distro}/Dockerfile.compile.template')
+    compile_template = env.get_template(f'{template_path(distro)}/Dockerfile.compile.template')
     with open(tmp_build_path / 'Dockerfile.compile', 'w') as dockerfile:
         dockerfile.write(compile_template.render())
 
