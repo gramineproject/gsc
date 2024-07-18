@@ -190,11 +190,15 @@ def merge_manifests_in_order(manifest1, manifest2, manifest1_name, manifest2_nam
     return manifest1
 
 def handle_redhat_repo_configs(distro, tmp_build_path):
-    if not distro.startswith("redhat/ubi"):
+    if not distro.startswith('redhat'):
         return
 
-    version_id = re.search(r'\d+', distro).group()
-    repo_name = f"rhel-{version_id}-for-x86_64-baseos-rpms"
+    version_id_match = re.search(r'^redhat/(ubi\d+|ubi\d+-minimal)$', distro)
+    if version_id_match:
+        version_id = re.search(r'\d+', version_id_match.group(1)).group(0)
+        repo_name = f'rhel-{version_id}-for-x86_64-baseos-rpms'
+    else:
+        raise ValueError(f'Invalid Red Hat distro format: {distro}')
 
     with open('/etc/yum.repos.d/redhat.repo') as redhat_repo:
         redhat_repo_contents = redhat_repo.read()
@@ -241,10 +245,10 @@ def handle_redhat_repo_configs(distro, tmp_build_path):
         shutil.copytree(sslclientkey_dir, tmp_build_path / 'pki/entitlement')
 
 def template_path(distro):
-    if distro.startswith("redhat/ubi"):
-        if "minimal" in distro:
-            return "redhat/ubi-minimal"
-        return "redhat/ubi"
+    if distro.startswith('redhat/ubi'):
+        if 'minimal' in distro:
+            return 'redhat/ubi-minimal'
+        return 'redhat/ubi'
     return distro
 
 def get_image_distro(docker_socket, image_name):
@@ -261,13 +265,14 @@ def get_image_distro(docker_socket, image_name):
     except KeyError:
         raise DistroRetrievalError
 
-    # RedHat specific logic to distinguish between UBI8 and UBI8-minimal
+    # RedHat specific logic to distinguish between UBI and UBI-minimal
     if (os_release['ID'] == 'rhel'):
+        ubi_version = version_id.split(".")[0]
         try:
             docker_socket.containers.run(image_name, entrypoint='ls /usr/bin/microdnf', remove=True)
-            distro = f'redhat/ubi{version_id.split(".")[0]}-minimal:{version_id}'
+            distro = f'redhat/ubi{ubi_version}-minimal:{version_id}'
         except docker.errors.ContainerError:
-            distro = f'redhat/ubi{version_id.split(".")[0]}:{version_id}'
+            distro = f'redhat/ubi{ubi_version}:{version_id}'
 
     return distro
 
