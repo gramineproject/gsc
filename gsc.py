@@ -190,13 +190,13 @@ def merge_manifests_in_order(manifest1, manifest2, manifest1_name, manifest2_nam
     return manifest1
 
 def handle_redhat_repo_configs(distro, tmp_build_path):
-    if not distro.startswith('redhat'):
+    if not distro.startswith('redhat/'):
         return
 
-    version_id_match = re.search(r'^redhat/(ubi\d+|ubi\d+-minimal)$', distro)
+    version_id_match = re.search(r'^redhat/ubi(\d+)(-minimal)?$', distro)
     if version_id_match:
-        version_id = re.search(r'\d+', version_id_match.group(1)).group(0)
-        repo_name = f'rhel-{version_id}-for-x86_64-baseos-rpms'
+        version_id = version_id_match.group(1)
+        repo_name = f"rhel-{version_id}-for-x86_64-baseos-rpms"
     else:
         raise ValueError(f'Invalid Red Hat distro format: {distro}')
 
