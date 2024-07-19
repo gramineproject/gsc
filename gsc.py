@@ -196,7 +196,7 @@ def handle_redhat_repo_configs(distro, tmp_build_path):
     version_id_match = re.search(r'^redhat/ubi(\d+)(-minimal)?$', distro)
     if version_id_match:
         version_id = version_id_match.group(1)
-        repo_name = f"rhel-{version_id}-for-x86_64-baseos-rpms"
+        repo_name = f'rhel-{version_id}-for-x86_64-baseos-rpms'
     else:
         raise ValueError(f'Invalid Red Hat distro format: {distro}')
 
