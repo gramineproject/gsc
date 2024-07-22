@@ -251,28 +251,32 @@ def template_path(distro):
         return 'redhat/ubi'
     return distro
 
+def regex_match(value, pattern):
+    return re.match(pattern, value) is not None
+
 def get_image_distro(docker_socket, image_name):
     out = docker_socket.containers.run(image_name, entrypoint='cat /etc/os-release', remove=True)
     out = out.decode('UTF-8')
 
     os_release = dict(shlex.split(line)[0].split('=') for line in out.splitlines() if line.strip())
 
-    # Some OS distros (e.g. Alpine) have very precise versions (e.g. 3.17.3), and to support these
-    # OS distros, we need to truncate at the 2nd dot.
-    try:
-        version_id = '.'.join(os_release['VERSION_ID'].split(".", 2)[:2])
-        distro = os_release['ID'] + ':' + version_id
-    except KeyError:
+    if 'ID' not in os_release or 'VERSION_ID' not in os_release:
         raise DistroRetrievalError
 
-    # RedHat specific logic to distinguish between UBI and UBI-minimal
-    if (os_release['ID'] == 'rhel'):
-        ubi_version = version_id.split(".")[0]
+    version_str = os_release['VERSION_ID']
+    version = version_str.split('.')
+    if os_release['ID'] == 'rhel':
+        # RedHat specific logic to distinguish between UBI and UBI-minimal
         try:
             docker_socket.containers.run(image_name, entrypoint='ls /usr/bin/microdnf', remove=True)
-            distro = f'redhat/ubi{ubi_version}-minimal:{version_id}'
         except docker.errors.ContainerError:
-            distro = f'redhat/ubi{ubi_version}:{version_id}'
+            distro = f'redhat/ubi{version[0]}:{version_str}'
+        else:
+            distro = f'redhat/ubi{version[0]}-minimal:{version_str}'
+    else:
+        # Some OS distros (e.g. Alpine) have very precise versions (e.g. 3.17.3), and to support these
+        # OS distros, we need to truncate at the 2nd dot.
+        distro = os_release['ID'] + ':' + '.'.join(version[:2])
 
     return distro
 
@@ -327,6 +331,7 @@ def gsc_build(args):
     # initialize Jinja env with configurations extracted from the original Docker image
     env = jinja2.Environment()
     env.filters['shlex_quote'] = shlex.quote
+    env.filters['regex_match'] = regex_match
     env.globals.update(config)
     env.globals.update(vars(args))
     env.globals.update({'app_image': original_image_name})
@@ -441,6 +446,7 @@ def gsc_build_gramine(args):
 
     # initialize Jinja env with user-provided configurations
     env = jinja2.Environment()
+    env.filters['regex_match'] = regex_match
     env.globals.update(config)
     env.globals.update(vars(args))
 

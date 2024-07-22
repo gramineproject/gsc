@@ -1,8 +1,13 @@
 {% extends "Dockerfile.common.build.template" %}
 
 {% block install %}
-{% set distro = Distro.split(':')[0] %}
-{% set ver = distro.split('ubi')[1] %}
+
+{% if Distro | regex_match('^redhat/ubi(\d+)(-minimal)?:(\d+).(\d+)$') %}
+    {% set ver = Distro.split(':')[0].split('ubi')[1] %}
+{% else %}
+    RUN echo "ERROR: Unsupported Red Hat distribution - {{ Distro }}." && exit 1;
+{% endif %}
+
 COPY redhat.repo /etc/yum.repos.d/
 COPY pki/entitlement/ /etc/pki/entitlement/
 COPY redhat-uep.pem /etc/rhsm/ca/
