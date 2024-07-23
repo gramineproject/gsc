@@ -5,7 +5,7 @@
 {% if get_ubi_version(Distro) %}
     {% set ver = get_ubi_version(Distro) %}
 {% else %}
-    {{ assert_not_none(Distro, 'ERROR: Unsupported Red Hat distribution - {{ Distro }}.') }}
+    {{ assert_not_none('ERROR: Unsupported Red Hat distribution - {{ Distro }}.') }}
 {% endif %}
 
 COPY redhat.repo /etc/yum.repos.d/

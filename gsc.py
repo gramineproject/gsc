@@ -251,10 +251,8 @@ def template_path(distro):
         return 'redhat/ubi'
     return distro
 
-def assert_not_none(value, error_message):
-    if value is None:
-        raise ValueError(error_message)
-    return value
+def assert_not_none(error_message):
+    raise ValueError(error_message)
 
 def get_ubi_version(distro):
     match = re.match(r'^redhat/ubi(\d+)(-minimal)?:(\d+).(\d+)$', distro)
