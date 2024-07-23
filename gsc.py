@@ -251,8 +251,14 @@ def template_path(distro):
         return 'redhat/ubi'
     return distro
 
-def regex_match(value, pattern):
-    return re.match(pattern, value) is not None
+def assert_not_none(value, error_message):
+    if value is None:
+        raise ValueError(error_message)
+    return value
+
+def get_ubi_version(distro):
+    match = re.match(r'^redhat/ubi(\d+)(-minimal)?:(\d+).(\d+)$', distro)
+    return match.group(1) if match else None
 
 def get_image_distro(docker_socket, image_name):
     out = docker_socket.containers.run(image_name, entrypoint='cat /etc/os-release', remove=True)
@@ -274,8 +280,7 @@ def get_image_distro(docker_socket, image_name):
         else:
             distro = f'redhat/ubi{version[0]}-minimal:{version_str}'
     else:
-        # Some OS distros (e.g. Alpine) have very precise versions (e.g. 3.17.3), and to support these
-        # OS distros, we need to truncate at the 2nd dot.
+        # Some OS distros (e.g. Alpine) have very precise versions (e.g. 3.17.3), and to support these OS distros, we need to truncate at the 2nd dot.
         distro = os_release['ID'] + ':' + '.'.join(version[:2])
 
     return distro
@@ -331,7 +336,8 @@ def gsc_build(args):
     # initialize Jinja env with configurations extracted from the original Docker image
     env = jinja2.Environment()
     env.filters['shlex_quote'] = shlex.quote
-    env.filters['regex_match'] = regex_match
+    env.globals['assert_not_none'] = assert_not_none
+    env.globals['get_ubi_version'] = get_ubi_version
     env.globals.update(config)
     env.globals.update(vars(args))
     env.globals.update({'app_image': original_image_name})
@@ -446,7 +452,8 @@ def gsc_build_gramine(args):
 
     # initialize Jinja env with user-provided configurations
     env = jinja2.Environment()
-    env.filters['regex_match'] = regex_match
+    env.globals['assert_not_none'] = assert_not_none
+    env.globals['get_ubi_version'] = get_ubi_version
     env.globals.update(config)
     env.globals.update(vars(args))
 
