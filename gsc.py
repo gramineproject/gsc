@@ -251,8 +251,10 @@ def template_path(distro):
         return 'redhat/ubi'
     return distro
 
-def assert_not_none(error_message):
-    raise ValueError(error_message)
+def assert_not_none(value, error_message):
+    if value is None:
+        raise jinja2.TemplateAssertionError(error_message, lineno=0, name='assert_not_none')
+    return value
 
 def get_ubi_version(distro):
     match = re.match(r'^redhat/ubi(\d+)(-minimal)?:(\d+).(\d+)$', distro)
@@ -278,7 +280,8 @@ def get_image_distro(docker_socket, image_name):
         else:
             distro = f'redhat/ubi{version[0]}-minimal:{version_str}'
     else:
-        # Some OS distros (e.g. Alpine) have very precise versions (e.g. 3.17.3), and to support these OS distros, we need to truncate at the 2nd dot.
+        # Some OS distros (e.g. Alpine) have very precise versions (e.g. 3.17.3),
+        # and to support these OS distros, we need to truncate at the 2nd dot.
         distro = os_release['ID'] + ':' + '.'.join(version[:2])
 
     return distro
@@ -334,7 +337,7 @@ def gsc_build(args):
     # initialize Jinja env with configurations extracted from the original Docker image
     env = jinja2.Environment()
     env.filters['shlex_quote'] = shlex.quote
-    env.globals['assert_not_none'] = assert_not_none
+    env.filters['assert_not_none'] = assert_not_none
     env.globals['get_ubi_version'] = get_ubi_version
     env.globals.update(config)
     env.globals.update(vars(args))
@@ -450,7 +453,7 @@ def gsc_build_gramine(args):
 
     # initialize Jinja env with user-provided configurations
     env = jinja2.Environment()
-    env.globals['assert_not_none'] = assert_not_none
+    env.filters['assert_not_none'] = assert_not_none
     env.globals['get_ubi_version'] = get_ubi_version
     env.globals.update(config)
     env.globals.update(vars(args))

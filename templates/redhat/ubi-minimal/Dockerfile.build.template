@@ -2,11 +2,7 @@
 
 {% block install %}
 
-{% if get_ubi_version(Distro) %}
-    {% set ver = get_ubi_version(Distro) %}
-{% else %}
-    {{ assert_not_none('ERROR: Unsupported Red Hat distribution - {{ Distro }}.') }}
-{% endif %}
+{% set ver = get_ubi_version(Distro) | assert_not_none('ERROR: Unsupported Red Hat distribution - ' + Distro) %}
 
 COPY redhat.repo /etc/yum.repos.d/
 COPY pki/entitlement/ /etc/pki/entitlement/
