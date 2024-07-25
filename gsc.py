@@ -253,12 +253,12 @@ def template_path(distro):
 
 def assert_not_none(value, error_message):
     if value is None:
-        raise jinja2.TemplateAssertionError(error_message, lineno=0, name='assert_not_none')
+        raise jinja2.TemplateError(error_message)
     return value
 
 def get_ubi_version(distro):
-    match = re.match(r'^redhat/ubi(\d+)(-minimal)?:(\d+).(\d+)$', distro)
-    return match.group(1) if match else None
+    match_ = re.match(r'^redhat/ubi(\d+)(-minimal)?:(\d+).(\d+)$', distro)
+    return match_.group(1) if match_ else None
 
 def get_image_distro(docker_socket, image_name):
     out = docker_socket.containers.run(image_name, entrypoint='cat /etc/os-release', remove=True)
