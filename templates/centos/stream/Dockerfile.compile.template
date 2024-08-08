@@ -11,6 +11,7 @@ RUN dnf distro-sync -y \
         autoconf  \
         binutils \
         bison \
+        cmake \
         epel-release \
         flex \
         gawk \

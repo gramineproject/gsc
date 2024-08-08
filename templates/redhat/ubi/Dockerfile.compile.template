@@ -18,6 +18,7 @@ RUN rm -rf /etc/rhsm-host \
     && dnf install -y \
         autoconf \
         bison \
+        cmake \
         elfutils-libelf-devel \
         flex \
         gawk \

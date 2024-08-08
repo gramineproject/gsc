@@ -10,6 +10,7 @@ RUN dnf update -y \
     &&  dnf install -y \
         autoconf \
         bison \
+        cmake \
         curl \
         elfutils-libelf-devel \
         epel-release \
