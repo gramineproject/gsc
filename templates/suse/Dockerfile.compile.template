@@ -1,0 +1,52 @@
+{% extends "Dockerfile.common.compile.template" %}
+
+{% block install %}
+
+{% set ver = get_sles_version(Distro) | assert_not_none(
+    'ERROR: Unsupported SLES distribution - ' + Distro)
+%}
+
+RUN zypper update -y \
+    && zypper install -y suseconnect-ng \
+    && mkdir -p /etc/zypp/credentials.d
+
+COPY SCCcredentials /etc/zypp/credentials.d/
+
+RUN SUSEConnect -p PackageHub/{{ver}}/x86_64 \
+    && SUSEConnect -p sle-module-basesystem/{{ver}}/x86_64 \
+    && SUSEConnect -p sle-module-desktop-applications/{{ver}}/x86_64 \
+    && SUSEConnect -p sle-module-development-tools/{{ver}}/x86_64 \
+    && zypper install -y \
+        autoconf \
+        bison \
+        cmake \
+        curl \
+        flex \
+        gawk \
+        gcc11 \
+        gcc11-c++ \
+        git \
+        libevent-devel \
+        libprotobuf-c-devel \
+        libprotobuf-c1 \
+        make \
+        meson \
+        nasm \
+        ninja \
+        openssl \
+        patch \
+        pkg-config \
+        protobuf-devel \
+        python3 \
+        python3-cryptography \
+        python3-pip \
+        python3-protobuf \
+        python3-tomli \
+        rpm-build \
+        wget \
+        which \
+    && /usr/bin/python3 -B -m pip install 'tomli-w>=0.4.0' \
+    && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 10 \
+    && update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-11 10
+
+{% endblock %}
