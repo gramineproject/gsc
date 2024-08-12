@@ -1,9 +1,6 @@
 {% extends "Dockerfile.common.compile.template" %}
 
 {% block install %}
-ENV http_proxy=http://proxy.iind.intel.com:911
-ENV https_proxy=http://proxy.iind.intel.com:912
-ENV no_proxy=127.0.0.1,localhost,intel.com
 
 RUN zypper update -y \
     && zypper install -y \

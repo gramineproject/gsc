@@ -1,9 +1,6 @@
 {% extends "Dockerfile.common.build.template" %}
 
 {% block install %}
-ENV http_proxy=http://proxy.iind.intel.com:911
-ENV https_proxy=http://proxy.iind.intel.com:912
-ENV no_proxy=127.0.0.1,localhost,intel.com
 
 # Combine all installation and removal steps in a single RUN command to reduce the final image size.
 # This is because each Dockerfile command creates a new layer which necessarily adds size to the
