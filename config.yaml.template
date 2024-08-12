@@ -10,6 +10,8 @@
 # - quay.io/centos/centos:stream9
 # - redhat/ubi8:8.8, redhat/ubi9:9.4
 # - redhat/ubi8-minimal:8.8, redhat/ubi9-minimal:9.4
+# - registry.suse.com/suse/sle15:15.4
+# - opensuse/leap:15.6
 
 # If Distro is set to "auto", GSC detects the distro automatically by examining the supplied
 # Docker image. Alternatively, Distro can be set to one of the supported distros mentioned above.

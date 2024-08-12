@@ -117,6 +117,8 @@ def extract_binary_info_from_image_config(config, env):
 def extract_environment_from_image_config(config):
     env_list = config['Env']
     base_image_environment = ''
+    if env_list is None:
+        return base_image_environment
     for env_var in env_list:
         # TODO: switch to loader.env_src_file = "file:file_with_serialized_envs" if
         # the need for multi-line envvars arises
@@ -253,6 +255,9 @@ def template_path(distro):
             return 'redhat/ubi-minimal'
         return 'redhat/ubi'
 
+    if distro.startswith(('registry.suse.com/suse/sle', 'opensuse/leap')):
+        return 'suse'
+
     return distro
 
 def assert_not_none(value, error_message):
@@ -283,6 +288,13 @@ def get_image_distro(docker_socket, image_name):
             distro = f'redhat/ubi{version[0]}:{version_str}'
         else:
             distro = f'redhat/ubi{version[0]}-minimal:{version_str}'
+
+    elif os_release['ID'] == 'sles':
+        distro = f'registry.suse.com/suse/sle{version[0]}:{version_str}'
+
+    elif os_release['ID'] == 'opensuse-leap':
+        distro = f'opensuse/leap:{version_str}'
+
     else:
         # Some OS distros (e.g. Alpine) have very precise versions (e.g. 3.17.3),
         # and to support these OS distros, we need to truncate at the 2nd dot.

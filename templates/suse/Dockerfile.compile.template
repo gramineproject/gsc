@@ -1,0 +1,35 @@
+{% extends "Dockerfile.common.compile.template" %}
+
+{% block install %}
+ENV http_proxy=http://proxy.iind.intel.com:911
+ENV https_proxy=http://proxy.iind.intel.com:912
+ENV no_proxy=127.0.0.1,localhost,intel.com
+
+RUN zypper update -y \
+    && zypper install -y \
+        autoconf \
+        bison \
+        curl \
+        flex \
+        gawk \
+        gcc-c++ \
+        git \
+        libevent-devel \
+        libprotobuf-c-devel \
+        libprotobuf-c1 \
+        make \
+        nasm \
+        ninja \
+        openssl \
+        patch \
+        pkg-config \
+        protobuf-devel \
+        python3 \
+        python3-cryptography \
+        python3-pip \
+        python3-protobuf \
+        rpm-build \
+        wget \
+        which \
+    && /usr/bin/python3 -B -m pip install 'tomli>=1.1.0' 'tomli-w>=0.4.0' 'meson>=0.56,!=1.2.*'
+{% endblock %}
