@@ -115,7 +115,7 @@ def extract_binary_info_from_image_config(config, env):
 
 
 def extract_environment_from_image_config(config):
-    env_list = config['Env']
+    env_list = config['Env'] or []
     base_image_environment = ''
     for env_var in env_list:
         # TODO: switch to loader.env_src_file = "file:file_with_serialized_envs" if
@@ -244,6 +244,21 @@ def handle_redhat_repo_configs(distro, tmp_build_path):
         # software updates and support from Red Hat.
         shutil.copytree(sslclientkey_dir, tmp_build_path / 'pki/entitlement')
 
+def handle_suse_repo_configs(distro, tmp_build_path):
+    if not distro.startswith('registry.suse.com/suse/sle'):
+        return
+
+    if not os.path.exists('/etc/zypp/credentials.d/SCCcredentials'):
+        print('Cannot find your SUSE Customer Center credentials file at '
+                '/etc/zypp/credentials.d/SCCcredentials. Please register and subscribe your SUSE '
+                'system to the SUSE Customer Center.')
+        sys.exit(1)
+
+    # This file contains the credentials for the SUSE Customer Center (SCC) account for the
+    # system to authenticate and receive software updates and support from SUSE. Copy it to
+    # the temporary build directory to include it in the graminized Docker image.
+    shutil.copyfile('/etc/zypp/credentials.d/SCCcredentials', tmp_build_path / 'SCCcredentials')
+
 def template_path(distro):
     if distro == 'quay.io/centos/centos':
         return 'centos/stream'
@@ -252,6 +267,9 @@ def template_path(distro):
         if 'minimal' in distro:
             return 'redhat/ubi-minimal'
         return 'redhat/ubi'
+
+    if distro.startswith('registry.suse.com/suse/sle'):
+        return 'suse'
 
     return distro
 
@@ -263,6 +281,10 @@ def assert_not_none(value, error_message):
 def get_ubi_version(distro):
     match_ = re.match(r'^redhat/ubi(\d+)(-minimal)?:(\d+).(\d+)$', distro)
     return match_.group(1) if match_ else None
+
+def get_sles_version(distro):
+    match_ = re.match(r'^registry.suse.com/suse/sle(\d+):(\d+\.\d+)$', distro)
+    return match_.group(2) if match_ else None
 
 def get_image_distro(docker_socket, image_name):
     out = docker_socket.containers.run(image_name, entrypoint='cat /etc/os-release', remove=True)
@@ -283,6 +305,8 @@ def get_image_distro(docker_socket, image_name):
             distro = f'redhat/ubi{version[0]}:{version_str}'
         else:
             distro = f'redhat/ubi{version[0]}-minimal:{version_str}'
+    elif os_release['ID'] == 'sles':
+        distro = f'registry.suse.com/suse/sle{version[0]}:{version_str}'
     else:
         # Some OS distros (e.g. Alpine) have very precise versions (e.g. 3.17.3),
         # and to support these OS distros, we need to truncate at the 2nd dot.
@@ -290,6 +314,7 @@ def get_image_distro(docker_socket, image_name):
 
     if os_release['NAME'] == 'CentOS Stream':
         distro = f'quay.io/centos/centos:stream{version[0]}'
+
     return distro
 
 def fetch_and_validate_distro_support(docker_socket, image_name, env):
@@ -345,6 +370,8 @@ def gsc_build(args):
     env.filters['shlex_quote'] = shlex.quote
     env.filters['assert_not_none'] = assert_not_none
     env.globals['get_ubi_version'] = get_ubi_version
+    env.globals['get_sles_version'] = get_sles_version
+    env.globals['template_path'] = template_path
     env.globals.update(config)
     env.globals.update(vars(args))
     env.globals.update({'app_image': original_image_name})
@@ -426,6 +453,7 @@ def gsc_build(args):
     shutil.copyfile('keys/intel-sgx-deb.key', tmp_build_path / 'intel-sgx-deb.key')
 
     handle_redhat_repo_configs(distro, tmp_build_path)
+    handle_suse_repo_configs(distro, tmp_build_path)
 
     build_docker_image(docker_socket.api, tmp_build_path, unsigned_image_name, 'Dockerfile.build',
                        rm=args.rm, nocache=args.no_cache, buildargs=extract_build_args(args))
@@ -461,6 +489,8 @@ def gsc_build_gramine(args):
     env = jinja2.Environment()
     env.filters['assert_not_none'] = assert_not_none
     env.globals['get_ubi_version'] = get_ubi_version
+    env.globals['get_sles_version'] = get_sles_version
+    env.globals['template_path'] = template_path
     env.globals.update(config)
     env.globals.update(vars(args))
 
@@ -496,6 +526,7 @@ def gsc_build_gramine(args):
     shutil.copyfile('keys/intel-sgx-deb.key', tmp_build_path / 'intel-sgx-deb.key')
 
     handle_redhat_repo_configs(distro, tmp_build_path)
+    handle_suse_repo_configs(distro, tmp_build_path)
 
     build_docker_image(docker_socket.api, tmp_build_path, gramine_image_name, 'Dockerfile.compile',
                        rm=args.rm, nocache=args.no_cache, buildargs=extract_build_args(args))
