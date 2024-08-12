@@ -1,0 +1,44 @@
+{% extends "Dockerfile.common.build.template" %}
+
+{% block install %}
+
+{% set ver = get_sles_version(Distro) | assert_not_none(
+    'ERROR: Unsupported SLES distribution - ' + Distro)
+%}
+
+RUN zypper update -y \
+    && zypper install -y suseconnect-ng \
+    && mkdir -p /etc/zypp/credentials.d
+
+COPY SCCcredentials /etc/zypp/credentials.d/
+
+RUN SUSEConnect -p PackageHub/{{ver}}/x86_64 \
+    && SUSEConnect -p sle-module-basesystem/{{ver}}/x86_64 \
+    && zypper install -y \
+        binutils \
+        openssl \
+        libprotobuf-c-devel \
+        python3 \
+        python3-cryptography \
+        python3-pip \
+        python3-protobuf \
+        python3-pyelftools \
+        python3-click \
+        python3-Jinja2 \
+        python3-tomli \
+        python3-voluptuous \
+        which \
+    && /usr/bin/python3 -B -m pip install 'tomli-w>=0.4.0' \
+    && zypper clean -a \
+    && rm -rf /etc/zypp/credentials.d/SCCcredentials
+
+{% if buildtype != "release" %}
+RUN zypper install -y \
+        gdb \
+        less \
+        libunwind \
+        python3-pytest \
+        strace \
+        vim
+{% endif %}
+{% endblock %}
