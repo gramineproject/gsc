@@ -19,7 +19,7 @@ RUN zypper update -y \
     && /usr/bin/python3 -B -m pip install click jinja2 protobuf pyelftools \
                                         'tomli>=1.1.0' 'tomli-w>=0.4.0' \
                                         voluptuous \
-    && zypper clean -a;
+    && zypper clean -a
 
 {% if buildtype != "release" %}
 RUN zypper install -y \
