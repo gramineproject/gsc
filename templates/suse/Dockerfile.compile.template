@@ -6,7 +6,7 @@ RUN zypper update -y \
     && zypper install -y \
         autoconf \
         bison \
-        cmake \ 
+        cmake \
         curl \
         flex \
         gawk \
