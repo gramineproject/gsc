@@ -302,6 +302,7 @@ def get_image_distro(docker_socket, image_name):
 
     if os_release['NAME'] == 'CentOS Stream':
         distro = f'quay.io/centos/centos:stream{version[0]}'
+
     return distro
 
 def fetch_and_validate_distro_support(docker_socket, image_name, env):
@@ -357,6 +358,7 @@ def gsc_build(args):
     env.filters['shlex_quote'] = shlex.quote
     env.filters['assert_not_none'] = assert_not_none
     env.globals['get_ubi_version'] = get_ubi_version
+    env.globals['template_path'] = template_path
     env.globals.update(config)
     env.globals.update(vars(args))
     env.globals.update({'app_image': original_image_name})
@@ -473,6 +475,7 @@ def gsc_build_gramine(args):
     env = jinja2.Environment()
     env.filters['assert_not_none'] = assert_not_none
     env.globals['get_ubi_version'] = get_ubi_version
+    env.globals['template_path'] = template_path
     env.globals.update(config)
     env.globals.update(vars(args))
 
