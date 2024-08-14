@@ -116,9 +116,10 @@ def extract_binary_info_from_image_config(config, env):
 
 def extract_environment_from_image_config(config):
     env_list = config['Env']
-    base_image_environment = ''
     if env_list is None:
         return ''
+    
+    base_image_environment = ''
     for env_var in env_list:
         # TODO: switch to loader.env_src_file = "file:file_with_serialized_envs" if
         # the need for multi-line envvars arises
