@@ -255,7 +255,7 @@ def template_path(distro):
             return 'redhat/ubi-minimal'
         return 'redhat/ubi'
 
-    if distro.startswith(('registry.suse.com/suse/sle', 'opensuse/leap')):
+    if distro.startswith('registry.suse.com/suse/sle'):
         return 'suse'
 
     return distro
@@ -291,9 +291,6 @@ def get_image_distro(docker_socket, image_name):
 
     elif os_release['ID'] == 'sles':
         distro = f'registry.suse.com/suse/sle{version[0]}:{version_str}'
-
-    elif os_release['ID'] == 'opensuse-leap':
-        distro = f'opensuse/leap:{version_str}'
 
     else:
         # Some OS distros (e.g. Alpine) have very precise versions (e.g. 3.17.3),

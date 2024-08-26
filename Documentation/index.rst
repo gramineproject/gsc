@@ -318,7 +318,7 @@ in :file:`config.yaml.template`.
    Ubuntu 22.04, Ubuntu 23.04, Debian 10, Debian 11, Debian 12, CentOS 8, CentOS
    Stream 9, Red Hat Universal Base Image (UBI) 8, Red Hat Universal Base Image
    (UBI) 9, Red Hat Universal Base Image (UBI) 8 minimal, Red Hat Universal Base Image
-   9 minimal, openSUSE Leap 15 and SUSE Linux Enterprise Server 15.
+   9 minimal and SUSE Linux Enterprise Server 15.
 
    Default value is ``auto`` which means GSC automatically detects the distro
    of the supplied Docker image. Users also have the option to provide one of
