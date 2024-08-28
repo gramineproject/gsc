@@ -2,12 +2,19 @@
 
 {% block install %}
 
-# Combine all installation and removal steps in a single RUN command to reduce the final image size.
-# This is because each Dockerfile command creates a new layer which necessarily adds size to the
-# final image. This trick allows to decrease the image size by hundreds of MBs.
+{% set ver = get_sles_version(Distro) | assert_not_none(
+    'ERROR: Unsupported SLES distribution - ' + Distro)
+%}
 
 RUN zypper update -y \
-    &&  zypper install -y \
+    && zypper install -y suseconnect-ng \
+    && mkdir -p /etc/zypp/credentials.d
+
+COPY SCCcredentials /etc/zypp/credentials.d/
+
+RUN SUSEConnect -p PackageHub/{{ver}}/x86_64 \
+    && SUSEConnect -p sle-module-python3/{{ver}}/x86_64 \
+    && zypper install -y \
         binutils \
         openssl \
         libprotobuf-c-devel \
@@ -15,13 +22,16 @@ RUN zypper update -y \
         python3-cryptography \
         python3-pip \
         python3-protobuf \
+        python3-pyelftools \
         python3-click \
         python3-Jinja2 \
+        python3-tomli \
+        python311-tomli-w \
+        python3-voluptuous \
         which \
-    && /usr/bin/python3 -B -m pip install pyelftools \
-                                        'tomli>=1.1.0' 'tomli-w>=0.4.0' \
-                                        voluptuous \
-    && zypper clean -a
+    && /usr/bin/python3 -B -m pip install tomli-w \
+    && zypper clean -a \
+    && rm -rf /etc/zypp/credentials.d/SCCcredentials
 
 {% if buildtype != "release" %}
 RUN zypper install -y \
