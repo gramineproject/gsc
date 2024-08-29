@@ -41,9 +41,9 @@ RUN SUSEConnect -p PackageHub/{{ver}}/x86_64 \
         python3-pip \
         python3-protobuf \
         python3-tomli \
-        python311-tomli-w \
         rpm-build \
         wget \
-        which
+        which \
+    && /usr/bin/python3 -B -m pip install 'tomli-w>=0.4.0'
 
 {% endblock %}

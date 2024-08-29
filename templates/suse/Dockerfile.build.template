@@ -26,10 +26,9 @@ RUN SUSEConnect -p PackageHub/{{ver}}/x86_64 \
         python3-click \
         python3-Jinja2 \
         python3-tomli \
-        python311-tomli-w \
         python3-voluptuous \
         which \
-    && /usr/bin/python3 -B -m pip install tomli-w \
+    && /usr/bin/python3 -B -m pip install 'tomli-w>=0.4.0' \
     && zypper clean -a \
     && rm -rf /etc/zypp/credentials.d/SCCcredentials
 
