@@ -54,6 +54,26 @@ pip. GSC requires Python 3.6 or later.
    sudo apt-get install docker.io python3 python3-pip
    pip3 install docker jinja2 tomli tomli-w pyyaml
 
+Python venv workaround for Ubuntu 24.04
+---------------------------------------
+
+Unfortunately, Ubuntu 24.04 (noble) has a `bug that prevents out-of-the-box
+execution of
+GSC <https://bugs.launchpad.net/ubuntu/+source/python-docker/+bug/2065348>`__.
+
+Until this bug is fixed, GSC must be run on Ubuntu 24.04 via Python virtual
+environment (venv). Please perform the following steps to install and activate
+venv for GSC:
+
+.. code-block:: sh
+
+   sudo apt-get install python3-venv
+   python3 -m venv my_venv && source my_venv/bin/activate
+   pip3 install 'docker>=6.1.0' jinja2 tomli tomli-w pyyaml
+
+Now you can execute GSC commands (`gsc build`, `gsc sign`, etc.) as usual,
+within the virtual environment confines.
+
 SGX software stack
 ------------------
 
