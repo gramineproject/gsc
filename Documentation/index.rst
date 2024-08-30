@@ -54,6 +54,18 @@ pip. GSC requires Python 3.6 or later.
    sudo apt-get install docker.io python3 python3-pip
    pip3 install docker jinja2 tomli tomli-w pyyaml
 
+On Ubuntu 24.04 (and any recent distro compliant with PEP 668) use Python virtual
+environment to install the required python packages:
+
+.. code-block:: sh
+
+   sudo apt-get install python3-venv
+   python3 -m venv my_venv && source my_venv/bin/activate
+   pip3 install 'docker>=6.1.0' jinja2 tomli tomli-w pyyaml
+
+NOTE: Execute GSC commands, such as `gsc build`, `gsc sign`, etc, within the virtual
+environment for Ubuntu 24.04 (or any recent distro compliant with PEP 668).
+
 SGX software stack
 ------------------
 
