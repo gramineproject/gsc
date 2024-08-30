@@ -59,7 +59,7 @@ Python venv workaround for Ubuntu 24.04
 
 Unfortunately, Ubuntu 24.04 (noble) has a `bug that prevents out-of-the-box
 execution of
-GSC <https://bugs.launchpad.net/ubuntu/+source/python-docker/+bug/2065348>`__.
+GSC<https://bugs.launchpad.net/ubuntu/+source/python-docker/+bug/2065348>`__.
 
 Until this bug is fixed, GSC must be run on Ubuntu 24.04 via Python virtual
 environment (venv). Please perform the following steps to install and activate
