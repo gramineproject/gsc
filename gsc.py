@@ -256,22 +256,10 @@ def handle_suse_repo_configs(distro, tmp_build_path):
                 'system to the SUSE Customer Center.')
         sys.exit(1)
 
-    with open('/etc/zypp/credentials.d/SCCcredentials', 'r') as suse_credentials:
-        suse_credentials_contents = suse_credentials.read()
-
-        pattern_username = re.compile(r'(?<!#)username\s*=\s*(.*)')
-        pattern_password = re.compile(r'(?<!#)password\s*=\s*(.*)')
-
-        if not pattern_username.search(suse_credentials_contents) or \
-                not pattern_password.search(suse_credentials_contents):
-            print('Cannot find username or password in /etc/zypp/credentials.d/SCCcredentials. '
-                    'Please register and subscribe your SUSE system to the SUSE Customer Center.')
-            sys.exit(1)
-
-        # This file contains the credentials for the SUSE Customer Center (SCC) account for the
-        # system to authenticate and receive software updates and support from SUSE. Copy it to
-        # the temporary build directory to include it in the graminized Docker image
-        shutil.copyfile('/etc/zypp/credentials.d/SCCcredentials', tmp_build_path / 'SCCcredentials')
+    # This file contains the credentials for the SUSE Customer Center (SCC) account for the
+    # system to authenticate and receive software updates and support from SUSE. Copy it to
+    # the temporary build directory to include it in the graminized Docker image.
+    shutil.copyfile('/etc/zypp/credentials.d/SCCcredentials', tmp_build_path / 'SCCcredentials')
 
 def template_path(distro):
     if distro == 'quay.io/centos/centos':

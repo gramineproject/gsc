@@ -6,6 +6,10 @@
     'ERROR: Unsupported SLES distribution - ' + Distro)
 %}
 
+ENV AS=/usr/bin/gcc-11
+ENV CC=/usr/bin/gcc-11
+ENV CXX=/usr/bin/g++-11
+
 RUN zypper update -y \
     && zypper install -y suseconnect-ng \
     && mkdir -p /etc/zypp/credentials.d
@@ -23,7 +27,8 @@ RUN SUSEConnect -p PackageHub/{{ver}}/x86_64 \
         curl \
         flex \
         gawk \
-        gcc-c++ \
+        gcc11 \
+        gcc11-c++ \
         git \
         libevent-devel \
         libprotobuf-c-devel \
