@@ -31,7 +31,6 @@ RUN cd /gramine \
        --buildtype={{buildtype}} \
        -Ddirect=enabled -Dsgx=enabled \
        {% if template_path(Distro) == 'ubuntu' %}-Ddcap=enabled{% endif %} \
-       {% if template_path(Distro) == 'suse' %}-Dlibc=musl{% endif %} \
        {% if "linux-sgx-driver" in SGXDriver.Repository %} \
        -Dsgx_driver=oot -Dsgx_driver_include_path=/gramine/driver \
        {% else %} \
