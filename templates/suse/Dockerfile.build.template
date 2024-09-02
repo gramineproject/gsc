@@ -13,7 +13,7 @@ RUN zypper update -y \
 COPY SCCcredentials /etc/zypp/credentials.d/
 
 RUN SUSEConnect -p PackageHub/{{ver}}/x86_64 \
-    && SUSEConnect -p sle-module-python3/{{ver}}/x86_64 \
+    && SUSEConnect -p sle-module-basesystem/{{ver}}/x86_64 \
     && zypper install -y \
         binutils \
         openssl \
