@@ -115,9 +115,7 @@ def extract_binary_info_from_image_config(config, env):
 
 
 def extract_environment_from_image_config(config):
-    env_list = config['Env']
-    if env_list is None:
-        return ''
+    env_list = config['Env'] or []
     base_image_environment = ''
     for env_var in env_list:
         # TODO: switch to loader.env_src_file = "file:file_with_serialized_envs" if
@@ -285,8 +283,8 @@ def get_ubi_version(distro):
     return match_.group(1) if match_ else None
 
 def get_sles_version(distro):
-    match_ = re.match(r'^registry.suse.com/suse/sle(\d+):(\d+).(\d+)$', distro)
-    return match_.group(2) + '.' + match_.group(3) if match_ else None
+    match_ = re.match(r'^registry.suse.com/suse/sle(\d+):(\d+\.\d+)$', distro)
+    return match_.group(2) if match_ else None
 
 def get_image_distro(docker_socket, image_name):
     out = docker_socket.containers.run(image_name, entrypoint='cat /etc/os-release', remove=True)
