@@ -34,8 +34,12 @@ if [ -n "$GRAMINE_MODE" ]; then
         GRAMINE_EXEC=gramine-sgx
     elif [ "$GRAMINE_MODE" == "direct" ]; then
         GRAMINE_EXEC=gramine-direct
+    elif [ "$GRAMINE_MODE" == "vm" ]; then
+        GRAMINE_EXEC=gramine-vm
+    elif [ "$GRAMINE_MODE" == "tdx" ]; then
+        GRAMINE_EXEC=gramine-tdx
     else
-        echo "ERROR: unrecognized GRAMINE_MODE; can only be 'direct' or 'sgx'."
+        echo "ERROR: unrecognized GRAMINE_MODE; can only be 'direct', 'sgx', 'vm' or 'tdx'."
         exit 1
     fi
 fi
