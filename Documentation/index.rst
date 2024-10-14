@@ -39,9 +39,6 @@ image.
 Prerequisites
 =============
 
-The installation descriptions of prerequisites are for Ubuntu 20.04 and may
-differ when using a different Ubuntu version or Linux distribution.
-
 Software packages
 -----------------
 
