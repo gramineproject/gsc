@@ -49,9 +49,11 @@ Please install the ``docker.io``, ``python3``, ``python3-pip`` packages. In
 addition, install the Docker client, Jinja2, TOML, and YAML python packages via
 pip. GSC requires Python 3.6 or later.
 
+For Ubuntu 22.04:
+
 .. code-block:: sh
 
-   sudo apt-get install docker.io python3 python3-pip
+   sudo apt update && sudo apt install -y docker.io python3 python3-pip
    pip3 install docker jinja2 tomli tomli-w pyyaml
 
 For Ubuntu 24.04:
@@ -59,7 +61,7 @@ For Ubuntu 24.04:
 .. code-block:: sh
 
    sudo apt update && sudo apt install -y docker.io python3 \
-      'python3-docker=5.0.3-1ubuntu1.1' python3-jinja2 python3-toml \
+      python3-docker python3-jinja2 python3-tomli \
       python3-tomli-w python3-yaml
 
 SGX software stack
