@@ -10,7 +10,8 @@ COPY gsc-signer-key.pem /gramine/app_files/gsc-signer-key.pem
 
 ARG passphrase
 
-RUN {% block path %}{% endblock %} gramine-sgx-sign \
+RUN {% block path %}{% endblock %} \
+      && gramine-sgx-sign \
       --key /gramine/app_files/gsc-signer-key.pem \
       --manifest /gramine/app_files/entrypoint.manifest \
       --output /gramine/app_files/entrypoint.manifest.sgx \
