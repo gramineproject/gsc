@@ -28,7 +28,7 @@ class DistroRetrievalError(Exception):
                          'image. Please specify OS distro manually in the configuration file.'),
                          *args)
 
-def test_trueish(value):
+def parse_to_boolean(value):
     if not value:
         return False
     value = value.casefold()
@@ -38,7 +38,7 @@ def test_trueish(value):
         return True
     if value.isdigit():
         return bool(int(value))
-    raise ValueError(f'Invalid value for trueish: {value!r}')
+    raise ValueError(f'Invalid value : {value!r}')
 
 def gsc_image_name(original_image_name):
     return f'gsc-{original_image_name}'
@@ -561,7 +561,7 @@ def gsc_sign_image(args):
     env.globals.update(yaml.safe_load(args.config_file))
     extract_user_from_image_config(unsigned_image.attrs['Config'], env)
     env.globals['args'] = extract_define_args(args)
-    env.tests['trueish'] = test_trueish
+    env.tests['boolean_true'] = parse_to_boolean
 
     try:
         distro = fetch_and_validate_distro_support(docker_socket, args.image, env)

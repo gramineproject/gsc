@@ -23,7 +23,7 @@ FROM {{image}}
 COPY --from=unsigned_image /gramine/app_files/*.sig /gramine/app_files/
 COPY --from=unsigned_image /gramine/app_files/*.sgx /gramine/app_files/
 
-{% if args.remove_gramine_deps is trueish %}
+{% if args.remove_gramine_deps is boolean_true %}
 # Temporarily switch to the root user to uninstall packages
 USER root
 
