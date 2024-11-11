@@ -44,3 +44,5 @@ RUN dnf install -y \
         strace
 {% endif %}
 {% endblock %}
+
+{% block path %}export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib64 -type d -path '*/site-packages')" &&{% endblock %}

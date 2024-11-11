@@ -11,6 +11,8 @@ fs.root.uri = "file:/"
 
 # Gramine's default working dir is '/', so change the working directory to the desired one
 fs.start_dir = "{{working_dir}}"
+fs.mounts = [
+]
 
 sgx.debug = {% if buildtype != "release" %} true {% else %} false {% endif %}
 
