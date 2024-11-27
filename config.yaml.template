@@ -32,22 +32,3 @@ Registry: ""
 Gramine:
     Repository: "https://github.com/gramineproject/gramine.git"
     Branch:     "master"
-
-# Specify the Intel SGX driver installed on your machine (more specifically, on the machine where
-# the graminized Docker container will run); there are several variants of the SGX driver:
-#
-#   - upstream (in-kernel) driver: use empty values like below
-#         Repository: ""
-#         Branch:     ""
-#
-#   - DCAP out-of-tree driver: same as above, use empty values
-#         Repository: ""
-#         Branch:     ""
-#
-#   - legacy out-of-tree driver: use something like the below values, but adjust the branch name
-#         Repository: "https://github.com/01org/linux-sgx-driver.git"
-#         Branch:     "sgx_driver_1.9"
-#
-SGXDriver:
-    Repository: ""
-    Branch:     ""

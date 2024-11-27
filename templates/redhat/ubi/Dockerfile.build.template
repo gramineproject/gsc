@@ -28,7 +28,6 @@ RUN rm -rf /etc/rhsm-host \
         python3-protobuf \
         python3-pyelftools \
         python3-voluptuous \
-        wget \
     && /usr/bin/python3 -B -m pip install click jinja2 \
                                           'tomli>=1.1.0' 'tomli-w>=0.4.0' \
     && dnf repolist \
