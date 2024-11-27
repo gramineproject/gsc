@@ -1,7 +1,7 @@
 {% extends "entrypoint.common.manifest.template" %}
 
 {% block loader %}
-loader.entrypoint = "file:/gramine/meson_build_output/lib/x86_64-linux-gnu/gramine/libsysdb.so"
+loader.entrypoint.uri = "file:/gramine/meson_build_output/lib/x86_64-linux-gnu/gramine/libsysdb.so"
 
 # Add "/usr/lib/x86_64-linux-gnu" explicitly because ldconfig in Ubuntu 21.04 doesn't
 # produce it; note that this Debian template is used by Ubuntu templates as well

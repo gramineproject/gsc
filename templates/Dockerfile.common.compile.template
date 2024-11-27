@@ -31,10 +31,5 @@ RUN cd /gramine \
        --buildtype={{buildtype}} \
        -Ddirect=enabled -Dsgx=enabled \
        {% if template_path(Distro).startswith('ubuntu:') %}-Ddcap=enabled{% endif %} \
-       {% if "linux-sgx-driver" in SGXDriver.Repository %} \
-       -Dsgx_driver=oot -Dsgx_driver_include_path=/gramine/driver \
-       {% else %} \
-       -Dsgx_driver=upstream -Dsgx_driver_include_path=/gramine/driver \
-       {% endif %} \
     && ninja -C build \
     && ninja -C build install
