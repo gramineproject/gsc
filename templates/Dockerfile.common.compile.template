@@ -13,8 +13,8 @@ RUN cd /gramine \
     && git fetch origin {{Gramine.Branch}} \
     && git checkout {{Gramine.Branch}}
 
-RUN mkdir -p /gramine/driver/asm \
-    && cd /gramine/driver/asm \
+RUN mkdir -p /usr/include/asm \
+    && cd /usr/include/asm \
     && wget --timeout=10 -O sgx.h \
         https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain/arch/x86/include/uapi/asm/sgx.h?h=v5.11 \
     && sha256sum sgx.h | grep -q a34a997ade42b61376b1c5d3d50f839fd28f2253fa047cb9c0e68a1b00477956
