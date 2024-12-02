@@ -19,6 +19,7 @@ RUN dnf update -y \
         gcc-c++ \
         git \
         httpd \
+        kernel-devel \
         libevent-devel \
         make \
         nasm \

@@ -14,6 +14,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
         gawk \
         git \
         libprotobuf-c-dev \
+        linux-libc-dev \
         linux-headers-generic \
         nasm \
         ninja-build \
