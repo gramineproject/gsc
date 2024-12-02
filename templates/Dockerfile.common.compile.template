@@ -13,18 +13,11 @@ RUN cd /gramine \
     && git fetch origin {{Gramine.Branch}} \
     && git checkout {{Gramine.Branch}}
 
-{% if "linux-sgx-driver" in SGXDriver.Repository %}
-RUN cd /gramine \
-    && git clone {{SGXDriver.Repository}} driver \
-    && cd driver \
-    && git checkout {{SGXDriver.Branch}}
-{% else %}
 RUN mkdir -p /gramine/driver/asm \
     && cd /gramine/driver/asm \
     && wget --timeout=10 -O sgx.h \
         https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/plain/arch/x86/include/uapi/asm/sgx.h?h=v5.11 \
     && sha256sum sgx.h | grep -q a34a997ade42b61376b1c5d3d50f839fd28f2253fa047cb9c0e68a1b00477956
-{% endif %}
 
 RUN cd /gramine \
     && meson setup build/ --prefix="/gramine/meson_build_output" \

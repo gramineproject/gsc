@@ -359,16 +359,6 @@ in :file:`config.yaml.template`.
    provided for popular cloud-provider environments. `Gramine.Repository` and
    `Gramine.Branch` are ignored in case `Gramine.Image` is specified.
 
-.. describe:: SGXDriver.Repository
-
-   Source repository of the Intel SGX driver. Default value: ""
-   (in-kernel driver).
-
-.. describe:: SGXDriver.Branch
-
-   Use this branch of the repository. Default value: ""
-   (in-kernel driver).
-
 Run graminized Docker images
 =============================
 
