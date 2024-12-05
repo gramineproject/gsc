@@ -4,7 +4,7 @@
 # which is recommended, you don't need to worry about the mismatch).
 #
 # Currently supported distros are:
-# - ubuntu:22.04
+# - ubuntu:22.04, ubuntu:24.04
 # - debian:12
 # - quay.io/centos/centos:stream9
 # - redhat/ubi9:9.4
