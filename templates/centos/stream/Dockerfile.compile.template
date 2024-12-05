@@ -18,7 +18,7 @@ RUN dnf distro-sync -y \
         gcc-c++ \
         git \
         httpd \
-        kernel-devel \
+        kernel-headers \
         libcurl-devel \
         make \
         nasm \

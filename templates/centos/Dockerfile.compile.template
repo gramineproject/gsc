@@ -19,7 +19,7 @@ RUN dnf update -y \
         gcc-c++ \
         git \
         httpd \
-        kernel-devel \
+        kernel-headers \
         libevent-devel \
         make \
         nasm \
@@ -37,7 +37,6 @@ RUN dnf update -y \
         python3-pip \
         python3-protobuf \
         rpm-build \
-        wget \
     && /usr/bin/python3 -B -m pip install 'tomli>=1.1.0' 'tomli-w>=0.4.0' 'meson>=0.56,!=1.2.*'
 
 {% endblock %}

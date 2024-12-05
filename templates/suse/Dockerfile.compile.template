@@ -26,7 +26,7 @@ RUN SUSEConnect -p PackageHub/{{ver}}/x86_64 \
         gcc11 \
         gcc11-c++ \
         git \
-        kernel-devel \
+        linux-glibc-devel \
         libevent-devel \
         libprotobuf-c-devel \
         libprotobuf-c1 \

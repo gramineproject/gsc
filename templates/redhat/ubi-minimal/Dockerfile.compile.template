@@ -25,7 +25,7 @@ RUN rm -rf /etc/rhsm-host \
         gcc-c++ \
         git \
         httpd \
-        kernel-devel \
+        kernel-headers \
         libevent-devel \
         make \
         nasm \
