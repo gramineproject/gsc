@@ -24,7 +24,6 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
         python3 \
         python3-cryptography \
         python3-protobuf \
-        wget \
 # please see the comment in Dockerfile.build.template for explanation why this condition is needed
         {%- if (distro[0] == "debian" and distro[1] | int >= 12) or
                (distro[0] == "ubuntu" and distro[1] | int >= 23) %}
