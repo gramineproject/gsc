@@ -5,7 +5,7 @@
 #
 # Currently supported distros are:
 # - ubuntu:22.04, ubuntu:24.04
-# - debian:12
+# - debian:11, debian:12
 # - quay.io/centos/centos:stream9
 # - redhat/ubi9:9.4
 # - redhat/ubi9-minimal:9.4
