@@ -39,6 +39,9 @@ image.
 Prerequisites
 =============
 
+The installation descriptions of prerequisites are for Ubuntu 22.04 and may
+differ when using a different Ubuntu version or Linux distribution.
+
 Software packages
 -----------------
 
@@ -319,13 +322,12 @@ in :file:`config.yaml.template`.
 
 .. describe:: Distro
 
-   Defines Linux distribution to be used to build Gramine in. This distro should
-   match the distro of the supplied Docker image; otherwise the results may be
-   unpredictable. Currently supported distros are Ubuntu 20.04, Ubuntu 21.04,
-   Ubuntu 22.04, Ubuntu 23.04, Debian 10, Debian 11, Debian 12, CentOS 8, CentOS
-   Stream 9, Red Hat Universal Base Image (UBI) 8, Red Hat Universal Base Image
-   (UBI) 9, Red Hat Universal Base Image (UBI) 8 minimal, Red Hat Universal Base Image
-   9 minimal and SUSE Linux Enterprise Server 15.
+   Defines Linux distribution to be used to build Gramine in. This distro
+   should match the distro of the supplied Docker image; otherwise the
+   results may be unpredictable. Currently supported distros are Ubuntu
+   22.04, Ubuntu 24.04, Debian 11, Debian 12, CentOS Stream 9, Red Hat Universal Base
+   Image (UBI) 9, Red Hat Universal Base Image (UBI) 9 minimal, and SUSE
+   Linux Enterprise Server 15.
 
    Default value is ``auto`` which means GSC automatically detects the distro
    of the supplied Docker image. Users also have the option to provide one of
@@ -333,8 +335,7 @@ in :file:`config.yaml.template`.
 
    .. warning::
       Please register and subscribe your host RHEL system to the Red Hat
-      Customer Portal to use Red Hat Universal Base Image (UBI) 8, Red Hat
-      Universal Base Image (UBI) 9, UBI8-minimal and UBI9-minimal distros.
+      Customer Portal to use Red Hat Universal Base Image (UBI) 9 and UBI9-minimal distros.
 
 .. describe:: Registry
 
