@@ -151,14 +151,6 @@ def main(args=None):
     else:
         print(f'\t[from inside Docker container] Skipping trusted files generation. This image must not be used in production.')
 
-    # Check if the [loader] section and entrypoint.uri field are present
-    if 'loader' not in rendered_manifest_dict:
-        rendered_manifest_dict['loader'] = {}
-    if 'entrypoint' not in rendered_manifest_dict['loader']:
-        rendered_manifest_dict['loader']['entrypoint'] = {}
-    if 'uri' not in rendered_manifest_dict['loader']['entrypoint']:
-        rendered_manifest_dict['loader']['entrypoint']['uri'] = "file:/gramine/meson_build_output/lib/x86_64-linux-gnu/gramine/libsysdb.so"
-
     with open(manifest, 'wb') as manifest_file:
         tomli_w.dump(rendered_manifest_dict, manifest_file)
     print(f'\t[from inside Docker container] Successfully finalized `{manifest}`.')
