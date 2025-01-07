@@ -10,7 +10,6 @@ import re
 import subprocess
 import sys
 
-import hashlib
 import jinja2
 import tomli
 import tomli_w
@@ -21,13 +20,6 @@ def is_utf8(filename_bytes):
         return True
     except UnicodeError:
         return False
-
-def compute_sha256(filename):
-    sha256_hash = hashlib.sha256()
-    with open(filename, 'rb') as f:
-        for byte_block in iter(lambda: f.read(4096), b""):
-            sha256_hash.update(byte_block)
-    return sha256_hash.hexdigest()
 
 def extract_files_from_user_manifest(manifest):
     files = []
@@ -106,7 +98,7 @@ def generate_trusted_files(root_dir, already_added_files):
                 # user manifest already contains this file (probably as allowed or protected)
                 continue
 
-            trusted_files.append({"uri": trusted_file_entry, "sha256": compute_sha256(filename)})
+            trusted_files.append(trusted_file_entry)
             num_trusted += 1
 
     print(f'\t[from inside Docker container] Found {num_trusted} files in `{root_dir}`.')
