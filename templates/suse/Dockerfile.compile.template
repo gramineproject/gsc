@@ -26,6 +26,7 @@ RUN SUSEConnect -p PackageHub/{{ver}}/x86_64 \
         gcc11 \
         gcc11-c++ \
         git \
+        linux-glibc-devel \
         libevent-devel \
         libprotobuf-c-devel \
         libprotobuf-c1 \
@@ -43,7 +44,6 @@ RUN SUSEConnect -p PackageHub/{{ver}}/x86_64 \
         python3-protobuf \
         python3-tomli \
         rpm-build \
-        wget \
         which \
     && /usr/bin/python3 -B -m pip install 'tomli-w>=0.4.0' \
     && update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-11 10 \
