@@ -1,6 +1,6 @@
 libos.entrypoint = "/gramine/app_files/{{binary_basename}}"
 
-# Add distro-specific `loader.entrypoint` and `loader.env.LD_LIBRARY_PATH`
+# Add distro-specific `loader.entrypoint.uri` and `loader.env.LD_LIBRARY_PATH`
 {% block loader %}{% endblock %}
 
 loader.env.PATH = "{{"{{env_path}}"}}"
