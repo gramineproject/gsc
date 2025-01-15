@@ -163,6 +163,7 @@ def main(args=None):
 
     if 'allow_all_but_log' not in rendered_manifest_dict['sgx'].get('file_check_policy', ''):
         trusted_files = generate_trusted_files(args.dir, already_added_files)
+        rendered_manifest_dict['sgx'].setdefault('trusted_files', [])
         rendered_manifest_dict['sgx']['trusted_files'] = expand_trusted_files(trusted_files + already_added_files)
     else:
         print(f'\t[from inside Docker container] Skipping trusted files generation. This image must not be used in production.')
