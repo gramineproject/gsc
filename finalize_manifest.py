@@ -7,6 +7,7 @@
 import argparse
 import os
 import re
+import pathlib
 import subprocess
 import sys
 
@@ -14,7 +15,6 @@ import hashlib
 import jinja2
 import tomli
 import tomli_w
-from urllib.parse import urlparse
 
 def is_utf8(filename_bytes):
     try:
@@ -22,6 +22,11 @@ def is_utf8(filename_bytes):
         return True
     except UnicodeError:
         return False
+
+def uri2path(uri):
+    if not uri.startswith('file:'):
+        raise ManifestError(f'Unsupported URI type: {uri}')
+    return pathlib.Path(uri[len('file:'):])
 
 def compute_sha256(filename):
     sha256 = hashlib.sha256()
@@ -33,9 +38,11 @@ def compute_sha256(filename):
 def expand_trusted_files(trusted_files):
     expanded_files = []
     for uri in trusted_files:
-        file_path = urlparse(uri).path
+        file_path = uri2path(uri)
         if os.path.exists(file_path):
             expanded_files.append({"uri": uri,"sha256": compute_sha256(file_path)})
+        else:
+            raise ManifestError(f'File not found: {file_path}')
     return expanded_files
 
 def extract_files_from_user_manifest(manifest):
