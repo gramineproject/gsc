@@ -1,4 +1,4 @@
-FROM openjdk:11
+FROM openjdk:21-jdk-slim
 
 COPY JavaExample.java .
 

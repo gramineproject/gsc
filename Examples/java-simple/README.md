@@ -9,37 +9,35 @@ using GSC. For more information on Java, please visit https://www.oracle.com/jav
 * Tested on:
   - Type: Azure Confidential Computing SGX Virtual Machine
   - Size: Standard DC1s v3 (1 vCPU, 8 GiB memory)
-  - OS: Linux (Ubuntu 20.04)
-  - OpenJDK 11
+  - OS: Linux (Ubuntu 24.04)
+  - OpenJDK 21
 
 ## Build and run graminized Docker image
 
 1. Build Docker image:
 
 ```bash
-$ docker build -t openjdk-11-java-simple .
+docker build -t openjdk-21-java-simple .
 ```
 
 2. Graminize the Docker image (this step can take some time!):
 
 ```bash
-$ (cd ../.. && ./gsc build openjdk-11-java-simple \
-    Examples/java-simple/java-simple.manifest \
-    -c <PATH-TO-CONFIG-FILE>)
+(cd ../.. && ./gsc build openjdk-21-java-simple \
+    Examples/java-simple/java-simple.manifest)
 ```
 
 3. Sign the graminized Docker image:
 
 ```bash
-$ (cd ../.. && ./gsc sign-image openjdk-11-java-simple \
-    <PATH-TO-KEY-FILE> \
-    -c <PATH-TO-CONFIG-FILE>)
+(cd ../.. && ./gsc sign-image openjdk-21-java-simple \
+    <PATH-TO-KEY-FILE>)
 ```
 
 4. Run graminized image:
 
 ```bash
-$ docker run --rm --device=/dev/sgx_enclave \
+docker run --rm --device=/dev/sgx_enclave \
     -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-    gsc-openjdk-11-java-simple
+    gsc-openjdk-21-java-simple
 ```
