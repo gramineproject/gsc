@@ -10,27 +10,27 @@ using GSC. For more information on Java, please visit https://www.oracle.com/jav
   - Type: Azure Confidential Computing SGX Virtual Machine
   - Size: Standard DC1s v3 (1 vCPU, 8 GiB memory)
   - OS: Linux (Ubuntu 24.04)
-  - openjdk:25-jdk-bookworm
+  - openjdk:24-jdk-bookworm
 
 ## Build and run graminized Docker image
 
 1. Build Docker image:
 
 ```bash
-docker build -t openjdk-25-java-simple .
+docker build -t openjdk-24-java-simple .
 ```
 
 2. Graminize the Docker image (this step can take some time!):
 
 ```bash
-(cd ../.. && ./gsc build openjdk-25-java-simple \
+(cd ../.. && ./gsc build openjdk-24-java-simple \
     Examples/java-simple/java-simple.manifest )
 ```
 
 3. Sign the graminized Docker image:
 
 ```bash
-(cd ../.. && ./gsc sign-image openjdk-25-java-simple \
+(cd ../.. && ./gsc sign-image openjdk-24-java-simple \
     <PATH-TO-KEY-FILE> )
 ```
 
@@ -39,5 +39,5 @@ docker build -t openjdk-25-java-simple .
 ```bash
 docker run --rm --device=/dev/sgx_enclave \
     -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
-    gsc-openjdk-25-java-simple
+    gsc-openjdk-24-java-simple
 ```
