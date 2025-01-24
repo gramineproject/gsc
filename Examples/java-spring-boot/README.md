@@ -50,7 +50,7 @@ docker build -t openjdk-21-java-spring-boot .
 
 ```bash
 (cd ../.. && ./gsc sign-image openjdk-21-java-spring-boot \
-    enclave-key.pem)
+    <PATH-TO-KEY-FILE>)
 ```
 
 6. Run graminized image (the application may take a while to load):
