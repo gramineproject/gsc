@@ -10,15 +10,14 @@ runs inside the SGX enclave. For more information on Spring Boot, please visit h
   - Type: Azure Confidential Computing SGX Virtual Machine
   - Size: Standard DC1s v3 (1 vCPU, 8 GiB memory)
   - OS: Linux (Ubuntu 24.04)
-  - OpenJDK 17
 
-* Install the OpenJDK 17 package so that Gradle can consume the files:
+* Install the OpenJDK 21 package so that Gradle can consume the files:
 
     ```bash
-    sudo apt-get install openjdk-17-jdk
+    sudo apt-get install openjdk-21-jdk
     ```
 
-* Follow the installation guide at https://gradle.org/install/ to install Gradle v7.6.
+* Follow the installation guide at https://gradle.org/install/ to install Gradle v8.12.
 
 ## Build and run graminized Docker image
 
@@ -31,7 +30,7 @@ runs inside the SGX enclave. For more information on Spring Boot, please visit h
 2. Build Docker image:
 
 ```bash
-docker build -t openjdk-17-java-spring-boot .
+docker build -t openjdk-21-java-spring-boot .
 ```
 
 3. Clean up files that will be no longer used:
@@ -43,15 +42,15 @@ docker build -t openjdk-17-java-spring-boot .
 4. Graminize the Docker image (this step can take some time!):
 
 ```bash
-(cd ../.. && ./gsc build openjdk-17-java-spring-boot \
-    Examples/java-spring-boot/java-spring-boot.manifest )
+(cd ../.. && ./gsc build openjdk-21-java-spring-boot \
+    Examples/java-spring-boot/java-spring-boot.manifest)
 ```
 
 5. Sign the graminized Docker image:
 
 ```bash
-(cd ../.. && ./gsc sign-image openjdk-17-java-spring-boot \
-    enclave-key.pem )
+(cd ../.. && ./gsc sign-image openjdk-21-java-spring-boot \
+    enclave-key.pem)
 ```
 
 6. Run graminized image (the application may take a while to load):
@@ -62,7 +61,7 @@ docker build -t openjdk-17-java-spring-boot .
         docker run --rm --device=/dev/sgx_enclave \
             -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
             -p 8080:8080 \
-            -d gsc-openjdk-17-java-spring-boot
+            -d gsc-openjdk-21-java-spring-boot
         ```
 
       * On a customized port using an environment variable, e.g. 9080:
@@ -72,7 +71,7 @@ docker build -t openjdk-17-java-spring-boot .
             -v /var/run/aesmd/aesm.socket:/var/run/aesmd/aesm.socket \
             -e SERVER_PORT=9080 \
             -p 9080:9080 \
-            -d gsc-openjdk-17-java-spring-boot
+            -d gsc-openjdk-21-java-spring-boot
         ```
 
 
