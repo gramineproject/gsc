@@ -24,14 +24,14 @@ docker build -t openjdk-24-java-simple .
 
 ```bash
 (cd ../.. && ./gsc build openjdk-24-java-simple \
-    Examples/java-simple/java-simple.manifest )
+    Examples/java-simple/java-simple.manifest)
 ```
 
 3. Sign the graminized Docker image:
 
 ```bash
 (cd ../.. && ./gsc sign-image openjdk-24-java-simple \
-    <PATH-TO-KEY-FILE> )
+    <PATH-TO-KEY-FILE>)
 ```
 
 4. Run graminized image:
