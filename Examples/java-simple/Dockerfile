@@ -1,4 +1,4 @@
-FROM openjdk:24-jdk-bookworm
+FROM openjdk:21-jdk-slim
 
 COPY JavaExample.java .
 
