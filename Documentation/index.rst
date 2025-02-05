@@ -430,10 +430,6 @@ options:
        --security-opt seccomp=<profile> \
        gsc-<image-name> ...
 
-.. note::
-    Previously, to run in ``direct`` mode, one specified ``--env
-    GSC_PAL=Linux``. This is deprecated in GSC v1.8 and will be removed in v1.9.
-
 Example
 =======
 
