@@ -390,6 +390,9 @@ def gsc_build(args):
     compile_template = env.get_template(f'{template_path(distro)}/Dockerfile.compile.template')
     env.globals.update({'compile_template': compile_template})
 
+    python_path_template = env.get_template(f'{template_path(distro)}/python.path.template')
+    env.globals.update({'python_path': python_path_template})
+
     # generate Dockerfile.build from Jinja-style templates/<distro>/Dockerfile.build.template
     # using the user-provided config file with info on OS distro, Gramine version and SGX driver
     # and other env configurations generated above

@@ -50,5 +50,3 @@ ENV LC_ALL en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 {% endblock %}
-
-{% block path %}export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib -type d -path '*/site-packages')" &&{% endblock %}

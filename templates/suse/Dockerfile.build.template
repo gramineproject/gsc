@@ -42,5 +42,3 @@ RUN zypper install -y \
         vim
 {% endif %}
 {% endblock %}
-
-{% block path %}export PYTHONPATH="${PYTHONPATH:+$PYTHONPATH:}$(find /gramine/meson_build_output/lib64 -type d -path '*/site-packages')" &&{% endblock %}

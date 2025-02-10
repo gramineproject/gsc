@@ -1,0 +1,1 @@
+{% extends "debian/python.path.template" %}
