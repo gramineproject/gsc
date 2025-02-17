@@ -12,7 +12,7 @@ COPY gsc-signer-key.pem /gramine/app_files/gsc-signer-key.pem
 
 ARG passphrase
 
-RUN {{ python_path(distro) }} && gramine-sgx-sign \
+RUN {{ python_path() }} && gramine-sgx-sign \
       --key /gramine/app_files/gsc-signer-key.pem \
       --manifest /gramine/app_files/entrypoint.manifest \
       --output /gramine/app_files/entrypoint.manifest.sgx \

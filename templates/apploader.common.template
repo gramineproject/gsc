@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+{% from 'python.common.path.template' import python_path %}
 
 {% if buildtype != "release" %}
 set -x
@@ -6,6 +7,10 @@ set -x
 set -e
 
 # Export distro-specific paths (typically `PYTHONPATH` and `PKG_CONFIG_PATH`)
+
+# Include Meson build output Python dir in $PYTHONPATH, needed by gramine-sgx-get-token
+{{ python_path() }}
+
 {% block path %}{% endblock %}
 
 # Note: default to SGX if Gramine mode (`direct`, `sgx`) wasn't specified

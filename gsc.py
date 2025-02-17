@@ -396,12 +396,12 @@ def gsc_build(args):
     build_template = env.get_template(f'{template_path(distro)}/Dockerfile.build.template')
 
     with open(tmp_build_path / 'Dockerfile.build', 'w') as dockerfile:
-        dockerfile.write(build_template.render(distro=distro))
+        dockerfile.write(build_template.render())
 
     # generate apploader.sh from Jinja-style templates/apploader.template
     apploader_template = env.get_template(f'{template_path(distro)}/apploader.template')
     with open(tmp_build_path / 'apploader.sh', 'w') as apploader:
-        apploader.write(apploader_template.render(distro=distro))
+        apploader.write(apploader_template.render())
 
     # generate entrypoint.manifest from three parts:
     #   - Jinja-style templates/entrypoint.manifest.template
@@ -574,7 +574,7 @@ def gsc_sign_image(args):
     sign_template = env.get_template(f'{template_path(distro)}/Dockerfile.sign.template')
     os.makedirs(tmp_build_path, exist_ok=True)
     with open(tmp_build_path / 'Dockerfile.sign', 'w') as dockerfile:
-        dockerfile.write(sign_template.render(image=unsigned_image_name, distro=distro))
+        dockerfile.write(sign_template.render(image=unsigned_image_name))
 
     # copy user-provided signing key to our tmp build dir (to copy it later inside Docker image)
     tmp_build_key_path = tmp_build_path / 'gsc-signer-key.pem'
