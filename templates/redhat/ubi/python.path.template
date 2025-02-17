@@ -1,1 +1,0 @@
-{% extends "centos/python.path.template" %}

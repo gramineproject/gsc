@@ -25,5 +25,3 @@ RUN \
         && apt-get autoremove -y \
         && rm -rf /var/lib/apt/lists/*;
 {% endblock %}
-
-{% block path %}export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib -type d -path '*/site-packages')" &&{% endblock %}

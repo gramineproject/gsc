@@ -390,21 +390,18 @@ def gsc_build(args):
     compile_template = env.get_template(f'{template_path(distro)}/Dockerfile.compile.template')
     env.globals.update({'compile_template': compile_template})
 
-    python_path_template = env.get_template(f'{template_path(distro)}/python.path.template')
-    env.globals.update({'python_path': python_path_template})
-
     # generate Dockerfile.build from Jinja-style templates/<distro>/Dockerfile.build.template
     # using the user-provided config file with info on OS distro, Gramine version and SGX driver
     # and other env configurations generated above
     build_template = env.get_template(f'{template_path(distro)}/Dockerfile.build.template')
 
     with open(tmp_build_path / 'Dockerfile.build', 'w') as dockerfile:
-        dockerfile.write(build_template.render())
+        dockerfile.write(build_template.render(distro=distro))
 
     # generate apploader.sh from Jinja-style templates/apploader.template
     apploader_template = env.get_template(f'{template_path(distro)}/apploader.template')
     with open(tmp_build_path / 'apploader.sh', 'w') as apploader:
-        apploader.write(apploader_template.render())
+        apploader.write(apploader_template.render(distro=distro))
 
     # generate entrypoint.manifest from three parts:
     #   - Jinja-style templates/entrypoint.manifest.template
@@ -577,7 +574,7 @@ def gsc_sign_image(args):
     sign_template = env.get_template(f'{template_path(distro)}/Dockerfile.sign.template')
     os.makedirs(tmp_build_path, exist_ok=True)
     with open(tmp_build_path / 'Dockerfile.sign', 'w') as dockerfile:
-        dockerfile.write(sign_template.render(image=unsigned_image_name))
+        dockerfile.write(sign_template.render(image=unsigned_image_name, distro=distro))
 
     # copy user-provided signing key to our tmp build dir (to copy it later inside Docker image)
     tmp_build_key_path = tmp_build_path / 'gsc-signer-key.pem'
