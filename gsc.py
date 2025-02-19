@@ -390,6 +390,9 @@ def gsc_build(args):
     compile_template = env.get_template(f'{template_path(distro)}/Dockerfile.compile.template')
     env.globals.update({'compile_template': compile_template})
 
+    python_path = env.get_template('python.common.path.template')
+    env.globals.update({'python_path': python_path.module.python_path})
+
     # generate Dockerfile.build from Jinja-style templates/<distro>/Dockerfile.build.template
     # using the user-provided config file with info on OS distro, Gramine version and SGX driver
     # and other env configurations generated above
@@ -572,6 +575,8 @@ def gsc_sign_image(args):
     env.loader = jinja2.FileSystemLoader('templates/')
 
     sign_template = env.get_template(f'{template_path(distro)}/Dockerfile.sign.template')
+    python_path = env.get_template('python.common.path.template')
+    env.globals.update({'python_path': python_path.module.python_path})
     os.makedirs(tmp_build_path, exist_ok=True)
     with open(tmp_build_path / 'Dockerfile.sign', 'w') as dockerfile:
         dockerfile.write(sign_template.render(image=unsigned_image_name))

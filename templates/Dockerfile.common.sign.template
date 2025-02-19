@@ -1,5 +1,3 @@
-{% from 'python.common.path.template' import python_path %}
-
 # Sign image in a separate stage to ensure that signing key is never part of the final image
 FROM {{image}} as unsigned_image
 
@@ -12,7 +10,7 @@ COPY gsc-signer-key.pem /gramine/app_files/gsc-signer-key.pem
 
 ARG passphrase
 
-RUN {{ python_path() }} \
+RUN {% block path %}{% endblock %} \
       && gramine-sgx-sign \
       --key /gramine/app_files/gsc-signer-key.pem \
       --manifest /gramine/app_files/entrypoint.manifest \

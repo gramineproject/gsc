@@ -1,3 +1,3 @@
-{%- macro python_path() -%}
-{% if 'debian' in Distro or 'ubuntu' in Distro %}export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib -type d -path '*/site-packages')" {% else %}export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output/lib64 -type d -path '*/site-packages')"{% endif %}
+{%- macro python_path(libdir) -%}
+export PYTHONPATH="${PYTHONPATH}:$(find /gramine/meson_build_output{{ libdir }} -type d -path '*/site-packages')"
 {%- endmacro -%}

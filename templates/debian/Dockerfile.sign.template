@@ -25,3 +25,5 @@ RUN \
         && apt-get autoremove -y \
         && rm -rf /var/lib/apt/lists/*;
 {% endblock %}
+
+{%- block path -%} {{- python_path('/lib') -}}{%- endblock -%}

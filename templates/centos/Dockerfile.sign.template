@@ -14,3 +14,5 @@ RUN \
           tcl \
        && dnf -y clean all;
 {% endblock %}
+
+{%- block path -%} {{- python_path('/lib64') -}}{%- endblock -%}
