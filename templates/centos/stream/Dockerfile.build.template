@@ -39,3 +39,6 @@ RUN dnf install -y \
         vim
 {% endif %}
 {% endblock %}
+
+{%- block path -%} {{- python_path('/lib64') -}}{%- endblock -%}
+
