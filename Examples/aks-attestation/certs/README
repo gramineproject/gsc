@@ -1,0 +1,13 @@
+This directory contains pre-generated example certificates. In particular:
+
+- `test-ca-sha256.crt` -- RSA SHA256 root CA certificate in PEM format. Loaded
+  in client (attester) so that client can verify the server's certificate.
+- `server2-sha256.crt` -- RSA SHA256 leaf server certificate in PEM format.
+  Loaded in server (verifier), so it will send it to the client during TLS
+  handshake. The "Common Name" field is set to
+  `ra-tls-server-aks-dns.eastus.cloudapp.azure.com`.
+- `server2.key` -- RSA private key in PEM format. Loaded in server (verifier).
+
+Note: These certificates should not be used in production. Here, user should
+      update the server2-sha256.crt with ``Common Name`` pointing to the DNS
+      name of the ra-tls-secret-prov server deployed in the AKS cluster.
