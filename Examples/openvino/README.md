@@ -65,7 +65,8 @@ docker run --rm --device /dev/sgx_enclave gsc-ubuntu24.04-openvino \
 
 ## Running the benchmark natively
 
-To run the benchmark in a native Docker container (outside Gramine), run the above commands with the following modifications:
+To run the benchmark in a native Docker container (outside Gramine), run the above
+commands with the following modifications:
 - remove `--device=/dev/sgx_enclave`,
 - replace `gsc-ubuntu24.04-openvino` with `ubuntu24.04-openvino`.
 
