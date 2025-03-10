@@ -4,6 +4,9 @@ For additional information on supported models, how to install, run and optimize
 OpenVINO, please see
 https://github.com/gramineproject/examples/blob/master/openvino/README.md.
 
+> **Note:** The OpenVINO examples content might be outdated, but the performance
+> suggestions provided there are generally applicable here.
+
 Currently tested distro is Ubuntu 24.04.
 
 ## Building graminized Docker image
