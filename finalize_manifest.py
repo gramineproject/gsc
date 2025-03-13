@@ -30,8 +30,8 @@ def uri2path(uri):
 
 def compute_sha256(filename):
     sha256 = hashlib.sha256()
-    with open(filename, "rb") as f:
-        for byte_block in iter(lambda: f.read(128 * sha256.block_size), b""):
+    with open(filename, 'rb') as f:
+        for byte_block in iter(lambda: f.read(128 * sha256.block_size), b''):
             sha256.update(byte_block)
     return sha256.hexdigest()
 
@@ -39,8 +39,8 @@ def expand_trusted_files(trusted_files):
     expanded_files = []
     for uri in trusted_files:
         file_path = uri2path(uri)
-        if os.path.exists(file_path):
-            expanded_files.append({"uri": uri,"sha256": compute_sha256(file_path)})
+        if file_path.exists():
+            expanded_files.append({'uri': uri, 'sha256': compute_sha256(file_path)})
         else:
             raise ManifestError(f'File not found: {file_path}')
     return expanded_files
