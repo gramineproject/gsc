@@ -7,9 +7,11 @@
 import argparse
 import os
 import re
+import pathlib
 import subprocess
 import sys
 
+import hashlib
 import jinja2
 import tomli
 import tomli_w
@@ -20,6 +22,28 @@ def is_utf8(filename_bytes):
         return True
     except UnicodeError:
         return False
+
+def uri2path(uri):
+    if not uri.startswith('file:'):
+        raise ManifestError(f'Unsupported URI type: {uri}')
+    return pathlib.Path(uri[len('file:'):])
+
+def compute_sha256(filename):
+    sha256 = hashlib.sha256()
+    with open(filename, 'rb') as f:
+        for byte_block in iter(lambda: f.read(128 * sha256.block_size), b''):
+            sha256.update(byte_block)
+    return sha256.hexdigest()
+
+def expand_trusted_files(trusted_files):
+    expanded_files = []
+    for uri in trusted_files:
+        file_path = uri2path(uri)
+        if file_path.exists():
+            expanded_files.append({'uri': uri, 'sha256': compute_sha256(file_path)})
+        else:
+            raise ManifestError(f'File not found: {file_path}')
+    return expanded_files
 
 def extract_files_from_user_manifest(manifest):
     files = []
@@ -139,7 +163,7 @@ def main(args=None):
 
     if 'allow_all_but_log' not in rendered_manifest_dict['sgx'].get('file_check_policy', ''):
         trusted_files = generate_trusted_files(args.dir, already_added_files)
-        rendered_manifest_dict['sgx'].setdefault('trusted_files', []).extend(trusted_files)
+        rendered_manifest_dict['sgx']['trusted_files'] = expand_trusted_files(trusted_files + already_added_files)
     else:
         print(f'\t[from inside Docker container] Skipping trusted files generation. This image must not be used in production.')
 
