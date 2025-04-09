@@ -16,6 +16,12 @@ import jinja2
 import tomli
 import tomli_w
 
+class ManifestError(Exception):
+    """Thrown at errors in manifest parsing and handling.
+
+    Contains a string with error description.
+    """
+
 def is_utf8(filename_bytes):
     try:
         filename_bytes.decode('UTF-8')
@@ -41,8 +47,6 @@ def expand_trusted_files(trusted_files):
         file_path = uri2path(uri)
         if file_path.exists():
             expanded_files.append({'uri': uri, 'sha256': compute_sha256(file_path)})
-        else:
-            raise ManifestError(f'File not found: {file_path}')
     return expanded_files
 
 def extract_files_from_user_manifest(manifest):
