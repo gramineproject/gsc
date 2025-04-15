@@ -46,7 +46,13 @@ def expand_trusted_files(trusted_files):
     for uri in trusted_files:
         file_path = uri2path(uri)
         if file_path.exists():
-            expanded_files.append({'uri': uri, 'sha256': compute_sha256(file_path)})
+            if file_path.is_dir():
+                for root, _, files in os.walk(file_path):
+                    for file in files:
+                        full_path = pathlib.Path(root) / file
+                        expanded_files.append({'uri': f'file:{full_path}', 'sha256': compute_sha256(full_path)})
+            else:
+                expanded_files.append({'uri': uri, 'sha256': compute_sha256(file_path)})
     return expanded_files
 
 def extract_files_from_user_manifest(manifest):
