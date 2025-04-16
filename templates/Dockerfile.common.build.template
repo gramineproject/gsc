@@ -62,6 +62,8 @@ RUN chmod u+x /gramine/app_files/apploader.sh \
     && rm -f /gramine/app_files/finalize_manifest.py
 
 RUN {% block path %}{% endblock %} \
+    && gramine-manifest /gramine/app_files/entrypoint.manifest \
+    /gramine/app_files/entrypoint.manifest \
     && gramine-manifest-check /gramine/app_files/entrypoint.manifest
 
 # Define default command
