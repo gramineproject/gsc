@@ -41,7 +41,7 @@ The official Gramine Library OS documentation can be found at
 https://gramine.readthedocs.io.
 
 The official GSC documentation can be found at
-https://gramine-gsc.readthedocs.io.
+https://gramine.readthedocs.io/projects/gsc.
 
 How to contribute?
 ==================
