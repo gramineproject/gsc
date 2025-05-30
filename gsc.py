@@ -69,10 +69,10 @@ def build_docker_image(docker_api, build_path, image_name, dockerfile, **kwargs)
 
 
 def extract_binary_info_from_image_config(config, env):
-    entrypoint = config['Entrypoint'] or []
+    entrypoint = config.get('Entrypoint', [])
     num_starting_entrypoint_items = len(entrypoint)
-    cmd = config['Cmd'] or []
-    working_dir = config['WorkingDir'] or ''
+    cmd = config.get('Cmd', [])
+    working_dir = config.get('WorkingDir', '')
 
     # Canonize working dir
     if working_dir == '':
@@ -115,7 +115,7 @@ def extract_binary_info_from_image_config(config, env):
 
 
 def extract_environment_from_image_config(config):
-    env_list = config['Env'] or []
+    env_list = config.get('Env', [])
     base_image_environment = ''
     for env_var in env_list:
         # TODO: switch to loader.env_src_file = "file:file_with_serialized_envs" if
@@ -158,7 +158,7 @@ def extract_define_args(args):
     return defineargs_dict
 
 def extract_user_from_image_config(config, env):
-    user = config['User']
+    user = config.get('User', 'root')
     if not user:
         user = 'root'
     env.globals.update({'app_user': user})
