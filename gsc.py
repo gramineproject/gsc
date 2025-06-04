@@ -69,10 +69,10 @@ def build_docker_image(docker_api, build_path, image_name, dockerfile, **kwargs)
 
 
 def extract_binary_info_from_image_config(config, env):
-    entrypoint = config['Entrypoint'] or []
+    entrypoint = config.get('Entrypoint') or []
     num_starting_entrypoint_items = len(entrypoint)
-    cmd = config['Cmd'] or []
-    working_dir = config['WorkingDir'] or ''
+    cmd = config.get('Cmd') or []
+    working_dir = config.get('WorkingDir') or ''
 
     # Canonize working dir
     if working_dir == '':
@@ -115,7 +115,7 @@ def extract_binary_info_from_image_config(config, env):
 
 
 def extract_environment_from_image_config(config):
-    env_list = config['Env'] or []
+    env_list = config.get('Env') or []
     base_image_environment = ''
     for env_var in env_list:
         # TODO: switch to loader.env_src_file = "file:file_with_serialized_envs" if
@@ -158,7 +158,7 @@ def extract_define_args(args):
     return defineargs_dict
 
 def extract_user_from_image_config(config, env):
-    user = config['User']
+    user = config.get('User')
     if not user:
         user = 'root'
     env.globals.update({'app_user': user})
@@ -349,8 +349,8 @@ def gsc_build(args):
         sys.exit(1)
 
     config = yaml.safe_load(args.config_file)
-    if 'Image' in config['Gramine']:
-        gramine_image_name = config['Gramine']['Image']
+    if 'Image' in config.get('Gramine'):
+        gramine_image_name = config.get('Gramine', {}).get('Image')
         if get_docker_image(docker_socket, gramine_image_name) is None:
             print(f'Cannot find base-Gramine Docker image `{gramine_image_name}`.')
             sys.exit(1)
@@ -471,7 +471,7 @@ def gsc_build_gramine(args):
     docker_socket = docker.from_env()
 
     config = yaml.safe_load(args.config_file)
-    if 'Image' in config['Gramine']:
+    if 'Image' in config.get('Gramine'):
         print('`gsc build-gramine` does not allow `Gramine.Image` to be set.')
         sys.exit(1)
 
