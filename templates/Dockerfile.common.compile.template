@@ -18,5 +18,5 @@ RUN cd /gramine \
        --buildtype={{buildtype}} \
        -Ddirect=enabled -Dsgx=enabled \
        {% if template_path(Distro).startswith('ubuntu:') %}-Ddcap=enabled{% endif %} \
-    && ninja -C build \
-    && ninja -C build install
+    && meson compile -C build/ \
+    && meson install -C build
