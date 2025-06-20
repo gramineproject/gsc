@@ -39,7 +39,7 @@ RUN env DEBIAN_FRONTEND=noninteractive apt-get update \
            python3-tomli-w
         {%- else %}
            python3-pip \
-           && /usr/bin/python3 -B -m pip install 'tomli>=1.1.0' 'tomli-w>=0.4.0' 'meson>=0.56,!=1.2.*'
+           && /usr/bin/python3 -B -m pip install 'tomli>=1.1.0' 'tomli-w>=0.4.0' 'meson>=0.58,!=1.2.*'
         {%- endif %}
 
 COPY intel-sgx-deb.key /
