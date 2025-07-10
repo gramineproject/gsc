@@ -30,4 +30,4 @@ Registry: ""
 # branch is guaranteed to work with current Gramine `master` branch).
 Gramine:
     Repository: "https://github.com/gramineproject/gramine.git"
-    Branch:     "v1.9"
+    Branch:     "master"
