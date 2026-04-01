@@ -69,10 +69,10 @@ def build_docker_image(docker_api, build_path, image_name, dockerfile, **kwargs)
 
 
 def extract_binary_info_from_image_config(config, env):
-    entrypoint = config['Entrypoint'] or []
+    entrypoint = config.get('Entrypoint') or []
     num_starting_entrypoint_items = len(entrypoint)
-    cmd = config['Cmd'] or []
-    working_dir = config['WorkingDir'] or ''
+    cmd = config.get('Cmd') or []
+    working_dir = config.get('WorkingDir') or ''
 
     # Canonize working dir
     if working_dir == '':
@@ -115,7 +115,7 @@ def extract_binary_info_from_image_config(config, env):
 
 
 def extract_environment_from_image_config(config):
-    env_list = config['Env'] or []
+    env_list = config.get('Env') or []
     base_image_environment = ''
     for env_var in env_list:
         # TODO: switch to loader.env_src_file = "file:file_with_serialized_envs" if
@@ -158,9 +158,7 @@ def extract_define_args(args):
     return defineargs_dict
 
 def extract_user_from_image_config(config, env):
-    user = config['User']
-    if not user:
-        user = 'root'
+    user = config.get('User') or 'root'
     env.globals.update({'app_user': user})
 
 def merge_manifests_in_order(manifest1, manifest2, manifest1_name, manifest2_name, path=[]):
@@ -349,11 +347,19 @@ def gsc_build(args):
         sys.exit(1)
 
     config = yaml.safe_load(args.config_file)
-    if 'Image' in config['Gramine']:
-        gramine_image_name = config['Gramine']['Image']
+    gramine_config = config.get('Gramine')
+    if not gramine_config:
+        sys.exit('Missing `Gramine` section in the config file.')
+
+    gramine_image_name = gramine_config.get('Image')
+    if gramine_image_name:
         if get_docker_image(docker_socket, gramine_image_name) is None:
-            print(f'Cannot find base-Gramine Docker image `{gramine_image_name}`.')
-            sys.exit(1)
+            sys.exit(f'Cannot find base-Gramine Docker image `{gramine_image_name}`.')
+    else:
+        if 'Repository' not in gramine_config:
+            sys.exit('`Gramine.Repository` is missing. Provide this or `Gramine.Image`.')
+        if 'Branch' not in gramine_config:
+            sys.exit('`Gramine.Branch` is missing.')
 
     print(f'Building unsigned graminized Docker image `{unsigned_image_name}` from original '
           f'application image `{original_image_name}`...')
@@ -471,9 +477,17 @@ def gsc_build_gramine(args):
     docker_socket = docker.from_env()
 
     config = yaml.safe_load(args.config_file)
-    if 'Image' in config['Gramine']:
-        print('`gsc build-gramine` does not allow `Gramine.Image` to be set.')
-        sys.exit(1)
+    gramine_config = config.get('Gramine')
+    if not gramine_config:
+        sys.exit('Missing `Gramine` section in the config file.')
+
+    if 'Image' in gramine_config:
+        sys.exit('`gsc build-gramine` does not allow `Gramine.Image` to be set.')
+
+    if 'Repository' not in gramine_config:
+        sys.exit('`Gramine.Repository` is required for `gsc build-gramine` but is missing.')
+    if 'Branch' not in gramine_config:
+        sys.exit('`Gramine.Branch` is required for `gsc build-gramine` but is missing.')
 
     if get_docker_image(docker_socket, gramine_image_name) is not None:
         print(f'Base-Gramine Docker image `{gramine_image_name}` already exists.')
