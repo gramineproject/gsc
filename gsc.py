@@ -28,6 +28,10 @@ class DistroRetrievalError(Exception):
                          'image. Please specify OS distro manually in the configuration file.'),
                          *args)
 
+class DockerBuildError(Exception):
+    """Exception raised when a Docker build fails."""
+    pass
+
 def test_trueish(value):
     if not value:
         return False
@@ -63,10 +67,11 @@ def build_docker_image(docker_api, build_path, image_name, dockerfile, **kwargs)
     stream = docker_api.build(path=build_path, tag=image_name, dockerfile=dockerfile,
                               decode=True, **kwargs)
     for chunk in stream:
-        if 'stream' in chunk:
+        if 'error' in chunk:
+            raise DockerBuildError(chunk['error'])
+        elif 'stream' in chunk:
             for line in chunk['stream'].splitlines():
                 print(line)
-
 
 def extract_binary_info_from_image_config(config, env):
     entrypoint = config['Entrypoint'] or []
@@ -451,8 +456,11 @@ def gsc_build(args):
     handle_redhat_repo_configs(distro, tmp_build_path)
     handle_suse_repo_configs(distro, tmp_build_path)
 
-    build_docker_image(docker_socket.api, tmp_build_path, unsigned_image_name, 'Dockerfile.build',
+    try:
+        build_docker_image(docker_socket.api, tmp_build_path, unsigned_image_name, 'Dockerfile.build',
                        rm=args.rm, nocache=args.no_cache, buildargs=extract_build_args(args))
+    except DockerBuildError as e:
+        sys.exit(f"Docker build failed: {e}")
 
     # Check if docker build failed
     if get_docker_image(docker_socket, unsigned_image_name) is None:
@@ -524,8 +532,11 @@ def gsc_build_gramine(args):
     handle_redhat_repo_configs(distro, tmp_build_path)
     handle_suse_repo_configs(distro, tmp_build_path)
 
-    build_docker_image(docker_socket.api, tmp_build_path, gramine_image_name, 'Dockerfile.compile',
-                       rm=args.rm, nocache=args.no_cache, buildargs=extract_build_args(args))
+    try:
+        build_docker_image(docker_socket.api, tmp_build_path, gramine_image_name,
+            'Dockerfile.compile', rm=args.rm, nocache=args.no_cache, buildargs=extract_build_args(args))
+    except DockerBuildError as e:
+        sys.exit(f"Docker build failed: {e}")
 
     # Check if docker build failed
     if get_docker_image(docker_socket, gramine_image_name) is None:
@@ -585,6 +596,8 @@ def gsc_sign_image(args):
         build_docker_image(docker_socket.api, tmp_build_path, signed_image_name, 'Dockerfile.sign',
                            forcerm=True, buildargs={'passphrase': args.passphrase,
                            'BUILD_ID': build_id})
+    except DockerBuildError as e:
+        sys.exit(f"Docker build failed: {e}")
     finally:
         os.remove(tmp_build_key_path)
         # Remove a temporary image created during multistage docker build to save disk space.
